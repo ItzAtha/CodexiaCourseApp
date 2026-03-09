@@ -6,7 +6,9 @@ import 'package:codexia_course_learning/features/home/views/home_page.dart';
 import 'package:codexia_course_learning/services/auth_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
+import 'package:shared_preferences_android/shared_preferences_android.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,6 +20,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool rememberMe = false;
   bool passwordVisible = false;
+  late SharedPreferencesAsync sharedPreferences;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -45,9 +48,27 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    const SharedPreferencesAsyncAndroidOptions options =
+        SharedPreferencesAsyncAndroidOptions(
+          backend: SharedPreferencesAndroidBackendLibrary.SharedPreferences,
+          originalSharedPreferencesOptions:
+              AndroidSharedPreferencesStoreOptions(fileName: 'auth_prefs'),
+        );
+
+    sharedPreferences = SharedPreferencesAsync(options: options);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0.0),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+        forceMaterialTransparency: true,
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(24.0),
         child: Center(
@@ -198,9 +219,12 @@ class _LoginPageState extends State<LoginPage> {
                     child: Checkbox(
                       value: rememberMe,
                       onChanged: (value) {
-                        setState(() {
-                          // TODO: Handle remember me logic here
+                        setState(() async {
                           rememberMe = value ?? false;
+                          await sharedPreferences.setBool(
+                            'rememberMe',
+                            rememberMe,
+                          );
                         });
                       },
                     ),
@@ -222,7 +246,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   if (formKey.currentState!.validate()) {
                     final userDoc = await FirebaseFirestore.instance
-                        .collection('users')
+                        .collection('Users')
                         .doc(emailController.text)
                         .get();
 
@@ -285,7 +309,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       description: Text(
-                        "Welcome back, ${userDoc['name']}!",
+                        "Welcome back, ${userCredential.user?.displayName}!",
                         style: TextStyle(color: Colors.white),
                       ),
                       type: ToastificationType.success,
@@ -312,7 +336,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   Text(
-                    "or login with",
+                    "or",
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey.shade600),
                   ),
