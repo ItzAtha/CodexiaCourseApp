@@ -1,14 +1,15 @@
 import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:codexia_course_learning/features/auth/views/register_page.dart';
-import 'package:codexia_course_learning/features/auth/views/reset_password_page.dart';
-import 'package:codexia_course_learning/features/home/views/home_page.dart';
-import 'package:codexia_course_learning/services/auth_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
+
+import './register_page.dart';
+import './reset_password_page.dart';
+import '../../home/views/home_page.dart';
+import '../../../services/auth_services.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -309,7 +310,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       description: Text(
-                        "Welcome back, ${userCredential.user?.displayName}!",
+                        "Welcome back, ${userDoc['displayName']}!",
                         style: TextStyle(color: Colors.white),
                       ),
                       type: ToastificationType.success,
