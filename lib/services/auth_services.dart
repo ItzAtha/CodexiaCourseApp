@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:codexia_course_learning/manager/firebase_manager.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+import '../manager/firebase_manager.dart';
 
 class AuthService {
   final GoogleSignIn _googleAuth = GoogleSignIn.instance;
@@ -21,12 +22,7 @@ class AuthService {
       UserCredential userCredential = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
 
-      await _addCredentialToFirestore(userCredential);
-
-      FirebaseManager firebaseManager = FirebaseManager();
-      await firebaseManager.updateData('Users', userCredential.user!.email!, {
-        'displayName': displayName,
-      });
+      await _addCredentialToFirestore(userCredential, displayName);
       return userCredential;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
@@ -88,13 +84,9 @@ class AuthService {
 
       GoogleSignInClientAuthorization? clientAuth = await googleUser
           .authorizationClient
-          .authorizationForScopes(scopes);
+          .authorizeScopes(scopes);
 
-      clientAuth ??= await googleUser.authorizationClient.authorizeScopes(
-        scopes,
-      );
       final String accessToken = clientAuth.accessToken;
-
       final AuthCredential credential = GoogleAuthProvider.credential(
         idToken: idToken,
         accessToken: accessToken,
@@ -140,6 +132,27 @@ class AuthService {
     return null;
   }
 
+  Future<bool> resetPassword(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      return true;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        _errorMessage = "No user found with this email address.";
+      } else if (e.code == 'invalid-email') {
+        _errorMessage = "The email address is not valid.";
+      } else {
+        _errorMessage =
+            e.message ?? 'An unknown error occurred during password reset.';
+      }
+      print('Password reset failed: ${e.message}');
+    } catch (e) {
+      _errorMessage = 'An unknown error occurred during password reset.';
+      print('An error occurred during password reset: $e');
+    }
+    return false;
+  }
+
   Future<bool> signOut() async {
     try {
       await _googleAuth.signOut();
@@ -151,22 +164,27 @@ class AuthService {
     return false;
   }
 
-  Future<void> _addCredentialToFirestore(UserCredential userCredential) async {
+  Future<void> _addCredentialToFirestore(
+    UserCredential userCredential, [
+    String? displayName = "Anonym User",
+  ]) async {
     FirebaseManager firebaseManager = FirebaseManager();
+    UserInfo userInfo = userCredential.user!.providerData.first;
+
     Map<String, dynamic>? existingUserData = await firebaseManager.getData(
       "Users",
-      userCredential.user!.email!,
+      userInfo.email!,
     );
 
     if (existingUserData == null) {
-      await firebaseManager.addData("Users", userCredential.user!.email!, {
-        "email": userCredential.user!.email!,
-        "displayName": userCredential.user!.displayName ?? "Unknown User",
+      await firebaseManager.addData("Users", userInfo.email!, {
+        "email": userInfo.email!,
+        "displayName": userInfo.displayName ?? displayName,
         "createdAt": DateTime.now().toIso8601String(),
         "lastSignIn": DateTime.now().toIso8601String(),
       });
     } else {
-      await firebaseManager.addData("Users", userCredential.user!.email!, {
+      await firebaseManager.addData("Users", userInfo.email!, {
         "lastSignIn": DateTime.now().toIso8601String(),
       }, SetOptions(merge: true));
     }
