@@ -12,7 +12,6 @@ class AuthenticationGate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_title)),
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -20,7 +19,7 @@ class AuthenticationGate extends StatelessWidget {
             return const HomePage();
           }
 
-          return const OpeningPage();
+          return OpeningPage(title: _title);
         },
       ),
     );
