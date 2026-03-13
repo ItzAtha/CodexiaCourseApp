@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'views/opening_page.dart';
-import '../home/views/home_page.dart';
+import '../home/dashboard_page.dart';
 
 class AuthenticationGate extends StatelessWidget {
   final String _title;
@@ -16,7 +16,7 @@ class AuthenticationGate extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return const HomePage();
+            return const DashboardPage();
           }
 
           return OpeningPage(title: _title);
