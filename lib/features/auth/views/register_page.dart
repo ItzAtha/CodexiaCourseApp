@@ -8,7 +8,7 @@ import 'package:toastification/toastification.dart';
 
 import '../../../manager/firebase_manager.dart';
 import '../../../services/auth_services.dart';
-import '../../home/views/home_page.dart';
+import '../../home/dashboard_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -33,7 +33,7 @@ class _RegisterPageState extends State<RegisterPage> {
       PageRouteBuilder(
         reverseTransitionDuration: Duration(milliseconds: 500),
         transitionDuration: Duration(milliseconds: 500),
-        pageBuilder: (context, animation, secondaryAnimation) => HomePage(),
+        pageBuilder: (context, animation, secondaryAnimation) => DashboardPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeThroughTransition(
             animation: animation,
