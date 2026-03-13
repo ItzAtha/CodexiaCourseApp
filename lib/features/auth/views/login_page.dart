@@ -8,7 +8,7 @@ import 'package:shared_preferences_android/shared_preferences_android.dart';
 
 import './register_page.dart';
 import './reset_password_page.dart';
-import '../../home/views/home_page.dart';
+import '../../home/dashboard_page.dart';
 import '../../../services/auth_services.dart';
 
 class LoginPage extends StatefulWidget {
@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
       PageRouteBuilder(
         reverseTransitionDuration: Duration(milliseconds: 500),
         transitionDuration: Duration(milliseconds: 500),
-        pageBuilder: (context, animation, secondaryAnimation) => HomePage(),
+        pageBuilder: (context, animation, secondaryAnimation) => DashboardPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeThroughTransition(
             animation: animation,
