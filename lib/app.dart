@@ -25,12 +25,18 @@ class _MyAppState extends State<MyApp> {
 
     lightTheme = ThemeData(
       useMaterial3: true,
-      appBarTheme: AppBarTheme(backgroundColor: Colors.blue.shade400),
+      scaffoldBackgroundColor: Color(0xFFF5F6FA),
+      searchBarTheme: SearchBarThemeData(
+        backgroundColor: WidgetStatePropertyAll(Color(0xFFFCFBFB)),
+      ),
     );
 
     darkTheme = ThemeData(
       useMaterial3: true,
-      appBarTheme: AppBarTheme(backgroundColor: Colors.blue),
+      scaffoldBackgroundColor: Color(0xFFF5F6FA),
+      searchBarTheme: SearchBarThemeData(
+        backgroundColor: WidgetStatePropertyAll(Color(0xFFFCFBFB)),
+      ),
     );
   }
 
