@@ -1,12 +1,15 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 class BottomNavbar extends StatefulWidget {
-  const BottomNavbar({super.key, required void Function(int) onItemSelected})
-    : _onItemSelected = onItemSelected;
+  const BottomNavbar({
+    super.key,
+    required void Function(int) onItemSelected,
+    required ValueNotifier<int> onItemSelectedNotifier,
+  }) : _onItemSelectedNotifier = onItemSelectedNotifier,
+       _onItemSelected = onItemSelected;
 
   final ValueChanged<int> _onItemSelected;
+  final ValueNotifier<int> _onItemSelectedNotifier;
 
   @override
   State<StatefulWidget> createState() => _BottomNavbarState();
@@ -17,58 +20,65 @@ class _BottomNavbarState extends State<BottomNavbar> {
 
   @override
   Widget build(BuildContext context) {
-    return BottomAppBar(
-      color: Color(0xFF0984E3),
-      shape: const CircularNotchedRectangle(),
-      clipBehavior: Clip.hardEdge,
-      notchMargin: 8.0,
-      height: 60.0,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          BottomNavbarItem(
-            index: 0,
-            currentIndex: selectedIndex,
-            label: "Home",
-            icon: Icons.home,
-            onPress: (index) {
-              setState(() => selectedIndex.value = index);
-              widget._onItemSelected(index);
-            },
-          ).buildWidget(),
-          BottomNavbarItem(
-            index: 1,
-            currentIndex: selectedIndex,
-            label: "Course",
-            icon: Icons.book,
-            onPress: (index) {
-              setState(() => selectedIndex.value = index);
-              widget._onItemSelected(index);
-            },
-          ).buildWidget(),
-          SizedBox(width: 15.0),
-          BottomNavbarItem(
-            index: 2,
-            currentIndex: selectedIndex,
-            label: "Community",
-            icon: Icons.people,
-            onPress: (index) {
-              setState(() => selectedIndex.value = index);
-              widget._onItemSelected(index);
-            },
-          ).buildWidget(),
-          BottomNavbarItem(
-            index: 3,
-            currentIndex: selectedIndex,
-            label: "Settings",
-            icon: Icons.settings,
-            onPress: (index) {
-              setState(() => selectedIndex.value = index);
-              widget._onItemSelected(index);
-            },
-          ).buildWidget(),
-        ],
-      ),
+    return ValueListenableBuilder(
+      valueListenable: widget._onItemSelectedNotifier,
+      builder: (context, value, child) {
+        selectedIndex.value = value;
+
+        return BottomAppBar(
+          color: Color(0xFF0984E3),
+          shape: const CircularNotchedRectangle(),
+          clipBehavior: Clip.hardEdge,
+          notchMargin: 8.0,
+          height: 60.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              BottomNavbarItem(
+                index: 0,
+                currentIndex: selectedIndex,
+                label: "Home",
+                icon: Icons.home,
+                onPress: (index) {
+                  setState(() => selectedIndex.value = index);
+                  widget._onItemSelected(index);
+                },
+              ).build(),
+              BottomNavbarItem(
+                index: 1,
+                currentIndex: selectedIndex,
+                label: "Course",
+                icon: Icons.book,
+                onPress: (index) {
+                  setState(() => selectedIndex.value = index);
+                  widget._onItemSelected(index);
+                },
+              ).build(),
+              SizedBox(width: 15.0),
+              BottomNavbarItem(
+                index: 2,
+                currentIndex: selectedIndex,
+                label: "Community",
+                icon: Icons.people,
+                onPress: (index) {
+                  setState(() => selectedIndex.value = index);
+                  widget._onItemSelected(index);
+                },
+              ).build(),
+              BottomNavbarItem(
+                index: 3,
+                currentIndex: selectedIndex,
+                label: "Settings",
+                icon: Icons.settings,
+                onPress: (index) {
+                  setState(() => selectedIndex.value = index);
+                  widget._onItemSelected(index);
+                },
+              ).build(),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -88,7 +98,7 @@ class BottomNavbarItem {
     required this.onPress,
   });
 
-  Widget buildWidget() {
+  Widget build() {
     return Center(
       child: Container(
         width: 20,
