@@ -1,6 +1,23 @@
-import 'package:codexia_course_learning/features/home/models/course_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../home/models/course_card.dart';
+import '../../course/foundation/java/java_course.dart';
+import '../../course/foundation/python/python_course.dart';
+import '../../course/foundation/web/web_course.dart';
+import '../../course/foundation/php/php_course.dart';
+import '../../course/foundation/c/cpp_course.dart';
+import '../../course/foundation/dart/dart_course.dart';
+import '../../course/foundation/arduino/arduino_course.dart';
+import '../../course/database/sql/sql_course.dart';
+import '../../course/database/prisma/prisma_course.dart';
+import '../../course/framework/spring/spring_course.dart';
+import '../../course/framework/django/django_course.dart';
+import '../../course/framework/laravel/laravel_course.dart';
+import '../../course/framework/reactjs/reactjs_course.dart';
+import '../../course/framework/nextjs/nextjs_course.dart';
+import '../../course/framework/expressjs/expressjs_course.dart';
+import '../../course/framework/flutter/flutter_course.dart';
+import '../../course/framework/platformio/platformio_course.dart';
 
 class CoursePage extends StatefulWidget {
   const CoursePage({super.key});
@@ -15,113 +32,197 @@ class _CoursePageState extends State<CoursePage> {
   final courseCardList = {
     "Programming Foundations": [
       CourseCard(
-          title: "Java Development",
-          description: "Learn Java programming and its applications in various domains.",
-          overview: "In this course, you will learn the fundamentals of Java programming language, including syntax, object-oriented programming concepts, and how to build applications using Java. Whether you're a beginner or looking to enhance your Java skills, this course will provide you with the knowledge and practical experience needed to succeed in Java development.",
-        courseImage: "java.svg"
-      ).create(),
+        title: "Java Development",
+        description:
+            "Learn Java programming and its applications in various domains.",
+        overview:
+            "In this course, you will learn the fundamentals of Java programming language, including syntax, object-oriented programming concepts, and how to build applications using Java. Whether you're a beginner or looking to enhance your Java skills, this course will provide you with the knowledge and practical experience needed to succeed in Java development.",
+        courseImage: "java.svg",
+        courseMenu: JavaCourse(),
+      ),
       CourseCard(
-          title: "Python Development",
-          description: "Learn Python programming and its applications in various domains.",
-          overview: "In this course, you will learn the fundamentals of Python programming language, including syntax, data structures, and how to build applications using Python. Whether you're a beginner or looking to enhance your Python skills, this course will provide you with the knowledge and practical experience needed to succeed in Python development.",
-          courseImage: "python.svg"
-      ).create(),
+        title: "Python Development",
+        description:
+            "Learn Python programming and its applications in various domains.",
+        overview:
+            "In this course, you will learn the fundamentals of Python programming language, including syntax, data structures, and how to build applications using Python. Whether you're a beginner or looking to enhance your Python skills, this course will provide you with the knowledge and practical experience needed to succeed in Python development.",
+        courseImage: "python.svg",
+        courseMenu: PythonCourse(),
+      ),
       CourseCard(
-          title: "Web Development",
-          description: "Learn how to build modern and responsive websites using HTML, CSS, and JavaScript.",
-          overview: "In this course, you will learn the fundamentals of web development, including HTML for structuring web pages, CSS for styling, and JavaScript for adding interactivity. Whether you're a beginner or looking to enhance your web development skills, this course will provide you with the knowledge and practical experience needed to build modern and responsive websites.",
-          courseImage: "web.svg"
-      ).create(),
+        title: "Web Development",
+        description:
+            "Learn how to build modern and responsive websites using HTML, CSS, and JavaScript.",
+        overview:
+            "In this course, you will learn the fundamentals of web development, including HTML for structuring web pages, CSS for styling, and JavaScript for adding interactivity. Whether you're a beginner or looking to enhance your web development skills, this course will provide you with the knowledge and practical experience needed to build modern and responsive websites.",
+        courseImage: "web.svg",
+        courseMenu: WebCourse(),
+      ),
       CourseCard(
-          title: "PHP Development",
-          description: "Learn PHP programming and its applications in web development.",
-          overview: "In this course, you will learn the fundamentals of PHP programming language, including syntax, data structures, and how to build web applications using PHP. Whether you're a beginner or looking to enhance your PHP skills, this course will provide you with the knowledge and practical experience needed to succeed in PHP development.",
-          courseImage: "php.svg"
-      ).create(),
+        title: "PHP Development",
+        description:
+            "Learn PHP programming and its applications in web development.",
+        overview:
+            "In this course, you will learn the fundamentals of PHP programming language, including syntax, data structures, and how to build web applications using PHP. Whether you're a beginner or looking to enhance your PHP skills, this course will provide you with the knowledge and practical experience needed to succeed in PHP development.",
+        courseImage: "php.svg",
+        courseMenu: PHPCourse(),
+      ),
       CourseCard(
-          title: "C Family Development",
-          description: "Learn C, C++, and C# programming languages and their applications in various domains.",
-          overview: "In this course, you will learn the fundamentals of C, C++, and C# programming languages, including syntax, data structures, and how to build applications using these languages. Whether you're a beginner or looking to enhance your skills in C, C++, or C#, this course will provide you with the knowledge and practical experience needed to succeed in development using these languages.",
-          courseImage: "c.svg"
-      ).create(),
+        title: "C/C++/C# Development",
+        description:
+            "Learn C, C++, and C# programming languages and their applications in various domains.",
+        overview:
+            "In this course, you will learn the fundamentals of C, C++, and C# programming languages, including syntax, data structures, and how to build applications using these languages. Whether you're a beginner or looking to enhance your skills in C, C++, or C#, this course will provide you with the knowledge and practical experience needed to succeed in development using these languages.",
+        courseImage: "c.svg",
+        courseMenu: CPPCourse(),
+      ),
       CourseCard(
         title: "Dart Development",
-        description: "Learn Dart programming and its applications in Flutter development.",
-        overview: "In this course, you will learn the fundamentals of Dart programming language, including syntax, data structures, and how to build applications using Dart. Whether you're a beginner or looking to enhance your Dart skills, this course will provide you with the knowledge and practical experience needed to succeed in Dart development, especially in the context of Flutter framework development.",
-        courseImage: "dart.svg"
-      ).create(),
+        description:
+            "Learn Dart programming and its applications in Flutter development.",
+        overview:
+            "In this course, you will learn the fundamentals of Dart programming language, including syntax, data structures, and how to build applications using Dart. Whether you're a beginner or looking to enhance your Dart skills, this course will provide you with the knowledge and practical experience needed to succeed in Dart development, especially in the context of Flutter framework development.",
+        courseImage: "dart.svg",
+        courseMenu: DartCourse(),
+      ),
       CourseCard(
-          title: "Arduino Development",
-          description: "Learn how to build interactive projects and prototypes using Arduino microcontroller platform.",
-          overview: "In this course, you will learn the fundamentals of Arduino development, including programming the Arduino board, working with sensors and actuators, and building interactive projects. Whether you're a beginner or looking to enhance your skills in Arduino development, this course will provide you with the knowledge and practical experience needed to create innovative projects using the Arduino platform.",
-          courseImage: "arduino.svg"
-      ).create(),
+        title: "Arduino Development",
+        description:
+            "Learn how to build interactive projects and prototypes using Arduino microcontroller platform.",
+        overview:
+            "In this course, you will learn the fundamentals of Arduino development, including programming the Arduino board, working with sensors and actuators, and building interactive projects. Whether you're a beginner or looking to enhance your skills in Arduino development, this course will provide you with the knowledge and practical experience needed to create innovative projects using the Arduino platform.",
+        courseImage: "arduino.svg",
+        courseMenu: ArduinoCourse(),
+      ),
     ],
     "Database Structures": [
       CourseCard(
         title: "SQL Database",
-        description: "Learn how to design and manage relational databases using SQL.",
-        overview: "In this course, you will learn the fundamentals of SQL databases, including database design, querying, and management using SQL. Whether you're a beginner or looking to enhance your SQL skills, this course will provide you with the knowledge and practical experience needed to succeed in SQL database development.",
-        courseImage: "sql.svg"
-      ).create(),
+        description:
+            "Learn how to design and manage relational databases using SQL.",
+        overview:
+            "In this course, you will learn the fundamentals of SQL databases, including database design, querying, and management using SQL. Whether you're a beginner or looking to enhance your SQL skills, this course will provide you with the knowledge and practical experience needed to succeed in SQL database development.",
+        courseImage: "sql.svg",
+        courseMenu: SQLCourse(),
+      ),
       CourseCard(
         title: "Prisma Database",
-        description: "Learn how to design and manage databases using Prisma ORM.",
-        overview: "In this course, you will learn the fundamentals of Prisma database development, including database design, querying, and management using Prisma ORM. Whether you're a beginner or looking to enhance your Prisma skills, this course will provide you with the knowledge and practical experience needed to succeed in Prisma database development.",
-        courseImage: "prisma.svg"
-      ).create(),
+        description:
+            "Learn how to design and manage databases using Prisma ORM.",
+        overview:
+            "In this course, you will learn the fundamentals of Prisma database development, including database design, querying, and management using Prisma ORM. Whether you're a beginner or looking to enhance your Prisma skills, this course will provide you with the knowledge and practical experience needed to succeed in Prisma database development.",
+        courseImage: "prisma.svg",
+        courseMenu: PrismaCourse(),
+      ),
     ],
     "Framework Development": [
       CourseCard(
         title: "Spring Framework",
-        description: "Learn how to build enterprise-level applications using the Spring Java framework.",
-        overview: "In this course, you will learn the fundamentals of Spring framework development, including Java programming language, Spring architecture, dependency injection, and how to build enterprise-level applications using the Spring Java framework. Whether you're a beginner or looking to enhance your Spring skills, this course will provide you with the knowledge and practical experience needed to succeed in Spring framework development.",
-        courseImage: "spring.svg"
-      ).create(),
+        description:
+            "Learn how to build enterprise-level applications using the Spring Java framework.",
+        overview:
+            "In this course, you will learn the fundamentals of Spring framework development, including Java programming language, Spring architecture, dependency injection, and how to build enterprise-level applications using the Spring Java framework. Whether you're a beginner or looking to enhance your Spring skills, this course will provide you with the knowledge and practical experience needed to succeed in Spring framework development.",
+        courseImage: "spring.svg",
+        courseMenu: SpringCourse(),
+      ),
       CourseCard(
         title: "Django Framework",
-        description: "Learn how to build secure and scalable web applications using the Django Python framework.",
-        overview: "In this course, you will learn the fundamentals of Django framework development, including Python programming language, Django architecture, routing, database management, and how to build secure and scalable web applications using the Django Python framework. Whether you're a beginner or looking to enhance your Django skills, this course will provide you with the knowledge and practical experience needed to succeed in Django framework development.",
-        courseImage: "django.svg"
-      ).create(),
+        description:
+            "Learn how to build secure and scalable web applications using the Django Python framework.",
+        overview:
+            "In this course, you will learn the fundamentals of Django framework development, including Python programming language, Django architecture, routing, database management, and how to build secure and scalable web applications using the Django Python framework. Whether you're a beginner or looking to enhance your Django skills, this course will provide you with the knowledge and practical experience needed to succeed in Django framework development.",
+        courseImage: "django.svg",
+        courseMenu: DjangoCourse(),
+      ),
       CourseCard(
         title: "Laravel Framework",
-        description: "Learn how to build robust and scalable web applications using the Laravel PHP framework.",
-        overview: "In this course, you will learn the fundamentals of Laravel framework development, including PHP programming language, Laravel architecture, routing, database management, and how to build robust and scalable web applications using the Laravel PHP framework. Whether you're a beginner or looking to enhance your Laravel skills, this course will provide you with the knowledge and practical experience needed to succeed in Laravel framework development.",
-        courseImage: "laravel.svg"
-      ).create(),
+        description:
+            "Learn how to build robust and scalable web applications using the Laravel PHP framework.",
+        overview:
+            "In this course, you will learn the fundamentals of Laravel framework development, including PHP programming language, Laravel architecture, routing, database management, and how to build robust and scalable web applications using the Laravel PHP framework. Whether you're a beginner or looking to enhance your Laravel skills, this course will provide you with the knowledge and practical experience needed to succeed in Laravel framework development.",
+        courseImage: "laravel.svg",
+        courseMenu: LaravelCourse(),
+      ),
       CourseCard(
         title: "React JS Library",
-        description: "Learn how to build dynamic and interactive web applications using the React JS library.",
-        overview: "In this course, you will learn the fundamentals of React JS development, including JSX syntax, component-based architecture, state management, and how to build dynamic and interactive web applications using the React JS library. Whether you're a beginner or looking to enhance your React JS skills, this course will provide you with the knowledge and practical experience needed to succeed in React JS development.",
-        courseImage: "reactjs.svg"
-      ).create(),
+        description:
+            "Learn how to build dynamic and interactive web applications using the React JS library.",
+        overview:
+            "In this course, you will learn the fundamentals of React JS development, including JSX syntax, component-based architecture, state management, and how to build dynamic and interactive web applications using the React JS library. Whether you're a beginner or looking to enhance your React JS skills, this course will provide you with the knowledge and practical experience needed to succeed in React JS development.",
+        courseImage: "reactjs.svg",
+        courseMenu: ReactJSCourse(),
+      ),
       CourseCard(
-          title: "Next JS Framework",
-          description: "Learn how to build server-rendered React applications using the Next JS framework.",
-          overview: "In this course, you will learn the fundamentals of Next JS framework development, including JavaScript programming language, Next JS architecture, routing, server-side rendering, and how to build server-rendered React applications using the Next JS framework. Whether you're a beginner or looking to enhance your Next JS skills, this course will provide you with the knowledge and practical experience needed to succeed in Next JS framework development.",
-          courseImage: "nextjs.svg"
-      ).create(),
+        title: "Next JS Framework",
+        description:
+            "Learn how to build server-rendered React applications using the Next JS framework.",
+        overview:
+            "In this course, you will learn the fundamentals of Next JS framework development, including JavaScript programming language, Next JS architecture, routing, server-side rendering, and how to build server-rendered React applications using the Next JS framework. Whether you're a beginner or looking to enhance your Next JS skills, this course will provide you with the knowledge and practical experience needed to succeed in Next JS framework development.",
+        courseImage: "nextjs.svg",
+        courseMenu: NextJSCourse(),
+      ),
       CourseCard(
         title: "Express JS Framework",
-        description: "Learn how to build fast and scalable web applications using the Express JS framework.",
-        overview: "In this course, you will learn the fundamentals of Express JS development, including JavaScript programming language, Express architecture, routing, middleware, and how to build fast and scalable web applications using the Express JS framework. Whether you're a beginner or looking to enhance your Express JS skills, this course will provide you with the knowledge and practical experience needed to succeed in Express JS development.",
-        courseImage: "express.svg"
-      ).create(),
+        description:
+            "Learn how to build fast and scalable web applications using the Express JS framework.",
+        overview:
+            "In this course, you will learn the fundamentals of Express JS development, including JavaScript programming language, Express architecture, routing, middleware, and how to build fast and scalable web applications using the Express JS framework. Whether you're a beginner or looking to enhance your Express JS skills, this course will provide you with the knowledge and practical experience needed to succeed in Express JS development.",
+        courseImage: "express.svg",
+        courseMenu: ExpressJSCourse(),
+      ),
       CourseCard(
         title: "Flutter Framework",
-        description: "Learn how to build beautiful and performant mobile apps using the Flutter framework.",
-        overview: "In this course, you will learn the fundamentals of Flutter framework development, including Dart programming language, Flutter widgets, state management, and how to build cross-platform mobile applications using Flutter. Whether you're a beginner or looking to enhance your Flutter skills, this course will provide you with the knowledge and practical experience needed to succeed in Flutter framework development.",
-        courseImage: "flutter.svg"
-      ).create(),
+        description:
+            "Learn how to build beautiful and performant mobile apps using the Flutter framework.",
+        overview:
+            "In this course, you will learn the fundamentals of Flutter framework development, including Dart programming language, Flutter widgets, state management, and how to build cross-platform mobile applications using Flutter. Whether you're a beginner or looking to enhance your Flutter skills, this course will provide you with the knowledge and practical experience needed to succeed in Flutter framework development.",
+        courseImage: "flutter.svg",
+        courseMenu: FlutterCourse(),
+      ),
       CourseCard(
         title: "Arduino with PlatformIO",
-        description: "Learn how to build interactive projects and prototypes using Arduino with PlatformIO IDE.",
-        overview: "In this course, you will learn the fundamentals of Arduino development using PlatformIO IDE, including programming the Arduino board, working with sensors and actuators, and building interactive projects. Whether you're a beginner or looking to enhance your skills in Arduino development with PlatformIO, this course will provide you with the knowledge and practical experience needed to create innovative projects using the Arduino platform with PlatformIO IDE.",
-        courseImage: "platformio.svg"
-      ).create(),
-    ]
+        description:
+            "Learn how to build interactive projects and prototypes using Arduino with PlatformIO IDE.",
+        overview:
+            "In this course, you will learn the fundamentals of Arduino development using PlatformIO IDE, including programming the Arduino board, working with sensors and actuators, and building interactive projects. Whether you're a beginner or looking to enhance your skills in Arduino development with PlatformIO, this course will provide you with the knowledge and practical experience needed to create innovative projects using the Arduino platform with PlatformIO IDE.",
+        courseImage: "platformio.svg",
+        courseMenu: PlatformIOCourse(),
+      ),
+    ],
   };
+  final filteredList = {};
+
+  void filterList(String search) {
+    List<CourseCard> filteredCourseList = [];
+
+    courseCardList.forEach((key, value) {
+      for (var element in value) {
+        if (element.title.toLowerCase().contains(search.toLowerCase())) {
+          filteredCourseList.add(element);
+          print(element.title);
+        }
+      }
+
+      setState(() {
+        filteredList.addAll({key: filteredCourseList});
+        filteredCourseList = [];
+        });
+    });
+
+    filteredList.forEach((key, value) {
+      print(key);
+      for (var element in value) {
+        print(element.title);
+      }
+    });
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    filteredList.addAll(courseCardList);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +250,7 @@ class _CoursePageState extends State<CoursePage> {
                         onChanged: (value) {
                           // Handle search input change
                           print("Search input: $value");
+                          filterList(value);
                         },
                       ),
                     ),
@@ -399,16 +501,20 @@ class _CoursePageState extends State<CoursePage> {
                       ),
                     ),
                     SizedBox(height: 10.0),
-                    ...courseCardList["Programming Foundations"]!,
+                    for (var element
+                        in filteredList["Programming Foundations"]!)
+                      element.create(),
                     SizedBox(height: 30.0),
-                    Text("Database Structures",
+                    Text(
+                      "Database Structures",
                       style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     SizedBox(height: 10.0),
-                    ...courseCardList["Database Structures"]!,
+                    for (var element in filteredList["Database Structures"]!)
+                      element.create(),
                     SizedBox(height: 30.0),
                     Text(
                       "Framework Development",
@@ -418,206 +524,13 @@ class _CoursePageState extends State<CoursePage> {
                       ),
                     ),
                     SizedBox(height: 10.0),
-                    ...courseCardList["Framework Development"]!,
+                    for (var element
+                        in filteredList["Framework Development"]!)
+                      element.create(),
                     SizedBox(height: 10.0),
                   ],
                 ),
               ),
-              // Expanded(
-              //   child: ListView(
-              //     children: <Widget>[
-              //       Text(
-              //         "Beginner Courses",
-              //         style: TextStyle(
-              //           fontSize: 18.0,
-              //           fontWeight: FontWeight.bold,
-              //         ),
-              //       ),
-              //       SizedBox(height: 10.0),
-              //       Card(
-              //         elevation: 4.0,
-              //         clipBehavior: Clip.hardEdge,
-              //         shape: RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.circular(15.0),
-              //         ),
-              //         child: ListTile(
-              //           leading: CircleAvatar(
-              //             radius: 20.0,
-              //             backgroundImage: NetworkImage(
-              //               "https://cdn-icons-png.flaticon.com/128/5968/5968350.png",
-              //             ),
-              //           ),
-              //           title: Text("Flutter for Beginners"),
-              //           subtitle: Text(
-              //             "Learn the basics of Flutter development.",
-              //           ),
-              //           trailing: const Icon(
-              //             Icons.arrow_forward_ios,
-              //             size: 16.0,
-              //           ),
-              //           onTap: () {
-              //             // Handle course tap
-              //             print("Tapped on Flutter for Beginners");
-              //           },
-              //         ),
-              //       ),
-              //       SizedBox(height: 10.0),
-              //       Card(
-              //         elevation: 4.0,
-              //         clipBehavior: Clip.hardEdge,
-              //         shape: RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.circular(15.0),
-              //         ),
-              //         child: ListTile(
-              //           leading: CircleAvatar(
-              //             radius: 20.0,
-              //             backgroundImage: NetworkImage(
-              //               "https://cdn-icons-png.flaticon.com/128/5968/5968350.png",
-              //             ),
-              //           ),
-              //           title: Text("Dart Programming"),
-              //           subtitle: Text("Master the Dart programming language."),
-              //           trailing: const Icon(
-              //             Icons.arrow_forward_ios,
-              //             size: 16.0,
-              //           ),
-              //           onTap: () {
-              //             // Handle course tap
-              //             print("Tapped on Dart Programming");
-              //           },
-              //         ),
-              //       ),
-              //       SizedBox(height: 20.0),
-              //       Text(
-              //         "Intermediate Courses",
-              //         style: TextStyle(
-              //           fontSize: 18.0,
-              //           fontWeight: FontWeight.bold,
-              //         ),
-              //       ),
-              //       SizedBox(height: 10.0),
-              //       Card(
-              //         elevation: 4.0,
-              //         clipBehavior: Clip.hardEdge,
-              //         shape: RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.circular(15.0),
-              //         ),
-              //         child: ListTile(
-              //           leading: CircleAvatar(
-              //             radius: 20.0,
-              //             backgroundImage: NetworkImage(
-              //               "https://cdn-icons-png.flaticon.com/128/5968/5968350.png",
-              //             ),
-              //           ),
-              //           title: Text("Flutter State Management"),
-              //           subtitle: Text(
-              //             "Explore various state management techniques in Flutter.",
-              //           ),
-              //           trailing: const Icon(
-              //             Icons.arrow_forward_ios,
-              //             size: 16.0,
-              //           ),
-              //           onTap: () {
-              //             // Handle course tap
-              //             print("Tapped on Flutter State Management");
-              //           },
-              //         ),
-              //       ),
-              //       SizedBox(height: 10.0),
-              //       Card(
-              //         elevation: 4.0,
-              //         clipBehavior: Clip.hardEdge,
-              //         shape: RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.circular(15.0),
-              //         ),
-              //         child: ListTile(
-              //           leading: CircleAvatar(
-              //             radius: 20.0,
-              //             backgroundImage: NetworkImage(
-              //               "https://cdn-icons-png.flaticon.com/128/5968/5968350.png",
-              //             ),
-              //           ),
-              //           title: Text("Flutter Animations"),
-              //           subtitle: Text(
-              //             "Learn how to create stunning animations in Flutter.",
-              //           ),
-              //           trailing: const Icon(
-              //             Icons.arrow_forward_ios,
-              //             size: 16.0,
-              //           ),
-              //           onTap: () {
-              //             // Handle course tap
-              //             print("Tapped on Flutter Animations");
-              //           },
-              //         ),
-              //       ),
-              //       SizedBox(height: 20.0),
-              //       Text(
-              //         "Expert Courses",
-              //         style: TextStyle(
-              //           fontSize: 18.0,
-              //           fontWeight: FontWeight.bold,
-              //         ),
-              //       ),
-              //       SizedBox(height: 10.0),
-              //       Card(
-              //         elevation: 4.0,
-              //         clipBehavior: Clip.hardEdge,
-              //         shape: RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.circular(15.0),
-              //         ),
-              //         child: ListTile(
-              //           leading: CircleAvatar(
-              //             radius: 20.0,
-              //             backgroundImage: NetworkImage(
-              //               "https://cdn-icons-png.flaticon.com/128/5968/5968350.png",
-              //             ),
-              //           ),
-              //           title: Text("Flutter Performance Optimization"),
-              //           subtitle: Text(
-              //             "Learn techniques to optimize the performance of your Flutter apps.",
-              //           ),
-              //           trailing: const Icon(
-              //             Icons.arrow_forward_ios,
-              //             size: 16.0,
-              //           ),
-              //           onTap: () {
-              //             // Handle course tap
-              //             print("Tapped on Flutter Performance Optimization");
-              //           },
-              //         ),
-              //       ),
-              //       SizedBox(height: 10.0),
-              //       Card(
-              //         elevation: 4.0,
-              //         clipBehavior: Clip.hardEdge,
-              //         shape: RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.circular(15.0),
-              //         ),
-              //         child: ListTile(
-              //           leading: CircleAvatar(
-              //             radius: 20.0,
-              //             backgroundImage: NetworkImage(
-              //               "https://cdn-icons-png.flaticon.com/128/5968/5968350.png",
-              //             ),
-              //           ),
-              //           title: Text("Flutter Architecture Patterns"),
-              //           subtitle: Text(
-              //             "Explore different architecture patterns for building scalable Flutter apps.",
-              //           ),
-              //           trailing: const Icon(
-              //             Icons.arrow_forward_ios,
-              //             size: 16.0,
-              //           ),
-              //           onTap: () {
-              //             // Handle course tap
-              //             print("Tapped on Flutter Architecture Patterns");
-              //           },
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
             ],
           ),
         ),
