@@ -29,6 +29,7 @@ class _MyAppState extends State<MyApp> {
       searchBarTheme: SearchBarThemeData(
         backgroundColor: WidgetStatePropertyAll(Color(0xFFFCFBFB)),
       ),
+      dividerColor: Colors.transparent,
     );
 
     darkTheme = ThemeData(
@@ -37,6 +38,7 @@ class _MyAppState extends State<MyApp> {
       searchBarTheme: SearchBarThemeData(
         backgroundColor: WidgetStatePropertyAll(Color(0xFFFCFBFB)),
       ),
+      dividerColor: Colors.transparent,
     );
   }
 
