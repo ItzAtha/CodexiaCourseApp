@@ -32,6 +32,7 @@ class _CoursePageState extends State<CoursePage> {
   final courseCardList = {
     "Programming Foundations": [
       CourseCard(
+        type: CardType.course,
         title: "Java Development",
         description:
             "Learn Java programming and its applications in various domains.",
@@ -41,6 +42,7 @@ class _CoursePageState extends State<CoursePage> {
         courseMenu: JavaCourse(),
       ),
       CourseCard(
+        type: CardType.course,
         title: "Python Development",
         description:
             "Learn Python programming and its applications in various domains.",
@@ -50,6 +52,7 @@ class _CoursePageState extends State<CoursePage> {
         courseMenu: PythonCourse(),
       ),
       CourseCard(
+        type: CardType.course,
         title: "Web Development",
         description:
             "Learn how to build modern and responsive websites using HTML, CSS, and JavaScript.",
@@ -59,6 +62,7 @@ class _CoursePageState extends State<CoursePage> {
         courseMenu: WebCourse(),
       ),
       CourseCard(
+        type: CardType.course,
         title: "PHP Development",
         description:
             "Learn PHP programming and its applications in web development.",
@@ -68,6 +72,7 @@ class _CoursePageState extends State<CoursePage> {
         courseMenu: PHPCourse(),
       ),
       CourseCard(
+        type: CardType.course,
         title: "C/C++/C# Development",
         description:
             "Learn C, C++, and C# programming languages and their applications in various domains.",
@@ -77,6 +82,7 @@ class _CoursePageState extends State<CoursePage> {
         courseMenu: CPPCourse(),
       ),
       CourseCard(
+        type: CardType.course,
         title: "Dart Development",
         description:
             "Learn Dart programming and its applications in Flutter development.",
@@ -86,6 +92,7 @@ class _CoursePageState extends State<CoursePage> {
         courseMenu: DartCourse(),
       ),
       CourseCard(
+        type: CardType.course,
         title: "Arduino Development",
         description:
             "Learn how to build interactive projects and prototypes using Arduino microcontroller platform.",
@@ -97,6 +104,7 @@ class _CoursePageState extends State<CoursePage> {
     ],
     "Database Structures": [
       CourseCard(
+        type: CardType.course,
         title: "SQL Database",
         description:
             "Learn how to design and manage relational databases using SQL.",
@@ -106,6 +114,7 @@ class _CoursePageState extends State<CoursePage> {
         courseMenu: SQLCourse(),
       ),
       CourseCard(
+        type: CardType.course,
         title: "Prisma Database",
         description:
             "Learn how to design and manage databases using Prisma ORM.",
@@ -117,6 +126,7 @@ class _CoursePageState extends State<CoursePage> {
     ],
     "Framework Development": [
       CourseCard(
+        type: CardType.course,
         title: "Spring Framework",
         description:
             "Learn how to build enterprise-level applications using the Spring Java framework.",
@@ -126,6 +136,7 @@ class _CoursePageState extends State<CoursePage> {
         courseMenu: SpringCourse(),
       ),
       CourseCard(
+        type: CardType.course,
         title: "Django Framework",
         description:
             "Learn how to build secure and scalable web applications using the Django Python framework.",
@@ -135,6 +146,7 @@ class _CoursePageState extends State<CoursePage> {
         courseMenu: DjangoCourse(),
       ),
       CourseCard(
+        type: CardType.course,
         title: "Laravel Framework",
         description:
             "Learn how to build robust and scalable web applications using the Laravel PHP framework.",
@@ -144,6 +156,7 @@ class _CoursePageState extends State<CoursePage> {
         courseMenu: LaravelCourse(),
       ),
       CourseCard(
+        type: CardType.course,
         title: "React JS Library",
         description:
             "Learn how to build dynamic and interactive web applications using the React JS library.",
@@ -153,6 +166,7 @@ class _CoursePageState extends State<CoursePage> {
         courseMenu: ReactJSCourse(),
       ),
       CourseCard(
+        type: CardType.course,
         title: "Next JS Framework",
         description:
             "Learn how to build server-rendered React applications using the Next JS framework.",
@@ -162,6 +176,7 @@ class _CoursePageState extends State<CoursePage> {
         courseMenu: NextJSCourse(),
       ),
       CourseCard(
+        type: CardType.course,
         title: "Express JS Framework",
         description:
             "Learn how to build fast and scalable web applications using the Express JS framework.",
@@ -171,6 +186,7 @@ class _CoursePageState extends State<CoursePage> {
         courseMenu: ExpressJSCourse(),
       ),
       CourseCard(
+        type: CardType.course,
         title: "Flutter Framework",
         description:
             "Learn how to build beautiful and performant mobile apps using the Flutter framework.",
@@ -180,6 +196,7 @@ class _CoursePageState extends State<CoursePage> {
         courseMenu: FlutterCourse(),
       ),
       CourseCard(
+        type: CardType.course,
         title: "Arduino with PlatformIO",
         description:
             "Learn how to build interactive projects and prototypes using Arduino with PlatformIO IDE.",
@@ -197,7 +214,7 @@ class _CoursePageState extends State<CoursePage> {
 
     courseCardList.forEach((key, value) {
       for (var element in value) {
-        if (element.title.toLowerCase().contains(search.toLowerCase())) {
+        if (element.title!.toLowerCase().contains(search.toLowerCase())) {
           filteredCourseList.add(element);
           print(element.title);
         }
