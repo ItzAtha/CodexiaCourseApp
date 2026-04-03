@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'services/auth_services.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
@@ -21,25 +22,28 @@ Future main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   const SharedPreferencesAsyncAndroidOptions options =
-  SharedPreferencesAsyncAndroidOptions(
-    backend: SharedPreferencesAndroidBackendLibrary.SharedPreferences,
-    originalSharedPreferencesOptions: AndroidSharedPreferencesStoreOptions(
-      fileName: 'auth_prefs',
-    ),
-  );
+      SharedPreferencesAsyncAndroidOptions(
+        backend: SharedPreferencesAndroidBackendLibrary.SharedPreferences,
+        originalSharedPreferencesOptions: AndroidSharedPreferencesStoreOptions(
+          fileName: 'auth_prefs',
+        ),
+      );
 
-  SharedPreferencesAsync sharedPreferences = SharedPreferencesAsync(options: options);
+  SharedPreferencesAsync sharedPreferences = SharedPreferencesAsync(
+    options: options,
+  );
 
   final User? currentUser = FirebaseAuth.instance.currentUser;
   if (currentUser != null) {
     final bool hasEmailProvider = currentUser.providerData.any(
-          (userInfo) => userInfo.providerId == 'password',
+      (userInfo) => userInfo.providerId == 'password',
     );
 
     if (hasEmailProvider) {
       print('User is signed in with Email/Password provider.');
 
-      bool isRememberMe = await sharedPreferences.getBool('rememberMe') ?? false;
+      bool isRememberMe =
+          await sharedPreferences.getBool('rememberMe') ?? false;
       if (isRememberMe) {
         bool successLogout = await AuthService().signOut();
         if (successLogout) {
@@ -56,11 +60,13 @@ Future main() async {
   }
 
   runApp(
-    EasyLocalization(
-      supportedLocales: const [Locale('en'), Locale('id')],
-      fallbackLocale: const Locale('en'),
-      path: 'assets/translations',
-      child: MyApp(themeMode: savedThemeMode),
+    ProviderScope(
+      child: EasyLocalization(
+        supportedLocales: const [Locale('en'), Locale('id')],
+        fallbackLocale: const Locale('en'),
+        path: 'assets/translations',
+        child: MyApp(themeMode: savedThemeMode),
+      ),
     ),
   );
 }
