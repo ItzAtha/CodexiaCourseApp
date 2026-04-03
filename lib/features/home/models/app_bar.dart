@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
-class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
+import '../../../shared/models/auth_user.dart';
+import '../../../shared/providers/auth_user_notifier.dart';
+
+class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authUserState = ref.watch(authUserProvider);
+    AuthUser? authUser = authUserState.value;
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -29,37 +37,46 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    const CircleAvatar(
-                      radius: 20.0,
-                      backgroundImage: NetworkImage(
-                        "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
+                Skeletonizer(
+                  enabled: authUserState.isLoading,
+                  enableSwitchAnimation: true,
+                  child: Row(
+                    children: <Widget>[
+                      CircleAvatar(
+                        radius: 20.0,
+                        backgroundImage: NetworkImage(
+                          authUser?.avatarPath ??
+                              "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 15.0),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const <Widget>[
-                        Text(
-                          "Welcome Back,",
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            color: Color(0xFFF5F6FA),
+                      const SizedBox(width: 15.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          const Skeleton.keep(
+                            child: Text(
+                              "Welcome Back,",
+                              style: TextStyle(
+                                fontSize: 14.0,
+                                color: Color(0xFFF5F6FA),
+                              ),
+                            ),
                           ),
-                        ),
-                        Text(
-                          "John Doe",
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFF5F6FA),
+                          Text(
+                            authUser?.displayName ??
+                                authUser?.username ??
+                                "Guest",
+                            style: const TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFF5F6FA),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
                 Material(
                   color: Colors.transparent,
