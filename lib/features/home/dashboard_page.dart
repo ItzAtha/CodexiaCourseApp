@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:toastification/toastification.dart';
 
 import './views/home_page.dart';
@@ -16,6 +18,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  bool isFloatingActionButtonOpened = false;
 
   int selectedIndex = 0;
   bool canCloseApp = false;
@@ -25,7 +28,7 @@ class _DashboardPageState extends State<DashboardPage> {
     HomePage(),
     CoursePage(),
     CommunityPage(),
-    SettingPage()
+    SettingPage(),
   ];
 
   void _onPopInvoked(bool canPop, Object? result) {
@@ -51,7 +54,10 @@ class _DashboardPageState extends State<DashboardPage> {
       );
 
       // Disable pop invoke and close the toast after 2s timeout
-      Future.delayed(Duration(seconds: 2), () => setState(() => canCloseApp = false));
+      Future.delayed(
+        Duration(seconds: 2),
+        () => setState(() => canCloseApp = false),
+      );
       setState(() => canCloseApp = true);
     }
   }
@@ -59,37 +65,60 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-        canPop: canCloseApp,
-        onPopInvokedWithResult: (canPop, result) => _onPopInvoked(canPop, result),
-        child: Scaffold(
-          extendBody: true,
-          floatingActionButtonLocation: FloatingActionButtonLocation
-              .centerDocked,
-          floatingActionButton: FloatingActionButton(
-            backgroundColor: Color(0xFF00CEC9),
-            shape: const CircleBorder(),
-            onPressed: () {
-              // TODO: Handle FAB action
-            },
-            child: const Icon(Icons.add, color: Color(0xFFF5F6FA)),
-          ),
-          bottomNavigationBar: BottomNavbar(
-            onItemSelected: (index) {
-              setState(() => selectedIndex = index);
-            },
-            onItemSelectedNotifier: ValueNotifier(selectedIndex),
-          ),
-          body: PageTransitionSwitcher(
-            duration: const Duration(milliseconds: 500),
-            transitionBuilder: (child, primaryAnimation, secondaryAnimation) =>
-                FadeThroughTransition(
-                  animation: primaryAnimation,
-                  secondaryAnimation: secondaryAnimation,
-                  child: child,
-                ),
-            child: pages[selectedIndex],
-          ),
+      canPop: canCloseApp,
+      onPopInvokedWithResult: (canPop, result) => _onPopInvoked(canPop, result),
+      child: Scaffold(
+        extendBody: true,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: SpeedDial(
+          icon: Icons.add,
+          activeIcon: Icons.close,
+          spacing: 3,
+          foregroundColor: Color(0xFFF5F6FA),
+          backgroundColor: Color(0xFF00CEC9),
+          childPadding: const EdgeInsets.all(5),
+          spaceBetweenChildren: 4,
+          overlayColor: Colors.black,
+          overlayOpacity: 0.5,
+          elevation: 8.0,
+          animationCurve: Curves.easeInOut,
+          labelTransitionBuilder: (widget, animation) =>
+              ScaleTransition(scale: animation, child: widget),
+          animationDuration: const Duration(milliseconds: 300),
+          children: [
+            SpeedDialChild(
+              child: const Icon(Icons.code),
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              label: 'Code Sandbox',
+              onTap: () => print('Code Sandbox'),
+            ),
+            SpeedDialChild(
+              child: const Icon(Icons.question_answer),
+              backgroundColor: Colors.orangeAccent,
+              foregroundColor: Colors.white,
+              label: 'Challenges',
+              onTap: () => print('Challenges'),
+            ),
+          ],
         ),
+        bottomNavigationBar: BottomNavbar(
+          onItemSelected: (index) {
+            setState(() => selectedIndex = index);
+          },
+          onItemSelectedNotifier: ValueNotifier(selectedIndex),
+        ),
+        body: PageTransitionSwitcher(
+          duration: const Duration(milliseconds: 500),
+          transitionBuilder: (child, primaryAnimation, secondaryAnimation) =>
+              FadeThroughTransition(
+                animation: primaryAnimation,
+                secondaryAnimation: secondaryAnimation,
+                child: child,
+              ),
+          child: pages[selectedIndex],
+        ),
+      ),
     );
   }
 }
