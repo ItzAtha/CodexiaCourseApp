@@ -12,9 +12,13 @@
 .swiftpm/
 migrate_working_dir/
 
+# Firebase related
 .env
 firebase.json
 firebase_options.dart
+
+# Generated files related
+*.g.dart
 
 # IntelliJ related
 *.iml
