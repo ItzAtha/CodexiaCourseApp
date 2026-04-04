@@ -1,0 +1,148 @@
+import 'package:animations/animations.dart';
+
+import '/features/auth/views/login_page.dart';
+import 'package:flutter/material.dart';
+
+class OpeningPage extends StatefulWidget {
+  const OpeningPage({super.key, required String title}) : _title = title;
+
+  final String _title;
+
+  @override
+  State<StatefulWidget> createState() => _OpeningPageState();
+}
+
+class _OpeningPageState extends State<OpeningPage> {
+  late final List<Widget> carouselPage = [
+    Container(
+      color: Colors.red,
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Center(
+          child: Text("Page 1", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+        ),
+      ),
+    ),
+    Container(
+      color: Colors.yellow,
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Center(
+          child: Text("Page 2", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+        ),
+      ),
+    ),
+    Container(
+      color: Colors.green,
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Center(
+          child: Text("Page 3", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+        ),
+      ),
+    ),
+    Container(
+      color: Colors.blue,
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Welcome to Codexia Course Learning",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          reverseTransitionDuration: Duration(milliseconds: 500),
+                          transitionDuration: Duration(milliseconds: 500),
+                          pageBuilder: (context, animation, secondaryAnimation) => LoginPage(),
+                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                            return SharedAxisTransition(
+                              animation: animation,
+                              secondaryAnimation: secondaryAnimation,
+                              transitionType: SharedAxisTransitionType.horizontal,
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    child: Text("Get Started"),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  ];
+
+  int currentPage = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(widget._title)),
+      body: Stack(
+        children: [
+          PageView.builder(
+            itemCount: carouselPage.length,
+            onPageChanged: (index) {
+              setState(() {
+                currentPage = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return carouselPage[index];
+            },
+          ),
+          Positioned(
+            bottom: 25.0,
+            left: 0,
+            right: 0,
+            child: PageViewIndicator(currentIndex: currentPage, pageCount: carouselPage.length),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PageViewIndicator extends StatelessWidget {
+  final int currentIndex;
+  final int pageCount;
+
+  const PageViewIndicator({super.key, required this.currentIndex, required this.pageCount});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        pageCount,
+        (index) => AnimatedScale(
+          scale: currentIndex == index ? 1.5 : 1.0,
+          duration: const Duration(milliseconds: 300),
+          child: Container(
+            width: 8,
+            height: 8,
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: currentIndex == index ? Colors.white : Colors.white54,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
