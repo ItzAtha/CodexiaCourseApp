@@ -3,6 +3,8 @@ import 'package:codexia_course_learning/shared/models/auth_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../models/user_avatar.dart';
+
 part 'auth_user_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
@@ -25,13 +27,25 @@ class AuthUserNotifier extends _$AuthUserNotifier {
       await usersCollection
           .doc(userId)
           .get()
-          .then((DocumentSnapshot documentSnapshot) {
+          .then((DocumentSnapshot documentSnapshot) async {
             if (documentSnapshot.exists) {
               final Map<String, dynamic> userData =
                   documentSnapshot.data() as Map<String, dynamic>;
+
+              DocumentReference userAvatarRef = userData['avatar'];
+              DocumentSnapshot avatarSnapshot = await userAvatarRef.get();
+              userData.update(
+                'avatar',
+                (value) => UserAvatar.fromJson(
+                  avatarSnapshot.data() as Map<String, dynamic>,
+                ),
+              );
+
               try {
                 authUser = AuthUser.fromJson(userData);
-                print('User Data with ID $userId: $userData');
+                print(
+                  'User Data with ID $userId: $userData with avatar ${avatarSnapshot.data()}',
+                );
               } catch (e) {
                 print('Error parsing user data: $e');
               }
@@ -55,9 +69,9 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     }
   }
 
-  void updateAvatar(String avatar) {
+  void updateAvatar(UserAvatar avatar) {
     if (state.value != null) {
-      state = AsyncData(state.value!.copyWith(avatarPath: avatar));
+      state = AsyncData(state.value!.copyWith(avatar: avatar));
     }
   }
 
