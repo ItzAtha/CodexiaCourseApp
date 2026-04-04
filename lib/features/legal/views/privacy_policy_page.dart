@@ -12,30 +12,21 @@ class PrivacyPolicyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Privacy Policy'),
-        centerTitle: true,
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Privacy Policy'), centerTitle: true, elevation: 0),
       body: SafeArea(
         child: FutureBuilder<String>(
           future: _loadPrivacyPolicyText(),
           builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
-            }
-
-            else if (snapshot.hasError) {
+            } else if (snapshot.hasError) {
               return Center(
                 child: Text(
                   'Error loading privacy policy: \n${snapshot.error}',
                   textAlign: TextAlign.center,
                 ),
               );
-            }
-
-            else {
+            } else {
               return Scrollbar(
                 child: Markdown(
                   data: snapshot.data ?? 'No privacy policy available.',

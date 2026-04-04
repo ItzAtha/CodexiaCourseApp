@@ -4,6 +4,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:toastification/toastification.dart';
 
+import '../../core/utils/logger.dart';
 import './views/home_page.dart';
 import './views/course_page.dart';
 import './views/community_page.dart';
@@ -24,12 +25,7 @@ class _DashboardPageState extends State<DashboardPage> {
   bool canCloseApp = false;
   DateTime? currentBackPressTime;
 
-  final List<Widget> pages = [
-    HomePage(),
-    CoursePage(),
-    CommunityPage(),
-    SettingPage(),
-  ];
+  final List<Widget> pages = [HomePage(), CoursePage(), CommunityPage(), SettingPage()];
 
   void _onPopInvoked(bool canPop, Object? result) {
     if (selectedIndex != 0) {
@@ -54,10 +50,7 @@ class _DashboardPageState extends State<DashboardPage> {
       );
 
       // Disable pop invoke and close the toast after 2s timeout
-      Future.delayed(
-        Duration(seconds: 2),
-        () => setState(() => canCloseApp = false),
-      );
+      Future.delayed(Duration(seconds: 2), () => setState(() => canCloseApp = false));
       setState(() => canCloseApp = true);
     }
   }
@@ -91,14 +84,14 @@ class _DashboardPageState extends State<DashboardPage> {
               backgroundColor: Colors.redAccent,
               foregroundColor: Colors.white,
               label: 'Code Sandbox',
-              onTap: () => print('Code Sandbox'),
+              onTap: () => DebugLogger(message: 'Code Sandbox', level: LogLevel.debug).log(),
             ),
             SpeedDialChild(
               child: const Icon(Icons.question_answer),
               backgroundColor: Colors.orangeAccent,
               foregroundColor: Colors.white,
               label: 'Challenges',
-              onTap: () => print('Challenges'),
+              onTap: () => DebugLogger(message: 'Challenges', level: LogLevel.debug).log(),
             ),
           ],
         ),
@@ -110,12 +103,11 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
         body: PageTransitionSwitcher(
           duration: const Duration(milliseconds: 500),
-          transitionBuilder: (child, primaryAnimation, secondaryAnimation) =>
-              FadeThroughTransition(
-                animation: primaryAnimation,
-                secondaryAnimation: secondaryAnimation,
-                child: child,
-              ),
+          transitionBuilder: (child, primaryAnimation, secondaryAnimation) => FadeThroughTransition(
+            animation: primaryAnimation,
+            secondaryAnimation: secondaryAnimation,
+            child: child,
+          ),
           child: pages[selectedIndex],
         ),
       ),

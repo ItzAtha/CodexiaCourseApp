@@ -129,18 +129,14 @@ class BottomNavbarItem {
                           Icon(
                             icon,
                             size: 24,
-                            color: value == index
-                                ? Color(0xFFF5F6FA)
-                                : Color(0xB3F5F6FA),
+                            color: value == index ? Color(0xFFF5F6FA) : Color(0xB3F5F6FA),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             label,
                             style: TextStyle(
                               fontSize: 12,
-                              color: value == index
-                                  ? Color(0xFFF5F6FA)
-                                  : Color(0xB3F5F6FA),
+                              color: value == index ? Color(0xFFF5F6FA) : Color(0xB3F5F6FA),
                             ),
                           ),
                         ],

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../core/utils/logger.dart';
 import '../manager/firebase_manager.dart';
 
 class AuthService {
@@ -19,71 +20,82 @@ class AuthService {
     String displayName,
   ) async {
     try {
-      UserCredential userCredential = await _firebaseAuth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
       await _addCredentialToFirestore(userCredential, displayName);
       return userCredential;
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-already-in-use') {
+    } on FirebaseAuthException catch (error, stackTrace) {
+      if (error.code == 'email-already-in-use') {
         _errorMessage = "This email address is already in use.";
-      } else if (e.code == 'invalid-email') {
+      } else if (error.code == 'invalid-email') {
         _errorMessage = "The email address is not valid.";
-      } else if (e.code == 'weak-password') {
-        _errorMessage =
-            "The password is too weak. Please choose a stronger password.";
+      } else if (error.code == 'weak-password') {
+        _errorMessage = "The password is too weak. Please choose a stronger password.";
       } else {
-        _errorMessage =
-            e.message ?? 'An unknown error occurred during Email Sign-Up.';
+        _errorMessage = error.message ?? 'An unknown error occurred during Email Sign-Up.';
       }
-      print('Email/Password Sign-Up failed: ${e.message}');
-    } catch (e) {
+      DebugLogger(
+        message: 'Email/Password Sign-Up failed: ${error.message}',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
+    } catch (error, stackTrace) {
       _errorMessage = 'An unknown error occurred during Email Sign-Up.';
-      print('An error occurred during Email/Password Sign-Up: $e');
+      DebugLogger(
+        message: 'An error occurred during Email/Password Sign-Up: $error',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
     }
     return null;
   }
 
-  Future<UserCredential?> signInWithEmailAndPassword(
-    String email,
-    String password,
-  ) async {
+  Future<UserCredential?> signInWithEmailAndPassword(String email, String password) async {
     try {
-      UserCredential userCredential = await _firebaseAuth
-          .signInWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
       await _addCredentialToFirestore(userCredential);
       return userCredential;
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
+    } on FirebaseAuthException catch (error, stackTrace) {
+      if (error.code == 'user-not-found') {
         _errorMessage = "No user found with this email address.";
-      } else if (e.code == 'wrong-password') {
+      } else if (error.code == 'wrong-password') {
         _errorMessage = "Incorrect password. Please try again.";
       } else {
-        _errorMessage =
-            e.message ?? 'An unknown error occurred during Email Sign-In.';
+        _errorMessage = error.message ?? 'An unknown error occurred during Email Sign-In.';
       }
-      print('Email/Password Sign-In failed: ${e.message}');
-    } catch (e) {
+      DebugLogger(
+        message: 'Email/Password Sign-In failed: ${error.message}',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
+    } catch (error, stackTrace) {
       _errorMessage = 'An unknown error occurred during Email Sign-In.';
-      print('An error occurred during Email/Password Sign-In: $e');
+      DebugLogger(
+        message: 'An error occurred during Email/Password Sign-In: $error',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
     }
     return null;
   }
 
   Future<UserCredential?> signInWithGoogle() async {
     try {
-      await _googleAuth.initialize(
-        serverClientId: dotenv.env['GOOGLE_CLIENT_ID'],
-      );
+      await _googleAuth.initialize(serverClientId: dotenv.env['GOOGLE_CLIENT_ID']);
 
       final GoogleSignInAccount googleUser = await _googleAuth.authenticate();
 
       String? idToken = googleUser.authentication.idToken;
       const List<String> scopes = ['email', 'profile'];
 
-      GoogleSignInClientAuthorization? clientAuth = await googleUser
-          .authorizationClient
+      GoogleSignInClientAuthorization? clientAuth = await googleUser.authorizationClient
           .authorizeScopes(scopes);
 
       final String accessToken = clientAuth.accessToken;
@@ -92,20 +104,26 @@ class AuthService {
         accessToken: accessToken,
       );
 
-      final UserCredential userCredential = await _firebaseAuth
-          .signInWithCredential(credential);
+      final UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
 
       await _addCredentialToFirestore(userCredential);
       return userCredential;
-    } on GoogleSignInException catch (e) {
-      if (e.code != GoogleSignInExceptionCode.canceled) {
-        _errorMessage =
-            e.description ?? 'An unknown error occurred during Google Sign-In.';
+    } on GoogleSignInException catch (error, stackTrace) {
+      if (error.code != GoogleSignInExceptionCode.canceled) {
+        _errorMessage = error.description ?? 'An unknown error occurred during Google Sign-In.';
       }
-      print('Google Sign-In failed: ${e.description}');
-    } catch (e) {
+      DebugLogger(
+        message: 'Google Sign-In failed: ${error.description}',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
+    } catch (error, stackTrace) {
       _errorMessage = 'An unknown error occurred during Google Sign-In.';
-      print('An error occurred during Google Sign-In: $e');
+      DebugLogger(
+        message: 'An error occurred during Google Sign-In: $error',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
     }
     return null;
   }
@@ -116,18 +134,24 @@ class AuthService {
 
       githubProvider.addScope('user:email');
 
-      final UserCredential userCredential = await _firebaseAuth
-          .signInWithProvider(githubProvider);
+      final UserCredential userCredential = await _firebaseAuth.signInWithProvider(githubProvider);
 
       await _addCredentialToFirestore(userCredential);
       return userCredential;
-    } on FirebaseAuthException catch (e) {
-      _errorMessage =
-          e.message ?? 'An unknown error occurred during Github Sign-In.';
-      print('Github Sign-In failed: ${e.message}');
-    } catch (e) {
+    } on FirebaseAuthException catch (error, stackTrace) {
+      _errorMessage = error.message ?? 'An unknown error occurred during Github Sign-In.';
+      DebugLogger(
+        message: 'Github Sign-In failed: ${error.message}',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
+    } catch (error, stackTrace) {
       _errorMessage = 'An unknown error occurred during Github Sign-In.';
-      print('An error occurred during Github Sign-In: $e');
+      DebugLogger(
+        message: 'An error occurred during Github Sign-In: $error',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
     }
     return null;
   }
@@ -136,19 +160,26 @@ class AuthService {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
       return true;
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
+    } on FirebaseAuthException catch (error, stackTrace) {
+      if (error.code == 'user-not-found') {
         _errorMessage = "No user found with this email address.";
-      } else if (e.code == 'invalid-email') {
+      } else if (error.code == 'invalid-email') {
         _errorMessage = "The email address is not valid.";
       } else {
-        _errorMessage =
-            e.message ?? 'An unknown error occurred during password reset.';
+        _errorMessage = error.message ?? 'An unknown error occurred during password reset.';
       }
-      print('Password reset failed: ${e.message}');
-    } catch (e) {
+      DebugLogger(
+        message: 'Password reset failed: ${error.message}',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
+    } catch (error, stackTrace) {
       _errorMessage = 'An unknown error occurred during password reset.';
-      print('An error occurred during password reset: $e');
+      DebugLogger(
+        message: 'An error occurred during password reset: $error',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
     }
     return false;
   }
@@ -158,8 +189,12 @@ class AuthService {
       await _googleAuth.signOut();
       await _firebaseAuth.signOut();
       return true;
-    } catch (e) {
-      print('An error occurred during sign-out: $e');
+    } catch (error, stackTrace) {
+      DebugLogger(
+        message: 'An error occurred during sign-out: $error',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
     }
     return false;
   }

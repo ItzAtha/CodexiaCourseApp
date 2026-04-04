@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'core/utils/logger.dart';
 import 'services/auth_services.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 
@@ -21,17 +22,12 @@ Future main() async {
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  const SharedPreferencesAsyncAndroidOptions options =
-      SharedPreferencesAsyncAndroidOptions(
-        backend: SharedPreferencesAndroidBackendLibrary.SharedPreferences,
-        originalSharedPreferencesOptions: AndroidSharedPreferencesStoreOptions(
-          fileName: 'auth_prefs',
-        ),
-      );
-
-  SharedPreferencesAsync sharedPreferences = SharedPreferencesAsync(
-    options: options,
+  const SharedPreferencesAsyncAndroidOptions options = SharedPreferencesAsyncAndroidOptions(
+    backend: SharedPreferencesAndroidBackendLibrary.SharedPreferences,
+    originalSharedPreferencesOptions: AndroidSharedPreferencesStoreOptions(fileName: 'auth_prefs'),
   );
+
+  SharedPreferencesAsync sharedPreferences = SharedPreferencesAsync(options: options);
 
   final User? currentUser = FirebaseAuth.instance.currentUser;
   if (currentUser != null) {
@@ -40,23 +36,34 @@ Future main() async {
     );
 
     if (hasEmailProvider) {
-      print('User is signed in with Email/Password provider.');
+      DebugLogger(
+        message: 'User is signed in with Email/Password provider.',
+        level: LogLevel.info,
+      ).log();
 
-      bool isRememberMe =
-          await sharedPreferences.getBool('rememberMe') ?? false;
+      bool isRememberMe = await sharedPreferences.getBool('rememberMe') ?? false;
       if (isRememberMe) {
         bool successLogout = await AuthService().signOut();
         if (successLogout) {
-          print('Successfully signed out user from email providers.');
+          DebugLogger(
+            message: 'Successfully signed out user from email providers.',
+            level: LogLevel.info,
+          ).log();
         } else {
-          print('No user was signed in or an error occurred during sign-out.');
+          DebugLogger(
+            message: 'No user was signed in or an error occurred during sign-out.',
+            level: LogLevel.info,
+          ).log();
         }
       }
     } else {
-      print('User is signed in with a provider other than Email/Password.');
+      DebugLogger(
+        message: 'User is signed in with a provider other than Email/Password.',
+        level: LogLevel.info,
+      ).log();
     }
   } else {
-    print('No user is currently signed in.');
+    DebugLogger(message: 'No user is currently signed in.', level: LogLevel.info).log();
   }
 
   runApp(

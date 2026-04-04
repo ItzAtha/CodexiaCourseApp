@@ -10,14 +10,17 @@ class ResetPasswordPage extends StatefulWidget {
 }
 
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
-
   final TextEditingController emailController = TextEditingController();
   final AuthService authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, forceMaterialTransparency: true),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        forceMaterialTransparency: true,
+      ),
       body: Padding(
         padding: EdgeInsets.all(24.0),
         child: Center(
@@ -37,13 +40,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 40.0),
-              Text(
-                "Email Address",
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text("Email Address", style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
               TextFormField(
                 controller: emailController,
                 decoration: InputDecoration(
@@ -69,9 +66,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               SizedBox(height: 25.0),
               ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all<Color>(
-                    Colors.blue.shade600,
-                  ),
+                  backgroundColor: WidgetStateProperty.all<Color>(Colors.blue.shade600),
                 ),
                 onPressed: () async {
                   String email = emailController.text.trim();
@@ -80,12 +75,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     if (success) {
                       Toastification().show(
                         title: Text("Reset Link Sent"),
-                        description: Text("A password reset link has been sent to your email address."),
+                        description: Text(
+                          "A password reset link has been sent to your email address.",
+                        ),
                         type: ToastificationType.success,
                         backgroundColor: Colors.green.shade400,
                         icon: Icon(Icons.check_circle, color: Colors.white),
                         autoCloseDuration: Duration(seconds: 5),
-
                       );
 
                       if (!context.mounted) return;

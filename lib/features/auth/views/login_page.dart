@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 
+import '../../../core/utils/logger.dart';
 import './register_page.dart';
 import './reset_password_page.dart';
 import '../../home/dashboard_page.dart';
@@ -52,12 +53,12 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
 
-    const SharedPreferencesAsyncAndroidOptions options =
-        SharedPreferencesAsyncAndroidOptions(
-          backend: SharedPreferencesAndroidBackendLibrary.SharedPreferences,
-          originalSharedPreferencesOptions:
-              AndroidSharedPreferencesStoreOptions(fileName: 'auth_prefs'),
-        );
+    const SharedPreferencesAsyncAndroidOptions options = SharedPreferencesAsyncAndroidOptions(
+      backend: SharedPreferencesAndroidBackendLibrary.SharedPreferences,
+      originalSharedPreferencesOptions: AndroidSharedPreferencesStoreOptions(
+        fileName: 'auth_prefs',
+      ),
+    );
 
     sharedPreferences = SharedPreferencesAsync(options: options);
   }
@@ -79,13 +80,7 @@ class _LoginPageState extends State<LoginPage> {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  Text(
-                    "Sign In",
-                    style: TextStyle(
-                      fontSize: 32.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text("Sign In", style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold)),
                   Text(
                     "Welcome back Codexian! Please sign in your account to continue your last course.",
                     textAlign: TextAlign.center,
@@ -101,10 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: <Widget>[
                     Text(
                       "Email Address",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                     ),
                     TextFormField(
                       controller: emailController,
@@ -133,10 +125,7 @@ class _LoginPageState extends State<LoginPage> {
                       children: <Widget>[
                         Text(
                           "Password",
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                         ),
                         Spacer(),
                         GestureDetector(
@@ -144,25 +133,16 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.push(
                               context,
                               PageRouteBuilder(
-                                reverseTransitionDuration: Duration(
-                                  milliseconds: 500,
-                                ),
+                                reverseTransitionDuration: Duration(milliseconds: 500),
                                 transitionDuration: Duration(milliseconds: 500),
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) =>
-                                        ResetPasswordPage(),
+                                pageBuilder: (context, animation, secondaryAnimation) =>
+                                    ResetPasswordPage(),
                                 transitionsBuilder:
-                                    (
-                                      context,
-                                      animation,
-                                      secondaryAnimation,
-                                      child,
-                                    ) {
+                                    (context, animation, secondaryAnimation, child) {
                                       return SharedAxisTransition(
                                         animation: animation,
                                         secondaryAnimation: secondaryAnimation,
-                                        transitionType:
-                                            SharedAxisTransitionType.horizontal,
+                                        transitionType: SharedAxisTransitionType.horizontal,
                                         child: child,
                                       );
                                     },
@@ -171,10 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           child: Text(
                             "Forgot Password?",
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              color: Colors.blue,
-                            ),
+                            style: TextStyle(fontSize: 14.0, color: Colors.blue),
                           ),
                         ),
                       ],
@@ -193,11 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                             });
                           },
                           customBorder: CircleBorder(),
-                          child: Icon(
-                            passwordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
+                          child: Icon(passwordVisible ? Icons.visibility : Icons.visibility_off),
                         ),
                         isDense: true,
                       ),
@@ -222,10 +195,7 @@ class _LoginPageState extends State<LoginPage> {
                       onChanged: (value) {
                         setState(() async {
                           rememberMe = value ?? false;
-                          await sharedPreferences.setBool(
-                            'rememberMe',
-                            rememberMe,
-                          );
+                          await sharedPreferences.setBool('rememberMe', rememberMe);
                         });
                       },
                     ),
@@ -237,9 +207,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 10.0),
               ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all<Color>(
-                    Colors.blue.shade600,
-                  ),
+                  backgroundColor: WidgetStateProperty.all<Color>(Colors.blue.shade600),
                 ),
                 onPressed: () async {
                   Toastification().dismissAll();
@@ -255,10 +223,7 @@ class _LoginPageState extends State<LoginPage> {
                       Toastification().show(
                         title: Text(
                           "Login Failed",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                         description: Text(
                           "No user found with this email address.",
@@ -269,25 +234,20 @@ class _LoginPageState extends State<LoginPage> {
                         icon: Icon(Icons.error, color: Colors.white),
                         autoCloseDuration: Duration(seconds: 5),
                       );
-                      print(
-                        'No user found with email: ${emailController.text}',
-                      );
+                      DebugLogger(
+                        message: 'No user found with email: ${emailController.text}',
+                        level: LogLevel.info,
+                      ).log();
                       return;
                     }
 
                     final UserCredential? userCredential = await authService
-                        .signInWithEmailAndPassword(
-                          emailController.text,
-                          passwordController.text,
-                        );
+                        .signInWithEmailAndPassword(emailController.text, passwordController.text);
                     if (userCredential == null) {
                       Toastification().show(
                         title: Text(
                           "Login Failed",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                         description: Text(
                           authService.getErrorMessage,
@@ -304,10 +264,7 @@ class _LoginPageState extends State<LoginPage> {
                     Toastification().show(
                       title: Text(
                         "Login Successful",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                       description: Text(
                         "Welcome back, ${userDoc['displayName']}!",
@@ -354,8 +311,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 15.0),
               ElevatedButton(
                 onPressed: () async {
-                  final UserCredential? userCredential = await authService
-                      .signInWithGoogle();
+                  final UserCredential? userCredential = await authService.signInWithGoogle();
 
                   if (userCredential == null) {
                     if (authService.getErrorMessage.isEmpty) return;
@@ -363,10 +319,7 @@ class _LoginPageState extends State<LoginPage> {
                     Toastification().show(
                       title: Text(
                         "Login Failed",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                       description: Text(
                         authService.getErrorMessage,
@@ -383,10 +336,7 @@ class _LoginPageState extends State<LoginPage> {
                   Toastification().show(
                     title: Text(
                       "Login Successful",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     description: Text(
                       "Welcome back, ${userCredential.user?.displayName}!",
@@ -405,27 +355,20 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Image.asset("assets/images/google.png", width: 24.0),
                     SizedBox(width: 10.0),
-                    Text(
-                      "Continue with Google",
-                      style: TextStyle(color: Colors.grey.shade600),
-                    ),
+                    Text("Continue with Google", style: TextStyle(color: Colors.grey.shade600)),
                   ],
                 ),
               ),
               SizedBox(height: 10.0),
               ElevatedButton(
                 onPressed: () async {
-                  final UserCredential? userCredential = await authService
-                      .signInWithGithub();
+                  final UserCredential? userCredential = await authService.signInWithGithub();
 
                   if (userCredential == null) {
                     Toastification().show(
                       title: Text(
                         "Login Failed",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                       description: Text(
                         authService.getErrorMessage,
@@ -442,10 +385,7 @@ class _LoginPageState extends State<LoginPage> {
                   Toastification().show(
                     title: Text(
                       "Login Successful",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     description: Text(
                       "Welcome back, ${userCredential.user?.displayName}!",
@@ -464,10 +404,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Image.asset("assets/images/github.png", width: 24.0),
                     SizedBox(width: 10.0),
-                    Text(
-                      "Continue with Github",
-                      style: TextStyle(color: Colors.grey.shade600),
-                    ),
+                    Text("Continue with Github", style: TextStyle(color: Colors.grey.shade600)),
                   ],
                 ),
               ),
@@ -485,30 +422,21 @@ class _LoginPageState extends State<LoginPage> {
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          reverseTransitionDuration: Duration(
-                            milliseconds: 500,
-                          ),
+                          reverseTransitionDuration: Duration(milliseconds: 500),
                           transitionDuration: Duration(milliseconds: 500),
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  RegisterPage(),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                                return SharedAxisTransition(
-                                  animation: animation,
-                                  secondaryAnimation: secondaryAnimation,
-                                  transitionType:
-                                      SharedAxisTransitionType.horizontal,
-                                  child: child,
-                                );
-                              },
+                          pageBuilder: (context, animation, secondaryAnimation) => RegisterPage(),
+                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                            return SharedAxisTransition(
+                              animation: animation,
+                              secondaryAnimation: secondaryAnimation,
+                              transitionType: SharedAxisTransitionType.horizontal,
+                              child: child,
+                            );
+                          },
                         ),
                       );
                     },
-                    child: Text(
-                      "Sign Up",
-                      style: TextStyle(fontSize: 14, color: Colors.blue),
-                    ),
+                    child: Text("Sign Up", style: TextStyle(fontSize: 14, color: Colors.blue)),
                   ),
                 ],
               ),

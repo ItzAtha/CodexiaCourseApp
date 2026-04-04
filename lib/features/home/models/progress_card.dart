@@ -37,11 +37,7 @@ class ProgressCard {
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    const Icon(
-                      Icons.calendar_today,
-                      size: 16.0,
-                      color: Color(0xFF0984E3),
-                    ),
+                    const Icon(Icons.calendar_today, size: 16.0, color: Color(0xFF0984E3)),
                     const SizedBox(width: 5.0),
                     Text(_startDate, style: TextStyle(fontSize: 14.0)),
                   ],
@@ -62,10 +58,7 @@ class ProgressCard {
                 Expanded(
                   child: Text(
                     _title,
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -74,16 +67,10 @@ class ProgressCard {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(
-                  "Progress",
-                  style: TextStyle(fontSize: 14.0, color: Colors.grey.shade600),
-                ),
+                Text("Progress", style: TextStyle(fontSize: 14.0, color: Colors.grey.shade600)),
                 const SizedBox(width: 10.0),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0,
-                    vertical: 4.0,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Colors.blue.shade50, Colors.blue.shade100],
@@ -141,10 +128,7 @@ class ProgressCard {
         ),
         borderRadius: BorderRadius.circular(12.0),
       ),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 12.0, color: color.shade900),
-      ),
+      child: Text(text, style: TextStyle(fontSize: 12.0, color: color.shade900)),
     );
   }
 }

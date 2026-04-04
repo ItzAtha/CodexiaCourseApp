@@ -3,6 +3,7 @@ import 'package:codexia_course_learning/shared/models/auth_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../core/utils/logger.dart';
 import '../../manager/firebase_manager.dart';
 import '../models/user_avatar.dart';
 
@@ -41,19 +42,34 @@ class AuthUserNotifier extends _$AuthUserNotifier {
 
               try {
                 authUser = AuthUser.fromJson(userData);
-                print('User Data with ID $userId: $userData with avatar ${avatarSnapshot.data()}');
-              } catch (e) {
-                print('Error parsing user data: $e');
+                DebugLogger(
+                  message:
+                      'User Data with ID $userId: $userData with avatar ${avatarSnapshot.data()}',
+                  level: LogLevel.info,
+                ).log();
+              } catch (error, stackTrace) {
+                DebugLogger(
+                  message: 'Error parsing user data: $error',
+                  stackTrace: stackTrace,
+                  level: LogLevel.error,
+                ).log();
               }
             } else {
-              print('User data not found for user ID: $userId');
+              DebugLogger(
+                message: 'User data not found for user ID: $userId',
+                level: LogLevel.info,
+              ).log();
             }
           })
           .catchError((error) {
-            print('Error getting user data: $error');
+            DebugLogger(
+              message: 'Error getting user data: $error',
+              stackTrace: StackTrace.current,
+              level: LogLevel.error,
+            ).log();
           });
     } else {
-      print('No user is currently signed in.');
+      DebugLogger(message: 'No user is currently signed in.', level: LogLevel.info).log();
     }
 
     return authUser;

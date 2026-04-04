@@ -6,6 +6,8 @@ import 'package:cloudinary_url_gen/cloudinary.dart';
 import 'package:cloudinary_url_gen/config/cloud_config.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import '../core/utils/logger.dart';
+
 class CloudinaryServices {
   final String _cloudName = dotenv.env['CLOUDINARY_CLOUD_NAME'] ?? "";
   final String _apiKey = dotenv.env['CLOUDINARY_API_KEY'] ?? "";
@@ -29,8 +31,12 @@ class CloudinaryServices {
       );
 
       return (response?.data?.publicId, response?.data?.url);
-    } catch (e) {
-      print("Error uploading image: $e");
+    } catch (error, stackTrace) {
+      DebugLogger(
+        message: "Error uploading image: $error",
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
       return null;
     }
   }
@@ -44,8 +50,12 @@ class CloudinaryServices {
       if (response.responseCode == 200) {
         return true;
       }
-    } catch (e) {
-      print("Error deleting image: $e");
+    } catch (error, stackTrace) {
+      DebugLogger(
+        message: "Error deleting image: $error",
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
     }
     return false;
   }

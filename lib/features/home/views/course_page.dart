@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/utils/logger.dart';
 import '../../home/models/course_card.dart';
 import '../../course/foundation/java/java_course.dart';
 import '../../course/foundation/python/python_course.dart';
@@ -34,8 +35,7 @@ class _CoursePageState extends State<CoursePage> {
       CourseCard(
         type: CardType.course,
         title: "Java Development",
-        description:
-            "Learn Java programming and its applications in various domains.",
+        description: "Learn Java programming and its applications in various domains.",
         overview:
             "In this course, you will learn the fundamentals of Java programming language, including syntax, object-oriented programming concepts, and how to build applications using Java. Whether you're a beginner or looking to enhance your Java skills, this course will provide you with the knowledge and practical experience needed to succeed in Java development.",
         courseImage: "java.svg",
@@ -44,8 +44,7 @@ class _CoursePageState extends State<CoursePage> {
       CourseCard(
         type: CardType.course,
         title: "Python Development",
-        description:
-            "Learn Python programming and its applications in various domains.",
+        description: "Learn Python programming and its applications in various domains.",
         overview:
             "In this course, you will learn the fundamentals of Python programming language, including syntax, data structures, and how to build applications using Python. Whether you're a beginner or looking to enhance your Python skills, this course will provide you with the knowledge and practical experience needed to succeed in Python development.",
         courseImage: "python.svg",
@@ -64,8 +63,7 @@ class _CoursePageState extends State<CoursePage> {
       CourseCard(
         type: CardType.course,
         title: "PHP Development",
-        description:
-            "Learn PHP programming and its applications in web development.",
+        description: "Learn PHP programming and its applications in web development.",
         overview:
             "In this course, you will learn the fundamentals of PHP programming language, including syntax, data structures, and how to build web applications using PHP. Whether you're a beginner or looking to enhance your PHP skills, this course will provide you with the knowledge and practical experience needed to succeed in PHP development.",
         courseImage: "php.svg",
@@ -84,8 +82,7 @@ class _CoursePageState extends State<CoursePage> {
       CourseCard(
         type: CardType.course,
         title: "Dart Development",
-        description:
-            "Learn Dart programming and its applications in Flutter development.",
+        description: "Learn Dart programming and its applications in Flutter development.",
         overview:
             "In this course, you will learn the fundamentals of Dart programming language, including syntax, data structures, and how to build applications using Dart. Whether you're a beginner or looking to enhance your Dart skills, this course will provide you with the knowledge and practical experience needed to succeed in Dart development, especially in the context of Flutter framework development.",
         courseImage: "dart.svg",
@@ -106,8 +103,7 @@ class _CoursePageState extends State<CoursePage> {
       CourseCard(
         type: CardType.course,
         title: "SQL Database",
-        description:
-            "Learn how to design and manage relational databases using SQL.",
+        description: "Learn how to design and manage relational databases using SQL.",
         overview:
             "In this course, you will learn the fundamentals of SQL databases, including database design, querying, and management using SQL. Whether you're a beginner or looking to enhance your SQL skills, this course will provide you with the knowledge and practical experience needed to succeed in SQL database development.",
         courseImage: "sql.svg",
@@ -116,8 +112,7 @@ class _CoursePageState extends State<CoursePage> {
       CourseCard(
         type: CardType.course,
         title: "Prisma Database",
-        description:
-            "Learn how to design and manage databases using Prisma ORM.",
+        description: "Learn how to design and manage databases using Prisma ORM.",
         overview:
             "In this course, you will learn the fundamentals of Prisma database development, including database design, querying, and management using Prisma ORM. Whether you're a beginner or looking to enhance your Prisma skills, this course will provide you with the knowledge and practical experience needed to succeed in Prisma database development.",
         courseImage: "prisma.svg",
@@ -216,24 +211,23 @@ class _CoursePageState extends State<CoursePage> {
       for (var element in value) {
         if (element.title!.toLowerCase().contains(search.toLowerCase())) {
           filteredCourseList.add(element);
-          print(element.title);
+          DebugLogger(message: element.title ?? "", level: LogLevel.debug).log();
         }
       }
 
       setState(() {
         filteredList.addAll({key: filteredCourseList});
         filteredCourseList = [];
-        });
+      });
     });
 
     filteredList.forEach((key, value) {
-      print(key);
+      DebugLogger(message: key, level: LogLevel.debug).log();
       for (var element in value) {
-        print(element.title);
+        DebugLogger(message: element.title, level: LogLevel.debug).log();
       }
     });
   }
-
 
   @override
   void initState() {
@@ -259,14 +253,12 @@ class _CoursePageState extends State<CoursePage> {
                       child: SearchBar(
                         leading: const Icon(Icons.search, size: 20.0),
                         shape: WidgetStatePropertyAll(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
+                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                         ),
                         hintText: "Search for courses",
                         onChanged: (value) {
                           // Handle search input change
-                          print("Search input: $value");
+                          DebugLogger(message: "Search input: $value", level: LogLevel.debug).log();
                           filterList(value);
                         },
                       ),
@@ -278,13 +270,14 @@ class _CoursePageState extends State<CoursePage> {
                       child: Material(
                         elevation: 8.0,
                         color: Color(0xFFFCFBFB),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                         child: IconButton(
                           onPressed: () {
                             // Handle filter action
-                            print("Filter button pressed");
+                            DebugLogger(
+                              message: "Filter button pressed",
+                              level: LogLevel.debug,
+                            ).log();
 
                             showModalBottomSheet(
                               context: context,
@@ -304,8 +297,7 @@ class _CoursePageState extends State<CoursePage> {
                                       child: SingleChildScrollView(
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.stretch,
+                                          crossAxisAlignment: CrossAxisAlignment.stretch,
                                           children: <Widget>[
                                             Text(
                                               "Filter Courses",
@@ -332,115 +324,83 @@ class _CoursePageState extends State<CoursePage> {
                                             Column(
                                               children: <Widget>[
                                                 Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
+                                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                   children: <Widget>[
                                                     FilterChip(
                                                       label: Text(
                                                         "Popular",
-                                                        style: TextStyle(
-                                                          fontSize: 14.0,
-                                                        ),
+                                                        style: TextStyle(fontSize: 14.0),
                                                       ),
                                                       onSelected: (selected) {
                                                         setState(() {
-                                                          isSelected[0] =
-                                                              selected;
+                                                          isSelected[0] = selected;
 
                                                           // Handle sort by popularity
-                                                          print(
-                                                            "Sort by Popular",
-                                                          );
+                                                          DebugLogger(
+                                                            message: "Sort by Popular",
+                                                            level: LogLevel.debug,
+                                                          ).log();
                                                         });
                                                       },
                                                       elevation: 4.0,
                                                       selected: isSelected[0],
-                                                      selectedColor: Color(
-                                                        0xFF00CEC9,
-                                                      ),
-                                                      backgroundColor: Color(
-                                                        0x8000CEC9,
-                                                      ),
-                                                      checkmarkColor: Color(
-                                                        0xFFFCFBFB,
-                                                      ),
+                                                      selectedColor: Color(0xFF00CEC9),
+                                                      backgroundColor: Color(0x8000CEC9),
+                                                      checkmarkColor: Color(0xFFFCFBFB),
                                                       side: BorderSide(
-                                                        color: Color(
-                                                          0xFF1E272E,
-                                                        ),
+                                                        color: Color(0xFF1E272E),
                                                         width: 1.0,
                                                       ),
                                                     ),
                                                     FilterChip(
                                                       label: Text(
                                                         "Rating",
-                                                        style: TextStyle(
-                                                          fontSize: 14.0,
-                                                        ),
+                                                        style: TextStyle(fontSize: 14.0),
                                                       ),
                                                       onSelected: (selected) {
                                                         setState(() {
-                                                          isSelected[1] =
-                                                              selected;
+                                                          isSelected[1] = selected;
 
                                                           // Handle sort by popularity
-                                                          print(
-                                                            "Sort by Rating",
-                                                          );
+                                                          DebugLogger(
+                                                            message: "Sort by Rating",
+                                                            level: LogLevel.debug,
+                                                          ).log();
                                                         });
                                                       },
                                                       elevation: 4.0,
                                                       selected: isSelected[1],
-                                                      selectedColor: Color(
-                                                        0xFF00CEC9,
-                                                      ),
-                                                      backgroundColor: Color(
-                                                        0x8000CEC9,
-                                                      ),
-                                                      checkmarkColor: Color(
-                                                        0xFFFCFBFB,
-                                                      ),
+                                                      selectedColor: Color(0xFF00CEC9),
+                                                      backgroundColor: Color(0x8000CEC9),
+                                                      checkmarkColor: Color(0xFFFCFBFB),
                                                       side: BorderSide(
-                                                        color: Color(
-                                                          0xFF1E272E,
-                                                        ),
+                                                        color: Color(0xFF1E272E),
                                                         width: 1.0,
                                                       ),
                                                     ),
                                                     FilterChip(
                                                       label: Text(
                                                         "Newest",
-                                                        style: TextStyle(
-                                                          fontSize: 14.0,
-                                                        ),
+                                                        style: TextStyle(fontSize: 14.0),
                                                       ),
                                                       onSelected: (selected) {
                                                         setState(() {
-                                                          isSelected[2] =
-                                                              selected;
+                                                          isSelected[2] = selected;
 
                                                           // Handle sort by popularity
-                                                          print(
-                                                            "Sort by Newest",
-                                                          );
+                                                          DebugLogger(
+                                                            message: "Sort by Newest",
+                                                            level: LogLevel.debug,
+                                                          ).log();
                                                         });
                                                       },
                                                       elevation: 4.0,
                                                       selected: isSelected[2],
-                                                      selectedColor: Color(
-                                                        0xFF00CEC9,
-                                                      ),
-                                                      backgroundColor: Color(
-                                                        0x8000CEC9,
-                                                      ),
-                                                      checkmarkColor: Color(
-                                                        0xFFFCFBFB,
-                                                      ),
+                                                      selectedColor: Color(0xFF00CEC9),
+                                                      backgroundColor: Color(0x8000CEC9),
+                                                      checkmarkColor: Color(0xFFFCFBFB),
                                                       side: BorderSide(
-                                                        color: Color(
-                                                          0xFF1E272E,
-                                                        ),
+                                                        color: Color(0xFF1E272E),
                                                         width: 1.0,
                                                       ),
                                                     ),
@@ -452,26 +412,23 @@ class _CoursePageState extends State<CoursePage> {
                                             ElevatedButton(
                                               onPressed: () {
                                                 // Handle apply filters
-                                                print("Apply filters");
+                                                DebugLogger(
+                                                  message: "Apply filters",
+                                                  level: LogLevel.debug,
+                                                ).log();
 
                                                 Navigator.pop(context);
                                               },
                                               style: ButtonStyle(
-                                                backgroundColor:
-                                                    WidgetStatePropertyAll(
-                                                      Color(0xFF0984E3),
-                                                    ),
+                                                backgroundColor: WidgetStatePropertyAll(
+                                                  Color(0xFF0984E3),
+                                                ),
                                                 padding: WidgetStatePropertyAll(
-                                                  EdgeInsets.symmetric(
-                                                    vertical: 12.0,
-                                                  ),
+                                                  EdgeInsets.symmetric(vertical: 12.0),
                                                 ),
                                                 shape: WidgetStatePropertyAll(
                                                   RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          10.0,
-                                                        ),
+                                                    borderRadius: BorderRadius.circular(10.0),
                                                   ),
                                                 ),
                                               ),
@@ -495,9 +452,7 @@ class _CoursePageState extends State<CoursePage> {
                           icon: const Icon(Icons.filter_list, size: 20.0),
                           style: ButtonStyle(
                             shape: WidgetStatePropertyAll(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
+                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                             ),
                           ),
                         ),
@@ -512,38 +467,24 @@ class _CoursePageState extends State<CoursePage> {
                   children: <Widget>[
                     Text(
                       "Programming Foundations",
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10.0),
-                    for (var element
-                        in filteredList["Programming Foundations"]!)
-                      element.create(),
+                    for (var element in filteredList["Programming Foundations"]!) element.create(),
                     SizedBox(height: 30.0),
                     Text(
                       "Database Structures",
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10.0),
-                    for (var element in filteredList["Database Structures"]!)
-                      element.create(),
+                    for (var element in filteredList["Database Structures"]!) element.create(),
                     SizedBox(height: 30.0),
                     Text(
                       "Framework Development",
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10.0),
-                    for (var element
-                        in filteredList["Framework Development"]!)
-                      element.create(),
+                    for (var element in filteredList["Framework Development"]!) element.create(),
                     SizedBox(height: 10.0),
                   ],
                 ),

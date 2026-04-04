@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:toastification/toastification.dart';
 
+import '../../core/utils/logger.dart';
 import 'views/opening_page.dart';
 import '../home/dashboard_page.dart';
 
@@ -17,10 +18,17 @@ class AuthenticationGate extends ConsumerWidget {
     ref.listen(authUserProvider, (previous, next) {
       next.when(
         data: (data) {
-          print("Successfully loaded profile: ${data.username}");
+          DebugLogger(
+            message: "Successfully loaded profile: ${data.username}",
+            level: LogLevel.info,
+          ).log();
         },
         error: (error, stackTrace) {
-          print("Error loading profile: $error");
+          DebugLogger(
+            message: "Error loading profile: $error",
+            stackTrace: stackTrace,
+            level: LogLevel.error,
+          ).log();
           Toastification().show(
             context: context,
             title: Text("Couldn't load profile"),
@@ -32,7 +40,7 @@ class AuthenticationGate extends ConsumerWidget {
           );
         },
         loading: () {
-          print("Loading profile...");
+          DebugLogger(message: "Loading profile...", level: LogLevel.info).log();
         },
       );
     });

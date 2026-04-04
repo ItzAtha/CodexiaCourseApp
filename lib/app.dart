@@ -6,8 +6,7 @@ import 'package:toastification/toastification.dart';
 import 'features/auth/auth_router.dart';
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key, required AdaptiveThemeMode? themeMode})
-    : _themeMode = themeMode;
+  const MyApp({super.key, required AdaptiveThemeMode? themeMode}) : _themeMode = themeMode;
 
   final AdaptiveThemeMode? _themeMode;
 

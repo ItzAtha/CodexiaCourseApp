@@ -1,3 +1,4 @@
+import 'package:codexia_course_learning/core/utils/logger.dart';
 import 'package:codexia_course_learning/shared/models/auth_user.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
 import 'package:flutter/material.dart';
@@ -41,22 +42,26 @@ class _SettingPageState extends ConsumerState<SettingPage> {
         (String?, String?)? userAvatar = await CloudinaryServices().uploadImage(image.path);
 
         if (userAvatar != null) {
-          print("Public Id: ${userAvatar.$1}");
-          print("URL: ${userAvatar.$2}");
+          DebugLogger(message: "Public Id: ${userAvatar.$1}", level: LogLevel.info).log();
+          DebugLogger(message: "URL: ${userAvatar.$2}", level: LogLevel.info).log();
 
           await deleteCurrentAvatar(publicId);
           UserAvatar avatar = UserAvatar(publicId: userAvatar.$1!, avatarPath: userAvatar.$2!);
           ref.read(authUserProvider.notifier).updateAvatar(avatar);
         }
       }
-    } catch (e) {
-      print("Error picking image: $e");
+    } catch (error, stackTrace) {
+      DebugLogger(
+        message: "Error picking image: $error",
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
     }
   }
 
   Future<void> deleteCurrentAvatar(String? publicId) async {
     if (publicId == null || publicId.isEmpty) {
-      print("No avatar to delete");
+      DebugLogger(message: "No avatar to delete", level: LogLevel.info).log();
       return;
     }
 
@@ -64,9 +69,9 @@ class _SettingPageState extends ConsumerState<SettingPage> {
 
     if (isDeleted) {
       ref.read(authUserProvider.notifier).updateAvatar(UserAvatar(publicId: ''));
-      print("Avatar deleted successfully");
+      DebugLogger(message: "Avatar deleted successfully", level: LogLevel.info).log();
     } else {
-      print("Failed to delete avatar");
+      DebugLogger(message: "Failed to delete avatar", level: LogLevel.info).log();
     }
   }
 
@@ -239,7 +244,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
               SizedBox(height: 15.0),
               OutlinedButton(
                 onPressed: () {
-                  print("Edit Profile");
+                  DebugLogger(message: "Edit Profile", level: LogLevel.debug).log();
                 },
                 style: OutlinedButton.styleFrom(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -270,7 +275,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       SizedBox(height: 10.0),
                       ExpansionTile(
                         onExpansionChanged: (value) {
-                          print("Change Theme");
+                          DebugLogger(message: "Change Theme", level: LogLevel.debug).log();
                           setState(() => isThemeOptionOpened = value);
                         },
                         leading: Icon(Icons.color_lens),
@@ -292,7 +297,10 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                             groupValue: themeOptions,
                             onChanged: (value) {
                               setState(() => themeOptions = value);
-                              print("Theme Options: $themeOptions");
+                              DebugLogger(
+                                message: "Theme Options: $themeOptions",
+                                level: LogLevel.debug,
+                              ).log();
                             },
                             child: Column(
                               children: <Widget>[
@@ -319,7 +327,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
-                          print("Notifications");
+                          DebugLogger(message: "Notifications", level: LogLevel.debug).log();
                         },
                         leading: Icon(Icons.notifications),
                         title: Text("Notifications"),
@@ -329,7 +337,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
-                          print("Accessibility");
+                          DebugLogger(message: "Accessibility", level: LogLevel.debug).log();
                         },
                         leading: Icon(Icons.accessibility),
                         title: Text("Accessibility"),
@@ -339,7 +347,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       Divider(thickness: 1.0, height: 1.0),
                       ExpansionTile(
                         onExpansionChanged: (value) {
-                          print("Change Language");
+                          DebugLogger(message: "Change Language", level: LogLevel.debug).log();
                           setState(() => isLanguageOptionOpened = value);
                         },
                         leading: Icon(Icons.language),
@@ -361,7 +369,10 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                             groupValue: languageOptions,
                             onChanged: (value) {
                               setState(() => languageOptions = value);
-                              print("Theme Options: $languageOptions");
+                              DebugLogger(
+                                message: "Theme Options: $languageOptions",
+                                level: LogLevel.debug,
+                              ).log();
                             },
                             child: Column(
                               children: <Widget>[
@@ -407,10 +418,13 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       SizedBox(height: 10.0),
                       ListTile(
                         onTap: () {
-                          print("Enable Fingerprint");
+                          DebugLogger(message: "Enable Fingerprint", level: LogLevel.debug).log();
 
                           setState(() => isFingerprintEnable = !isFingerprintEnable);
-                          print("Is Fingerprint Enable? $isFingerprintEnable");
+                          DebugLogger(
+                            message: "Is Fingerprint Enable? $isFingerprintEnable",
+                            level: LogLevel.debug,
+                          ).log();
                         },
                         leading: Icon(Icons.fingerprint),
                         title: Text("Enable Fingerprint"),
@@ -420,7 +434,10 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                             value: isFingerprintEnable,
                             onChanged: (value) {
                               setState(() => isFingerprintEnable = value);
-                              print("Is Fingerprint Enable? $isFingerprintEnable");
+                              DebugLogger(
+                                message: "Is Fingerprint Enable? $isFingerprintEnable",
+                                level: LogLevel.debug,
+                              ).log();
                             },
                             activeTrackColor: Color(0xFF00CEC9),
                           ),
@@ -430,7 +447,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
-                          print("Enable 2FA");
+                          DebugLogger(message: "Enable 2FA", level: LogLevel.debug).log();
                         },
                         leading: Icon(Icons.security),
                         title: Text("Enable 2FA"),
@@ -440,7 +457,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
-                          print("Device Management");
+                          DebugLogger(message: "Device Management", level: LogLevel.debug).log();
                         },
                         leading: Icon(Icons.devices),
                         title: Text("Device Management"),
@@ -450,7 +467,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
-                          print("App Permissions");
+                          DebugLogger(message: "App Permissions", level: LogLevel.debug).log();
                         },
                         leading: Icon(Icons.perm_device_info),
                         title: Text("App Permissions"),
@@ -484,7 +501,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       SizedBox(height: 10.0),
                       ListTile(
                         onTap: () {
-                          print("FAQ");
+                          DebugLogger(message: "FAQ", level: LogLevel.debug).log();
                         },
                         leading: Icon(Icons.question_answer),
                         title: Text("FAQ"),
@@ -494,7 +511,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
-                          print("About Us");
+                          DebugLogger(message: "About Us", level: LogLevel.debug).log();
                         },
                         leading: Icon(Icons.info),
                         title: Text("About Us"),
@@ -504,7 +521,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
-                          print("Rate Us");
+                          DebugLogger(message: "Rate Us", level: LogLevel.debug).log();
                         },
                         leading: Icon(Icons.star),
                         title: Text("Rate Us"),
@@ -514,7 +531,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
-                          print("Privacy Policy");
+                          DebugLogger(message: "Privacy Policy", level: LogLevel.debug).log();
                         },
                         leading: Icon(Icons.policy),
                         title: Text("Privacy Policy"),
@@ -524,7 +541,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
-                          print("Term of Service");
+                          DebugLogger(message: "Term of Service", level: LogLevel.debug).log();
                         },
                         leading: Icon(Icons.privacy_tip),
                         title: Text("Term of Service"),
@@ -534,7 +551,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
-                          print("Contact Support");
+                          DebugLogger(message: "Contact Support", level: LogLevel.debug).log();
                         },
                         leading: Icon(Icons.contact_support),
                         title: Text("Contact Support"),
@@ -574,7 +591,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       SizedBox(height: 10.0),
                       OutlinedButton(
                         onPressed: () {
-                          print("Reset Course");
+                          DebugLogger(message: "Reset Course", level: LogLevel.debug).log();
                         },
                         style: OutlinedButton.styleFrom(
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -594,7 +611,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       SizedBox(height: 5.0),
                       OutlinedButton(
                         onPressed: () {
-                          print("Logout Account");
+                          DebugLogger(message: "Logout Account", level: LogLevel.debug).log();
                         },
                         style: OutlinedButton.styleFrom(
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -614,7 +631,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       SizedBox(height: 5.0),
                       OutlinedButton(
                         onPressed: () {
-                          print("Delete Account");
+                          DebugLogger(message: "Delete Account", level: LogLevel.debug).log();
                         },
                         style: OutlinedButton.styleFrom(
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),

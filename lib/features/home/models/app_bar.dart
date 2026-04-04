@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+import '../../../core/utils/logger.dart';
 import '../../../shared/models/auth_user.dart';
 import '../../../shared/providers/auth_user_notifier.dart';
 
@@ -57,16 +58,11 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                           const Skeleton.keep(
                             child: Text(
                               "Welcome Back,",
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                color: Color(0xFFF5F6FA),
-                              ),
+                              style: TextStyle(fontSize: 14.0, color: Color(0xFFF5F6FA)),
                             ),
                           ),
                           Text(
-                            authUser?.displayName ??
-                                authUser?.username ??
-                                "Guest",
+                            authUser?.displayName ?? authUser?.username ?? "Guest",
                             style: const TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeight.bold,
@@ -84,7 +80,7 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                     customBorder: CircleBorder(),
                     onTap: () {
                       // Handle notification tap
-                      print("Notification tapped");
+                      DebugLogger(message: "Notification tapped", level: LogLevel.debug).log();
                     },
                     child: Container(
                       padding: const EdgeInsets.all(4.0),
@@ -101,11 +97,7 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                         child: Stack(
                           alignment: Alignment.center,
                           children: <Widget>[
-                            const Icon(
-                              Icons.notifications,
-                              size: 20.0,
-                              color: Colors.blue,
-                            ),
+                            const Icon(Icons.notifications, size: 20.0, color: Colors.blue),
                             Positioned(
                               top: 1.0,
                               right: 2.0,

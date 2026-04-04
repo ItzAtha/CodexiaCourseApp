@@ -33,8 +33,7 @@ class CourseCard {
        _title = title,
        _type = type {
     assert(
-      type == CardType.course ||
-          (type == CardType.courseDetail && courseLevel != null),
+      type == CardType.course || (type == CardType.courseDetail && courseLevel != null),
       "Course level must be set for course detail card",
     );
   }
@@ -46,9 +45,7 @@ class CourseCard {
       closedElevation: 0.0,
       openColor: Color(0xFFF5F6FA),
       closedColor: Color(0xFFF5F6FA),
-      closedShape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
+      closedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
       transitionDuration: Duration(milliseconds: 800),
       transitionType: ContainerTransitionType.fadeThrough,
       closedBuilder: (context, openAction) {
@@ -56,16 +53,11 @@ class CourseCard {
           elevation: 4.0,
           color: Color(0xFFFCFBFB),
           clipBehavior: Clip.antiAlias,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
           margin: EdgeInsets.symmetric(horizontal: 4.0, vertical: 10.0),
           child: switch (_type) {
             CardType.course => ExpansionTile(
-              title: Text(
-                _title!,
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),
-              ),
+              title: Text(_title!, style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600)),
               subtitle: Text(_description),
               leading: CircleAvatar(
                 radius: 20.0,
@@ -80,53 +72,34 @@ class CourseCard {
                 reverseCurve: Curves.easeIn,
               ),
               children: <Widget>[
-                Divider(
-                  thickness: 1.5,
-                  color: Colors.grey.shade300,
-                  height: 2.0,
-                ),
+                Divider(thickness: 1.5, color: Colors.grey.shade300, height: 2.0),
                 Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Column(
                     children: <Widget>[
                       Text(
                         "Course Overview",
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),
                       ),
                       SizedBox(height: 10.0),
                       Text(
                         _overview!,
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          color: Colors.grey.shade700,
-                        ),
+                        style: TextStyle(fontSize: 14.0, color: Colors.grey.shade700),
                       ),
                       SizedBox(height: 20.0),
                       Text(
                         "Available Levels",
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),
                       ),
                       SizedBox(height: 10.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                              vertical: 4.0,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [
-                                  Colors.green.shade100,
-                                  Colors.green.shade300,
-                                ],
+                                colors: [Colors.green.shade100, Colors.green.shade300],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
@@ -134,23 +107,14 @@ class CourseCard {
                             ),
                             child: Text(
                               "Beginner",
-                              style: TextStyle(
-                                fontSize: 12.0,
-                                color: Colors.green.shade900,
-                              ),
+                              style: TextStyle(fontSize: 12.0, color: Colors.green.shade900),
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                              vertical: 4.0,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [
-                                  Colors.orange.shade100,
-                                  Colors.orange.shade300,
-                                ],
+                                colors: [Colors.orange.shade100, Colors.orange.shade300],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
@@ -158,23 +122,14 @@ class CourseCard {
                             ),
                             child: Text(
                               "Intermediate",
-                              style: TextStyle(
-                                fontSize: 12.0,
-                                color: Colors.orange.shade900,
-                              ),
+                              style: TextStyle(fontSize: 12.0, color: Colors.orange.shade900),
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                              vertical: 4.0,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [
-                                  Colors.red.shade100,
-                                  Colors.red.shade300,
-                                ],
+                                colors: [Colors.red.shade100, Colors.red.shade300],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
@@ -182,10 +137,7 @@ class CourseCard {
                             ),
                             child: Text(
                               "Expert",
-                              style: TextStyle(
-                                fontSize: 12.0,
-                                color: Colors.red.shade900,
-                              ),
+                              style: TextStyle(fontSize: 12.0, color: Colors.red.shade900),
                             ),
                           ),
                         ],
@@ -194,25 +146,16 @@ class CourseCard {
                       ElevatedButton(
                         onPressed: openAction,
                         style: ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll(
-                            Color(0xFF0984E3),
-                          ),
-                          padding: WidgetStatePropertyAll(
-                            EdgeInsets.symmetric(vertical: 4.0),
-                          ),
+                          backgroundColor: WidgetStatePropertyAll(Color(0xFF0984E3)),
+                          padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 4.0)),
                           shape: WidgetStatePropertyAll(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
+                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                           ),
                           fixedSize: WidgetStatePropertyAll(Size(150.0, 36.0)),
                         ),
                         child: Text(
                           "See Details",
-                          style: TextStyle(
-                            color: Color(0xFFF5F6FA),
-                            fontSize: 14.0,
-                          ),
+                          style: TextStyle(color: Color(0xFFF5F6FA), fontSize: 14.0),
                         ),
                       ),
                     ],
@@ -233,11 +176,7 @@ class CourseCard {
                         child: Image.asset("assets/images/$_courseImage"),
                       ),
 
-                      Positioned(
-                        right: 10.0,
-                        top: 10.0,
-                        child: _getLevelBadge(_courseLevel!),
-                      ),
+                      Positioned(right: 10.0, top: 10.0, child: _getLevelBadge(_courseLevel!)),
                     ],
                   ),
                 ),
@@ -249,36 +188,22 @@ class CourseCard {
                     children: <Widget>[
                       Text(
                         "What you'll learn",
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),
                       ),
                       SizedBox(height: 10.0),
                       Text(_description, textAlign: TextAlign.justify),
-                      Divider(
-                        thickness: 1.0,
-                        color: Colors.grey.shade400,
-                        height: 20.0,
-                      ),
+                      Divider(thickness: 1.0, color: Colors.grey.shade400, height: 20.0),
                       ElevatedButton(
                         onPressed: openAction,
                         style: ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll(
-                            Color(0xFF0984E3),
-                          ),
+                          backgroundColor: WidgetStatePropertyAll(Color(0xFF0984E3)),
                           shape: WidgetStatePropertyAll(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
+                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                           ),
                         ),
                         child: Text(
                           "Get Started",
-                          style: TextStyle(
-                            color: Color(0xFFF5F6FA),
-                            fontSize: 16.0,
-                          ),
+                          style: TextStyle(color: Color(0xFFF5F6FA), fontSize: 16.0),
                         ),
                       ),
                     ],
@@ -322,10 +247,7 @@ class CourseCard {
         ),
         borderRadius: BorderRadius.circular(12.0),
       ),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 12.0, color: color.shade900),
-      ),
+      child: Text(text, style: TextStyle(fontSize: 12.0, color: color.shade900)),
     );
   }
 }

@@ -6,12 +6,7 @@ class AuthUser {
   String email;
   UserAvatar? avatar;
 
-  AuthUser({
-    required this.username,
-    this.displayName,
-    required this.email,
-    this.avatar,
-  });
+  AuthUser({required this.username, this.displayName, required this.email, this.avatar});
 
   AuthUser.defaultUser() : username = 'Guest', email = '';
 
@@ -33,12 +28,7 @@ class AuthUser {
     };
   }
 
-  AuthUser copyWith({
-    String? username,
-    String? displayName,
-    String? email,
-    UserAvatar? avatar,
-  }) {
+  AuthUser copyWith({String? username, String? displayName, String? email, UserAvatar? avatar}) {
     return AuthUser(
       username: username ?? this.username,
       displayName: displayName ?? this.displayName,

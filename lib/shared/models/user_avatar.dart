@@ -5,10 +5,7 @@ class UserAvatar {
   UserAvatar({required this.publicId, this.avatarPath});
 
   factory UserAvatar.fromJson(Map<String, dynamic> json) {
-    return UserAvatar(
-      publicId: json['public_id'],
-      avatarPath: json['avatarPath'],
-    );
+    return UserAvatar(publicId: json['public_id'], avatarPath: json['avatarPath']);
   }
 
   Map<String, dynamic> toJson() {

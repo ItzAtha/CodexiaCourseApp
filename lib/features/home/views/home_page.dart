@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
       level: Level.expert,
       progress: 0.72,
       courseImage: "arduino.svg",
-    ).create()
+    ).create(),
   ];
 
   @override
@@ -75,15 +75,9 @@ class _HomePageState extends State<HomePage> {
                   builder: (context, child) {
                     double scale = 1.0;
                     if (carouselController.position.haveDimensions) {
-                      scale = max(
-                        0.8,
-                        1 - (carouselController.page! - index).abs() * 0.2,
-                      );
+                      scale = max(0.8, 1 - (carouselController.page! - index).abs() * 0.2);
                     }
-                    return Transform.scale(
-                      scale: scale,
-                      child: progressCardList[index],
-                    );
+                    return Transform.scale(scale: scale, child: progressCardList[index]);
                   },
                 );
               },

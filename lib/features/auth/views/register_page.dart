@@ -63,13 +63,7 @@ class _RegisterPageState extends State<RegisterPage> {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  Text(
-                    "Sign Up",
-                    style: TextStyle(
-                      fontSize: 32.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text("Sign Up", style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold)),
                   Text(
                     "Welcome Codexian! Please sign up your account to start your course journey.",
                     textAlign: TextAlign.center,
@@ -83,19 +77,10 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      "Username",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text("Username", style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                     TextFormField(
                       controller: usernameController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        isDense: true,
-                      ),
+                      decoration: InputDecoration(border: OutlineInputBorder(), isDense: true),
                       textInputAction: TextInputAction.next,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
@@ -108,10 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     SizedBox(height: 15.0),
                     Text(
                       "Email Address",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                     ),
                     TextFormField(
                       controller: emailController,
@@ -136,13 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       },
                     ),
                     SizedBox(height: 15.0),
-                    Text(
-                      "Password",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text("Password", style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                     TextFormField(
                       controller: passwordController,
                       obscureText: !passwordVisible,
@@ -157,11 +133,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             });
                           },
                           customBorder: CircleBorder(),
-                          child: Icon(
-                            passwordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
+                          child: Icon(passwordVisible ? Icons.visibility : Icons.visibility_off),
                         ),
                         isDense: true,
                       ),
@@ -192,7 +164,8 @@ class _RegisterPageState extends State<RegisterPage> {
                             PageRouteBuilder(
                               reverseTransitionDuration: Duration(milliseconds: 500),
                               transitionDuration: Duration(milliseconds: 500),
-                              pageBuilder: (context, animation, secondaryAnimation) => TermsOfServicePage(),
+                              pageBuilder: (context, animation, secondaryAnimation) =>
+                                  TermsOfServicePage(),
                               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                 return FadeThroughTransition(
                                   animation: animation,
@@ -215,7 +188,8 @@ class _RegisterPageState extends State<RegisterPage> {
                             PageRouteBuilder(
                               reverseTransitionDuration: Duration(milliseconds: 500),
                               transitionDuration: Duration(milliseconds: 500),
-                              pageBuilder: (context, animation, secondaryAnimation) => PrivacyPolicyPage(),
+                              pageBuilder: (context, animation, secondaryAnimation) =>
+                                  PrivacyPolicyPage(),
                               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                 return FadeThroughTransition(
                                   animation: animation,
@@ -234,9 +208,7 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(height: 10.0),
               ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all<Color>(
-                    Colors.blue.shade600,
-                  ),
+                  backgroundColor: WidgetStateProperty.all<Color>(Colors.blue.shade600),
                 ),
                 onPressed: () async {
                   Toastification().dismissAll();
@@ -245,19 +217,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   if (formKey.currentState!.validate()) {
                     final UserCredential? userCredential = await authService
                         .signUpWithEmailAndPassword(
-                      emailController.text,
-                      passwordController.text,
-                      usernameController.text
-                    );
+                          emailController.text,
+                          passwordController.text,
+                          usernameController.text,
+                        );
 
                     if (userCredential == null) {
                       Toastification().show(
                         title: Text(
                           "Registration Failed",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                         description: Text(
                           authService.getErrorMessage,
@@ -274,10 +243,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     Toastification().show(
                       title: Text(
                         "Registration Successful",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                       description: Text(
                         "Successfully registered with email ${userCredential.user?.email}. You can now log in to your account.",
@@ -326,8 +292,7 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(height: 15.0),
               ElevatedButton(
                 onPressed: () async {
-                  final UserCredential? userCredential = await authService
-                      .signInWithGoogle();
+                  final UserCredential? userCredential = await authService.signInWithGoogle();
 
                   if (userCredential == null) {
                     if (authService.getErrorMessage.isEmpty) return;
@@ -335,10 +300,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     Toastification().show(
                       title: Text(
                         "Login Failed",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                       description: Text(
                         authService.getErrorMessage,
@@ -355,10 +317,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   Toastification().show(
                     title: Text(
                       "Login Successful",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     description: Text(
                       "Welcome, ${userCredential.user?.displayName}!",
@@ -377,27 +336,20 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     Image.asset("assets/images/google.png", width: 24.0),
                     SizedBox(width: 10.0),
-                    Text(
-                      "Continue with Google",
-                      style: TextStyle(color: Colors.grey.shade600),
-                    ),
+                    Text("Continue with Google", style: TextStyle(color: Colors.grey.shade600)),
                   ],
                 ),
               ),
               SizedBox(height: 10.0),
               ElevatedButton(
                 onPressed: () async {
-                  final UserCredential? userCredential = await authService
-                      .signInWithGithub();
+                  final UserCredential? userCredential = await authService.signInWithGithub();
 
                   if (userCredential == null) {
                     Toastification().show(
                       title: Text(
                         "Login Failed",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                       description: Text(
                         authService.getErrorMessage,
@@ -414,10 +366,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   Toastification().show(
                     title: Text(
                       "Login Successful",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     description: Text(
                       "Welcome, ${userCredential.user?.displayName}!",
@@ -436,10 +385,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     Image.asset("assets/images/github.png", width: 24.0),
                     SizedBox(width: 10.0),
-                    Text(
-                      "Continue with Github",
-                      style: TextStyle(color: Colors.grey.shade600),
-                    ),
+                    Text("Continue with Github", style: TextStyle(color: Colors.grey.shade600)),
                   ],
                 ),
               ),
@@ -454,10 +400,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   SizedBox(width: 10.0),
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
-                    child: Text(
-                      "Sign In",
-                      style: TextStyle(fontSize: 14, color: Colors.blue),
-                    ),
+                    child: Text("Sign In", style: TextStyle(fontSize: 14, color: Colors.blue)),
                   ),
                 ],
               ),
