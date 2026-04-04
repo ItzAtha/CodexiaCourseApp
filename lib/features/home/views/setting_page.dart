@@ -55,7 +55,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           CircleAvatar(
                             radius: 55.0,
                             backgroundImage: NetworkImage(
-                              authUser?.avatarPath ??
+                              authUser?.avatar?.avatarPath ??
                                   "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
                             ),
                           ),
