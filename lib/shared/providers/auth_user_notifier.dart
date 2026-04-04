@@ -3,6 +3,7 @@ import 'package:codexia_course_learning/shared/models/auth_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../manager/firebase_manager.dart';
 import '../models/user_avatar.dart';
 
 part 'auth_user_notifier.g.dart';
@@ -29,23 +30,18 @@ class AuthUserNotifier extends _$AuthUserNotifier {
           .get()
           .then((DocumentSnapshot documentSnapshot) async {
             if (documentSnapshot.exists) {
-              final Map<String, dynamic> userData =
-                  documentSnapshot.data() as Map<String, dynamic>;
+              final Map<String, dynamic> userData = documentSnapshot.data() as Map<String, dynamic>;
 
               DocumentReference userAvatarRef = userData['avatar'];
               DocumentSnapshot avatarSnapshot = await userAvatarRef.get();
               userData.update(
                 'avatar',
-                (value) => UserAvatar.fromJson(
-                  avatarSnapshot.data() as Map<String, dynamic>,
-                ),
+                (value) => UserAvatar.fromJson(avatarSnapshot.data() as Map<String, dynamic>),
               );
 
               try {
                 authUser = AuthUser.fromJson(userData);
-                print(
-                  'User Data with ID $userId: $userData with avatar ${avatarSnapshot.data()}',
-                );
+                print('User Data with ID $userId: $userData with avatar ${avatarSnapshot.data()}');
               } catch (e) {
                 print('Error parsing user data: $e');
               }
@@ -64,14 +60,24 @@ class AuthUserNotifier extends _$AuthUserNotifier {
   }
 
   Future<void> updateDisplayName(String displayName) async {
+    FirebaseManager firestore = FirebaseManager();
+
     if (state.value != null) {
       state = AsyncData(state.value!.copyWith(displayName: displayName));
+
+      await firestore.updateData('Users', state.value!.email, {
+        'displayName': state.value!.displayName,
+      });
     }
   }
 
-  void updateAvatar(UserAvatar avatar) {
+  Future<void> updateAvatar(UserAvatar avatar) async {
+    FirebaseManager firestore = FirebaseManager();
+
     if (state.value != null) {
       state = AsyncData(state.value!.copyWith(avatar: avatar));
+
+      await firestore.updateData('Avatars', state.value!.email, state.value!.avatar!.toJson());
     }
   }
 
