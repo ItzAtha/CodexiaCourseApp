@@ -3,8 +3,10 @@ import 'package:codexia_course_learning/shared/models/auth_user.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:toastification/toastification.dart';
 
 import '../../../services/cloudinary_services.dart';
 import '../../../shared/models/user_avatar.dart';
@@ -27,53 +29,6 @@ class _SettingPageState extends ConsumerState<SettingPage> {
 
   ThemeOptions? themeOptions = ThemeOptions.auto;
   LanguageOptions? languageOptions = LanguageOptions.en;
-
-  Future<void> selectAvatarImage(ImageSource source, {String? publicId}) async {
-    final imagePicker = ImagePicker();
-    try {
-      final XFile? image = await imagePicker.pickImage(
-        source: source,
-        maxWidth: 1920,
-        maxHeight: 1920,
-        preferredCameraDevice: CameraDevice.front,
-      );
-
-      if (image != null) {
-        (String?, String?)? userAvatar = await CloudinaryServices().uploadImage(image.path);
-
-        if (userAvatar != null) {
-          DebugLogger(message: "Public Id: ${userAvatar.$1}", level: LogLevel.info).log();
-          DebugLogger(message: "URL: ${userAvatar.$2}", level: LogLevel.info).log();
-
-          await deleteCurrentAvatar(publicId);
-          UserAvatar avatar = UserAvatar(publicId: userAvatar.$1!, avatarPath: userAvatar.$2!);
-          ref.read(authUserProvider.notifier).updateAvatar(avatar);
-        }
-      }
-    } catch (error, stackTrace) {
-      DebugLogger(
-        message: "Error picking image: $error",
-        stackTrace: stackTrace,
-        level: LogLevel.error,
-      ).log();
-    }
-  }
-
-  Future<void> deleteCurrentAvatar(String? publicId) async {
-    if (publicId == null || publicId.isEmpty) {
-      DebugLogger(message: "No avatar to delete", level: LogLevel.info).log();
-      return;
-    }
-
-    bool isDeleted = await CloudinaryServices().deleteImage(publicId);
-
-    if (isDeleted) {
-      ref.read(authUserProvider.notifier).updateAvatar(UserAvatar(publicId: ''));
-      DebugLogger(message: "Avatar deleted successfully", level: LogLevel.info).log();
-    } else {
-      DebugLogger(message: "Failed to delete avatar", level: LogLevel.info).log();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,92 +90,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                                     showDragHandle: true,
                                     backgroundColor: Color(0xFFF5F6FA),
                                     builder: (context) {
-                                      return Consumer(
-                                        builder: (context, ref, child) {
-                                          final authUserState = ref.watch(authUserProvider);
-                                          AuthUser? authUser = authUserState.value;
-
-                                          return SizedBox(
-                                            height: 130.0,
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                              children: <Widget>[
-                                                InkWell(
-                                                  onTap: () => selectAvatarImage(
-                                                    ImageSource.camera,
-                                                    publicId: authUser?.avatar?.publicId,
-                                                  ),
-                                                  customBorder: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(10.0),
-                                                  ),
-                                                  child: SizedBox(
-                                                    height: 100.0,
-                                                    width: 100.0,
-                                                    child: Column(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      children: <Widget>[
-                                                        Icon(Icons.camera_alt, size: 40.0),
-                                                        SizedBox(height: 5.0),
-                                                        Text(
-                                                          "Camera",
-                                                          style: TextStyle(fontSize: 16.0),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                                InkWell(
-                                                  onTap: () => selectAvatarImage(
-                                                    ImageSource.gallery,
-                                                    publicId: authUser?.avatar?.publicId,
-                                                  ),
-                                                  customBorder: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(10.0),
-                                                  ),
-                                                  child: SizedBox(
-                                                    height: 100.0,
-                                                    width: 100.0,
-                                                    child: Column(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      children: <Widget>[
-                                                        Icon(Icons.photo, size: 40.0),
-                                                        SizedBox(height: 5.0),
-                                                        Text(
-                                                          "Gallery",
-                                                          style: TextStyle(fontSize: 16.0),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                                InkWell(
-                                                  onTap: () => deleteCurrentAvatar(
-                                                    authUser?.avatar?.publicId,
-                                                  ),
-                                                  customBorder: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(10.0),
-                                                  ),
-                                                  child: SizedBox(
-                                                    height: 100.0,
-                                                    width: 100.0,
-                                                    child: Column(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      children: <Widget>[
-                                                        Icon(Icons.delete, size: 40.0),
-                                                        SizedBox(height: 5.0),
-                                                        Text(
-                                                          "Delete",
-                                                          style: TextStyle(fontSize: 16.0),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      );
+                                      return AvatarSelector();
                                     },
                                   );
                                 },
@@ -656,6 +526,217 @@ class _SettingPageState extends ConsumerState<SettingPage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class AvatarSelector extends ConsumerStatefulWidget {
+  const AvatarSelector({super.key});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _AvatarSelectorState();
+}
+
+class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
+  bool isDeleteButtonPress = false;
+
+  Future<void> selectAvatarImage(ImageSource source, {String? publicId}) async {
+    final imagePicker = ImagePicker();
+    try {
+      final XFile? image = await imagePicker.pickImage(
+        source: source,
+        maxWidth: 1920,
+        maxHeight: 1920,
+        preferredCameraDevice: CameraDevice.front,
+      );
+
+      if (image != null) {
+        final croppedImage = await cropAvatarImage(image.path);
+
+        if (croppedImage == null) {
+          DebugLogger(message: "Cropped image is null", level: LogLevel.info).log();
+          return;
+        }
+
+        (String?, String?)? userAvatar = await CloudinaryServices().uploadImage(croppedImage.path);
+
+        if (userAvatar != null) {
+          DebugLogger(message: "Public Id: ${userAvatar.$1}", level: LogLevel.info).log();
+          DebugLogger(message: "URL: ${userAvatar.$2}", level: LogLevel.info).log();
+
+          await deleteCurrentAvatar(publicId);
+          UserAvatar avatar = UserAvatar(publicId: userAvatar.$1!, avatarPath: userAvatar.$2!);
+          ref.read(authUserProvider.notifier).updateAvatar(avatar);
+
+          Toastification().show(
+            title: Text("Avatar Updated"),
+            description: Text("Your avatar has been updated successfully."),
+            type: ToastificationType.success,
+            style: ToastificationStyle.flat,
+            alignment: Alignment.topCenter,
+            autoCloseDuration: Duration(seconds: 3),
+            animationDuration: Duration(milliseconds: 500),
+          );
+
+          DebugLogger(message: "Avatar updated successfully", level: LogLevel.info).log();
+        }
+      }
+    } catch (error, stackTrace) {
+      Toastification().show(
+        title: Text("Error"),
+        description: Text("An error occurred while selecting the image."),
+        type: ToastificationType.error,
+        style: ToastificationStyle.flat,
+        alignment: Alignment.topCenter,
+        autoCloseDuration: Duration(seconds: 3),
+        animationDuration: Duration(milliseconds: 500),
+      );
+
+      DebugLogger(
+        message: "Error picking image: $error",
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
+    }
+  }
+
+  Future<void> deleteCurrentAvatar(String? publicId) async {
+    if (publicId == null || publicId.isEmpty) {
+      DebugLogger(message: "No avatar to delete", level: LogLevel.info).log();
+      return;
+    }
+
+    bool isDeleted = await CloudinaryServices().deleteImage(publicId);
+
+    if (isDeleted) {
+      ref.read(authUserProvider.notifier).updateAvatar(UserAvatar(publicId: ''));
+      if (isDeleteButtonPress) {
+        Toastification().show(
+          title: Text("Avatar Deleted"),
+          description: Text("Your avatar has been deleted successfully."),
+          type: ToastificationType.success,
+          style: ToastificationStyle.flat,
+          alignment: Alignment.topCenter,
+          autoCloseDuration: Duration(seconds: 3),
+          animationDuration: Duration(milliseconds: 500),
+        );
+      }
+
+      DebugLogger(message: "Avatar deleted successfully", level: LogLevel.info).log();
+    } else {
+      if (isDeleteButtonPress) {
+        Toastification().show(
+          title: Text("Error"),
+          description: Text("An error occurred while deleting the avatar."),
+          type: ToastificationType.error,
+          style: ToastificationStyle.flat,
+          alignment: Alignment.topCenter,
+          autoCloseDuration: Duration(seconds: 3),
+          animationDuration: Duration(milliseconds: 500),
+        );
+      }
+
+      DebugLogger(message: "Failed to delete avatar", level: LogLevel.info).log();
+    }
+  }
+
+  Future<CroppedFile?> cropAvatarImage(String filePath) async {
+    final ImageCropper cropper = ImageCropper();
+
+    final croppedImage = await cropper.cropImage(
+      sourcePath: filePath,
+      aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+      compressQuality: 100,
+      compressFormat: ImageCompressFormat.jpg,
+      uiSettings: <PlatformUiSettings>[
+        AndroidUiSettings(
+          toolbarTitle: 'Avatar Crop',
+          cropStyle: CropStyle.circle,
+          showCropGrid: true,
+          toolbarColor: Color(0xFF0984E3),
+          toolbarWidgetColor: Color(0xFFF5F6FA),
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false,
+        ),
+        IOSUiSettings(
+          title: 'Avatar Crop',
+          cropStyle: CropStyle.circle,
+          showCancelConfirmationDialog: true,
+          aspectRatioLockEnabled: false,
+        ),
+      ],
+    );
+    return croppedImage;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final authUserState = ref.watch(authUserProvider);
+    AuthUser? authUser = authUserState.value;
+
+    return SizedBox(
+      height: 130.0,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          InkWell(
+            onTap: () =>
+                selectAvatarImage(ImageSource.camera, publicId: authUser?.avatar?.publicId),
+            customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            child: SizedBox(
+              height: 100.0,
+              width: 100.0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.camera_alt, size: 40.0),
+                  SizedBox(height: 5.0),
+                  Text("Camera", style: TextStyle(fontSize: 16.0)),
+                ],
+              ),
+            ),
+          ),
+          InkWell(
+            onTap: () =>
+                selectAvatarImage(ImageSource.gallery, publicId: authUser?.avatar?.publicId),
+            customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            child: SizedBox(
+              height: 100.0,
+              width: 100.0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.photo, size: 40.0),
+                  SizedBox(height: 5.0),
+                  Text("Gallery", style: TextStyle(fontSize: 16.0)),
+                ],
+              ),
+            ),
+          ),
+          InkWell(
+            onTap: () async {
+              setState(() => isDeleteButtonPress = true);
+
+              await deleteCurrentAvatar(authUser?.avatar?.publicId);
+
+              setState(() => isDeleteButtonPress = false);
+            },
+            customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            child: SizedBox(
+              height: 100.0,
+              width: 100.0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.delete, size: 40.0),
+                  SizedBox(height: 5.0),
+                  Text("Delete", style: TextStyle(fontSize: 16.0)),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
