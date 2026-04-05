@@ -42,11 +42,9 @@ class AuthUserNotifier extends _$AuthUserNotifier {
 
               try {
                 authUser = AuthUser.fromJson(userData);
-                DebugLogger(
-                  message:
-                      'User Data with ID $userId: $userData with avatar ${avatarSnapshot.data()}',
-                  level: LogLevel.info,
-                ).log();
+                Map<String, dynamic> authUserDetail = authUser.toJson();
+
+                DebugLogger(message: authUserDetail, level: LogLevel.trace).log();
               } catch (error, stackTrace) {
                 DebugLogger(
                   message: 'Error parsing user data: $error',
