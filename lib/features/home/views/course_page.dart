@@ -252,9 +252,6 @@ class _CoursePageState extends State<CoursePage> {
                     Expanded(
                       child: SearchBar(
                         leading: const Icon(Icons.search, size: 20.0),
-                        shape: WidgetStatePropertyAll(
-                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                        ),
                         hintText: "Search for courses",
                         onChanged: (value) {
                           // Handle search input change
@@ -268,9 +265,9 @@ class _CoursePageState extends State<CoursePage> {
                       width: 45.0,
                       height: 45.0,
                       child: Material(
-                        elevation: 8.0,
-                        color: Color(0xFFFCFBFB),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                        elevation:
+                            Theme.of(context).iconButtonTheme.style?.elevation?.resolve({}) ?? 0.0,
+                        shape: Theme.of(context).iconButtonTheme.style?.shape?.resolve({}),
                         child: IconButton(
                           onPressed: () {
                             // Handle filter action
@@ -284,15 +281,11 @@ class _CoursePageState extends State<CoursePage> {
                               builder: (context) {
                                 return StatefulBuilder(
                                   builder: (context, setState) {
-                                    return Container(
-                                      width: double.infinity,
-                                      padding: EdgeInsets.all(20.0),
-                                      decoration: BoxDecoration(
-                                        color: Color(0xFFF5F6FA),
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(20.0),
-                                          topRight: Radius.circular(20.0),
-                                        ),
+                                    return Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 20.0,
+                                        right: 20.0,
+                                        bottom: 10.0,
                                       ),
                                       child: SingleChildScrollView(
                                         child: Column(
@@ -302,8 +295,11 @@ class _CoursePageState extends State<CoursePage> {
                                             Text(
                                               "Filter Courses",
                                               style: TextStyle(
-                                                fontSize: 18.0,
+                                                fontSize: 20.0,
                                                 fontWeight: FontWeight.bold,
+                                                color: Theme.of(
+                                                  context,
+                                                ).textTheme.labelMedium?.color,
                                               ),
                                               textAlign: TextAlign.center,
                                             ),
@@ -313,6 +309,9 @@ class _CoursePageState extends State<CoursePage> {
                                               style: TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.w600,
+                                                color: Theme.of(
+                                                  context,
+                                                ).textTheme.labelSmall?.color,
                                               ),
                                             ),
                                             Divider(
@@ -342,15 +341,7 @@ class _CoursePageState extends State<CoursePage> {
                                                           ).log();
                                                         });
                                                       },
-                                                      elevation: 4.0,
                                                       selected: isSelected[0],
-                                                      selectedColor: Color(0xFF00CEC9),
-                                                      backgroundColor: Color(0x8000CEC9),
-                                                      checkmarkColor: Color(0xFFFCFBFB),
-                                                      side: BorderSide(
-                                                        color: Color(0xFF1E272E),
-                                                        width: 1.0,
-                                                      ),
                                                     ),
                                                     FilterChip(
                                                       label: Text(
@@ -368,15 +359,7 @@ class _CoursePageState extends State<CoursePage> {
                                                           ).log();
                                                         });
                                                       },
-                                                      elevation: 4.0,
                                                       selected: isSelected[1],
-                                                      selectedColor: Color(0xFF00CEC9),
-                                                      backgroundColor: Color(0x8000CEC9),
-                                                      checkmarkColor: Color(0xFFFCFBFB),
-                                                      side: BorderSide(
-                                                        color: Color(0xFF1E272E),
-                                                        width: 1.0,
-                                                      ),
                                                     ),
                                                     FilterChip(
                                                       label: Text(
@@ -394,15 +377,7 @@ class _CoursePageState extends State<CoursePage> {
                                                           ).log();
                                                         });
                                                       },
-                                                      elevation: 4.0,
                                                       selected: isSelected[2],
-                                                      selectedColor: Color(0xFF00CEC9),
-                                                      backgroundColor: Color(0x8000CEC9),
-                                                      checkmarkColor: Color(0xFFFCFBFB),
-                                                      side: BorderSide(
-                                                        color: Color(0xFF1E272E),
-                                                        width: 1.0,
-                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -450,11 +425,6 @@ class _CoursePageState extends State<CoursePage> {
                             );
                           },
                           icon: const Icon(Icons.filter_list, size: 20.0),
-                          style: ButtonStyle(
-                            shape: WidgetStatePropertyAll(
-                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                            ),
-                          ),
                         ),
                       ),
                     ),
@@ -467,24 +437,39 @@ class _CoursePageState extends State<CoursePage> {
                   children: <Widget>[
                     Text(
                       "Programming Foundations",
-                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).textTheme.labelMedium?.color,
+                      ),
                     ),
                     SizedBox(height: 10.0),
-                    for (var element in filteredList["Programming Foundations"]!) element.create(),
+                    for (var element in filteredList["Programming Foundations"]!)
+                      element.create(context),
                     SizedBox(height: 30.0),
                     Text(
                       "Database Structures",
-                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).textTheme.labelMedium?.color,
+                      ),
                     ),
                     SizedBox(height: 10.0),
-                    for (var element in filteredList["Database Structures"]!) element.create(),
+                    for (var element in filteredList["Database Structures"]!)
+                      element.create(context),
                     SizedBox(height: 30.0),
                     Text(
                       "Framework Development",
-                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).textTheme.labelMedium?.color,
+                      ),
                     ),
                     SizedBox(height: 10.0),
-                    for (var element in filteredList["Framework Development"]!) element.create(),
+                    for (var element in filteredList["Framework Development"]!)
+                      element.create(context),
                     SizedBox(height: 10.0),
                   ],
                 ),

@@ -32,10 +32,26 @@ class PrivacyPolicyPage extends StatelessWidget {
                   data: snapshot.data ?? 'No privacy policy available.',
                   padding: const EdgeInsets.all(16.0),
                   styleSheet: MarkdownStyleSheet(
-                    p: const TextStyle(fontSize: 16, height: 1.5),
-                    h1: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    h2: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    listBullet: const TextStyle(fontSize: 16, height: 1.5),
+                    p: TextStyle(
+                      fontSize: 16,
+                      height: 1.5,
+                      color: Theme.of(context).textTheme.labelSmall?.color,
+                    ),
+                    h1: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.labelLarge?.color,
+                    ),
+                    h2: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.labelMedium?.color,
+                    ),
+                    listBullet: TextStyle(
+                      fontSize: 16,
+                      height: 1.5,
+                      color: Theme.of(context).textTheme.labelSmall?.color,
+                    ),
                   ),
                 ),
               );

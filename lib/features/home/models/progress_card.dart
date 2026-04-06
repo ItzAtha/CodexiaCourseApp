@@ -22,11 +22,8 @@ class ProgressCard {
        _startDate = startDate,
        _title = title;
 
-  Widget create() {
+  Widget create(BuildContext context) {
     return Card(
-      elevation: 8.0,
-      color: Color(0xFFFCFBFB),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -39,7 +36,13 @@ class ProgressCard {
                   children: <Widget>[
                     const Icon(Icons.calendar_today, size: 16.0, color: Color(0xFF0984E3)),
                     const SizedBox(width: 5.0),
-                    Text(_startDate, style: TextStyle(fontSize: 14.0)),
+                    Text(
+                      _startDate,
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        color: Theme.of(context).textTheme.labelSmall?.color,
+                      ),
+                    ),
                   ],
                 ),
                 _getLevelBadge(_level),
@@ -58,7 +61,11 @@ class ProgressCard {
                 Expanded(
                   child: Text(
                     _title,
-                    style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.labelSmall?.color,
+                    ),
                   ),
                 ),
               ],

@@ -1,4 +1,7 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:codexia_course_learning/core/utils/logger.dart';
+import 'package:codexia_course_learning/features/legal/views/privacy_policy_page.dart';
+import 'package:codexia_course_learning/features/legal/views/terms_of_service_page.dart';
 import 'package:codexia_course_learning/shared/models/auth_user.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +21,6 @@ class SettingPage extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _SettingPageState();
 }
 
-enum ThemeOptions { auto, light, dark }
-
 enum LanguageOptions { en, id }
 
 class _SettingPageState extends ConsumerState<SettingPage> {
@@ -27,7 +28,6 @@ class _SettingPageState extends ConsumerState<SettingPage> {
   bool isThemeOptionOpened = false;
   bool isLanguageOptionOpened = false;
 
-  ThemeOptions? themeOptions = ThemeOptions.auto;
   LanguageOptions? languageOptions = LanguageOptions.en;
 
   @override
@@ -69,6 +69,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
 
                                 return Center(
                                   child: CircularProgressIndicator(
+                                    backgroundColor: Color(0xFF00CEC9),
                                     value: loadingProgress.expectedTotalBytes != null
                                         ? loadingProgress.cumulativeBytesLoaded /
                                               loadingProgress.expectedTotalBytes!
@@ -86,9 +87,6 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                                 onPressed: () {
                                   showModalBottomSheet(
                                     context: context,
-                                    elevation: 8.0,
-                                    showDragHandle: true,
-                                    backgroundColor: Color(0xFFF5F6FA),
                                     builder: (context) {
                                       return AvatarSelector();
                                     },
@@ -105,9 +103,19 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                     ),
                     Text(
                       authUser?.displayName ?? authUser?.username ?? "Guest",
-                      style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 28.0,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).textTheme.labelLarge?.color,
+                      ),
                     ),
-                    Text(authUser?.email ?? "guest@gmail.com", style: TextStyle(fontSize: 16.0)),
+                    Text(
+                      authUser?.email ?? "guest@gmail.com",
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Theme.of(context).textTheme.labelSmall?.color,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -120,12 +128,16 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                   minimumSize: Size(180.0, 40.0),
                 ),
-                child: Text("Edit Profile", style: TextStyle(color: Colors.black, fontSize: 16.0)),
+                child: Text(
+                  "Edit Profile",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: Theme.of(context).textTheme.labelSmall?.color,
+                  ),
+                ),
               ),
               SizedBox(height: 40.0),
               Card(
-                color: Color(0xFFFCFBFB),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 14.0),
                   child: Column(
@@ -134,12 +146,14 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         children: <Widget>[
                           Text(
                             "General",
-                            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).textTheme.labelMedium?.color,
+                            ),
                           ),
                           SizedBox(width: 10.0),
-                          Expanded(
-                            child: Divider(thickness: 1.2, height: 20.0, color: Colors.black),
-                          ),
+                          Expanded(child: Divider(thickness: 1.2, height: 20.0)),
                         ],
                       ),
                       SizedBox(height: 10.0),
@@ -148,13 +162,22 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           DebugLogger(message: "Change Theme", level: LogLevel.debug).log();
                           setState(() => isThemeOptionOpened = value);
                         },
-                        leading: Icon(Icons.color_lens),
-                        title: Text("Change Theme"),
+                        leading: Icon(Icons.color_lens, color: Theme.of(context).iconTheme.color),
+                        title: Text(
+                          "Change Theme",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        ),
                         trailing: AnimatedRotation(
                           turns: isThemeOptionOpened ? 0.25 : 0.0,
                           duration: Duration(milliseconds: 500),
                           curve: Curves.easeInOut,
-                          child: Icon(Icons.arrow_forward_ios),
+                          child: Icon(
+                            Icons.arrow_forward_ios,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
                         ),
                         tilePadding: EdgeInsets.only(left: 10.0, right: 10.0),
                         iconColor: Colors.grey.shade800,
@@ -163,30 +186,49 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           duration: Duration(milliseconds: 500),
                         ),
                         children: <Widget>[
-                          RadioGroup<ThemeOptions>(
-                            groupValue: themeOptions,
+                          RadioGroup<AdaptiveThemeMode>(
+                            groupValue: AdaptiveTheme.of(context).mode,
                             onChanged: (value) {
-                              setState(() => themeOptions = value);
+                              AdaptiveTheme.of(context).setThemeMode(value!);
+
                               DebugLogger(
-                                message: "Theme Options: $themeOptions",
+                                message: "Theme Options: $value",
                                 level: LogLevel.debug,
                               ).log();
                             },
                             child: Column(
                               children: <Widget>[
-                                RadioListTile<ThemeOptions>(
-                                  title: Text("Auto"),
-                                  value: ThemeOptions.auto,
+                                RadioListTile<AdaptiveThemeMode>(
+                                  title: Text(
+                                    "Auto",
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      color: Theme.of(context).textTheme.labelSmall?.color,
+                                    ),
+                                  ),
+                                  value: AdaptiveThemeMode.system,
                                   activeColor: Color(0xFF00CEC9),
                                 ),
-                                RadioListTile<ThemeOptions>(
-                                  title: Text("Light"),
-                                  value: ThemeOptions.light,
+                                RadioListTile<AdaptiveThemeMode>(
+                                  title: Text(
+                                    "Light",
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      color: Theme.of(context).textTheme.labelSmall?.color,
+                                    ),
+                                  ),
+                                  value: AdaptiveThemeMode.light,
                                   activeColor: Color(0xFF00CEC9),
                                 ),
-                                RadioListTile<ThemeOptions>(
-                                  title: Text("Dark"),
-                                  value: ThemeOptions.dark,
+                                RadioListTile<AdaptiveThemeMode>(
+                                  title: Text(
+                                    "Dark",
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      color: Theme.of(context).textTheme.labelSmall?.color,
+                                    ),
+                                  ),
+                                  value: AdaptiveThemeMode.dark,
                                   activeColor: Color(0xFF00CEC9),
                                 ),
                               ],
@@ -199,9 +241,21 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         onTap: () {
                           DebugLogger(message: "Notifications", level: LogLevel.debug).log();
                         },
-                        leading: Icon(Icons.notifications),
-                        title: Text("Notifications"),
-                        trailing: Icon(Icons.arrow_forward_ios),
+                        leading: Icon(
+                          Icons.notifications,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        title: Text(
+                          "Notifications",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                         contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
                       Divider(thickness: 1.0, height: 1.0),
@@ -209,9 +263,21 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         onTap: () {
                           DebugLogger(message: "Accessibility", level: LogLevel.debug).log();
                         },
-                        leading: Icon(Icons.accessibility),
-                        title: Text("Accessibility"),
-                        trailing: Icon(Icons.arrow_forward_ios),
+                        leading: Icon(
+                          Icons.accessibility,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        title: Text(
+                          "Accessibility",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                         contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
                       Divider(thickness: 1.0, height: 1.0),
@@ -220,13 +286,22 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           DebugLogger(message: "Change Language", level: LogLevel.debug).log();
                           setState(() => isLanguageOptionOpened = value);
                         },
-                        leading: Icon(Icons.language),
-                        title: Text("Change Language"),
+                        leading: Icon(Icons.language, color: Theme.of(context).iconTheme.color),
+                        title: Text(
+                          "Change Language",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        ),
                         trailing: AnimatedRotation(
                           turns: isLanguageOptionOpened ? 0.25 : 0.0,
                           duration: Duration(milliseconds: 500),
                           curve: Curves.easeInOut,
-                          child: Icon(Icons.arrow_forward_ios),
+                          child: Icon(
+                            Icons.arrow_forward_ios,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
                         ),
                         tilePadding: EdgeInsets.only(left: 10.0, right: 10.0),
                         iconColor: Colors.grey.shade800,
@@ -247,12 +322,24 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                             child: Column(
                               children: <Widget>[
                                 RadioListTile<LanguageOptions>(
-                                  title: Text("English"),
+                                  title: Text(
+                                    "English",
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      color: Theme.of(context).textTheme.labelSmall?.color,
+                                    ),
+                                  ),
                                   value: LanguageOptions.en,
                                   activeColor: Color(0xFF00CEC9),
                                 ),
                                 RadioListTile<LanguageOptions>(
-                                  title: Text("Indonesia"),
+                                  title: Text(
+                                    "Indonesia",
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      color: Theme.of(context).textTheme.labelSmall?.color,
+                                    ),
+                                  ),
                                   value: LanguageOptions.id,
                                   activeColor: Color(0xFF00CEC9),
                                 ),
@@ -267,8 +354,6 @@ class _SettingPageState extends ConsumerState<SettingPage> {
               ),
               SizedBox(height: 20.0),
               Card(
-                color: Color(0xFFFCFBFB),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 14.0),
                   child: Column(
@@ -277,12 +362,14 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         children: <Widget>[
                           Text(
                             "Security",
-                            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).textTheme.labelMedium?.color,
+                            ),
                           ),
                           SizedBox(width: 10.0),
-                          Expanded(
-                            child: Divider(thickness: 1.2, height: 20.0, color: Colors.black),
-                          ),
+                          Expanded(child: Divider(thickness: 1.2, height: 20.0)),
                         ],
                       ),
                       SizedBox(height: 10.0),
@@ -296,8 +383,14 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                             level: LogLevel.debug,
                           ).log();
                         },
-                        leading: Icon(Icons.fingerprint),
-                        title: Text("Enable Fingerprint"),
+                        leading: Icon(Icons.fingerprint, color: Theme.of(context).iconTheme.color),
+                        title: Text(
+                          "Enable Fingerprint",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        ),
                         trailing: Transform.scale(
                           scale: 0.8,
                           child: Switch(
@@ -319,9 +412,18 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         onTap: () {
                           DebugLogger(message: "Enable 2FA", level: LogLevel.debug).log();
                         },
-                        leading: Icon(Icons.security),
-                        title: Text("Enable 2FA"),
-                        trailing: Icon(Icons.arrow_forward_ios),
+                        leading: Icon(Icons.security, color: Theme.of(context).iconTheme.color),
+                        title: Text(
+                          "Enable 2FA",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                         contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
                       Divider(thickness: 1.0, height: 1.0),
@@ -329,9 +431,18 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         onTap: () {
                           DebugLogger(message: "Device Management", level: LogLevel.debug).log();
                         },
-                        leading: Icon(Icons.devices),
-                        title: Text("Device Management"),
-                        trailing: Icon(Icons.arrow_forward_ios),
+                        leading: Icon(Icons.devices, color: Theme.of(context).iconTheme.color),
+                        title: Text(
+                          "Device Management",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                         contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
                       Divider(thickness: 1.0, height: 1.0),
@@ -339,9 +450,21 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         onTap: () {
                           DebugLogger(message: "App Permissions", level: LogLevel.debug).log();
                         },
-                        leading: Icon(Icons.perm_device_info),
-                        title: Text("App Permissions"),
-                        trailing: Icon(Icons.arrow_forward_ios),
+                        leading: Icon(
+                          Icons.perm_device_info,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        title: Text(
+                          "App Permissions",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                         contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
                     ],
@@ -350,8 +473,6 @@ class _SettingPageState extends ConsumerState<SettingPage> {
               ),
               SizedBox(height: 20.0),
               Card(
-                color: Color(0xFFFCFBFB),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 14.0),
                   child: Column(
@@ -360,12 +481,14 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         children: <Widget>[
                           Text(
                             "Help Center",
-                            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).textTheme.labelMedium?.color,
+                            ),
                           ),
                           SizedBox(width: 10.0),
-                          Expanded(
-                            child: Divider(thickness: 1.2, height: 20.0, color: Colors.black),
-                          ),
+                          Expanded(child: Divider(thickness: 1.2, height: 20.0)),
                         ],
                       ),
                       SizedBox(height: 10.0),
@@ -373,9 +496,21 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         onTap: () {
                           DebugLogger(message: "FAQ", level: LogLevel.debug).log();
                         },
-                        leading: Icon(Icons.question_answer),
-                        title: Text("FAQ"),
-                        trailing: Icon(Icons.arrow_forward_ios),
+                        leading: Icon(
+                          Icons.question_answer,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        title: Text(
+                          "FAQ",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                         contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
                       Divider(thickness: 1.0, height: 1.0),
@@ -383,9 +518,18 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         onTap: () {
                           DebugLogger(message: "About Us", level: LogLevel.debug).log();
                         },
-                        leading: Icon(Icons.info),
-                        title: Text("About Us"),
-                        trailing: Icon(Icons.arrow_forward_ios),
+                        leading: Icon(Icons.info, color: Theme.of(context).iconTheme.color),
+                        title: Text(
+                          "About Us",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                         contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
                       Divider(thickness: 1.0, height: 1.0),
@@ -393,29 +537,64 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         onTap: () {
                           DebugLogger(message: "Rate Us", level: LogLevel.debug).log();
                         },
-                        leading: Icon(Icons.star),
-                        title: Text("Rate Us"),
-                        trailing: Icon(Icons.arrow_forward_ios),
+                        leading: Icon(Icons.star, color: Theme.of(context).iconTheme.color),
+                        title: Text(
+                          "Rate Us",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                         contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
                       Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "Privacy Policy", level: LogLevel.debug).log();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const PrivacyPolicyPage()),
+                          );
                         },
-                        leading: Icon(Icons.policy),
-                        title: Text("Privacy Policy"),
-                        trailing: Icon(Icons.arrow_forward_ios),
+                        leading: Icon(Icons.policy, color: Theme.of(context).iconTheme.color),
+                        title: Text(
+                          "Privacy Policy",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                         contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
                       Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "Term of Service", level: LogLevel.debug).log();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const TermsOfServicePage()),
+                          );
                         },
-                        leading: Icon(Icons.privacy_tip),
-                        title: Text("Term of Service"),
-                        trailing: Icon(Icons.arrow_forward_ios),
+                        leading: Icon(Icons.privacy_tip, color: Theme.of(context).iconTheme.color),
+                        title: Text(
+                          "Term of Service",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                         contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
                       Divider(thickness: 1.0, height: 1.0),
@@ -423,9 +602,21 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         onTap: () {
                           DebugLogger(message: "Contact Support", level: LogLevel.debug).log();
                         },
-                        leading: Icon(Icons.contact_support),
-                        title: Text("Contact Support"),
-                        trailing: Icon(Icons.arrow_forward_ios),
+                        leading: Icon(
+                          Icons.contact_support,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        title: Text(
+                          "Contact Support",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                         contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
                       SizedBox(height: 10.0),
@@ -440,8 +631,6 @@ class _SettingPageState extends ConsumerState<SettingPage> {
               ),
               SizedBox(height: 20.0),
               Card(
-                color: Color(0xFFFCFBFB),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 14.0),
                   child: Column(
@@ -450,12 +639,14 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         children: <Widget>[
                           Text(
                             "Danger Zone",
-                            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).textTheme.labelMedium?.color,
+                            ),
                           ),
                           SizedBox(width: 10.0),
-                          Expanded(
-                            child: Divider(thickness: 1.2, height: 20.0, color: Colors.black),
-                          ),
+                          Expanded(child: Divider(thickness: 1.2, height: 20.0)),
                         ],
                       ),
                       SizedBox(height: 10.0),
@@ -675,8 +866,8 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
     final authUserState = ref.watch(authUserProvider);
     AuthUser? authUser = authUserState.value;
 
-    return SizedBox(
-      height: 130.0,
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
@@ -692,7 +883,13 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
                 children: <Widget>[
                   Icon(Icons.camera_alt, size: 40.0),
                   SizedBox(height: 5.0),
-                  Text("Camera", style: TextStyle(fontSize: 16.0)),
+                  Text(
+                    "Camera",
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Theme.of(context).textTheme.labelSmall?.color,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -709,7 +906,13 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
                 children: <Widget>[
                   Icon(Icons.photo, size: 40.0),
                   SizedBox(height: 5.0),
-                  Text("Gallery", style: TextStyle(fontSize: 16.0)),
+                  Text(
+                    "Gallery",
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Theme.of(context).textTheme.labelSmall?.color,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -731,7 +934,13 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
                 children: <Widget>[
                   Icon(Icons.delete, size: 40.0),
                   SizedBox(height: 5.0),
-                  Text("Delete", style: TextStyle(fontSize: 16.0)),
+                  Text(
+                    "Delete",
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Theme.of(context).textTheme.labelSmall?.color,
+                    ),
+                  ),
                 ],
               ),
             ),

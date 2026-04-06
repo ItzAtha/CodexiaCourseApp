@@ -38,27 +38,39 @@ class CourseCard {
     );
   }
 
-  Widget create() {
+  Widget create(BuildContext context) {
     return OpenContainer(
       tappable: false,
       openElevation: 4.0,
       closedElevation: 0.0,
-      openColor: Color(0xFFF5F6FA),
-      closedColor: Color(0xFFF5F6FA),
+      openColor: Theme.of(context).scaffoldBackgroundColor,
+      closedColor: Theme.of(context).scaffoldBackgroundColor,
       closedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
       transitionDuration: Duration(milliseconds: 800),
       transitionType: ContainerTransitionType.fadeThrough,
       closedBuilder: (context, openAction) {
         return Card(
           elevation: 4.0,
-          color: Color(0xFFFCFBFB),
           clipBehavior: Clip.antiAlias,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
           margin: EdgeInsets.symmetric(horizontal: 4.0, vertical: 10.0),
           child: switch (_type) {
             CardType.course => ExpansionTile(
-              title: Text(_title!, style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600)),
-              subtitle: Text(_description),
+              title: Text(
+                _title!,
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).textTheme.labelSmall?.color,
+                ),
+              ),
+              subtitle: Text(
+                _description,
+                style: TextStyle(
+                  fontSize: 14.0,
+                  color: Theme.of(context).textTheme.labelSmall?.color,
+                ),
+              ),
               leading: CircleAvatar(
                 radius: 20.0,
                 backgroundColor: Colors.transparent,
@@ -72,24 +84,38 @@ class CourseCard {
                 reverseCurve: Curves.easeIn,
               ),
               children: <Widget>[
-                Divider(thickness: 1.5, color: Colors.grey.shade300, height: 2.0),
+                Divider(thickness: 1.5, height: 2.0),
                 Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Column(
                     children: <Widget>[
                       Text(
                         "Course Overview",
-                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).textTheme.labelSmall?.color,
+                        ),
                       ),
                       SizedBox(height: 10.0),
                       Text(
                         _overview!,
-                        style: TextStyle(fontSize: 14.0, color: Colors.grey.shade700),
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: Theme.of(
+                            context,
+                          ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
+                        ),
                       ),
                       SizedBox(height: 20.0),
                       Text(
                         "Available Levels",
-                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).textTheme.labelSmall?.color,
+                        ),
                       ),
                       SizedBox(height: 10.0),
                       Row(
@@ -188,11 +214,24 @@ class CourseCard {
                     children: <Widget>[
                       Text(
                         "What you'll learn",
-                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).textTheme.labelSmall?.color,
+                        ),
                       ),
                       SizedBox(height: 10.0),
-                      Text(_description, textAlign: TextAlign.justify),
-                      Divider(thickness: 1.0, color: Colors.grey.shade400, height: 20.0),
+                      Text(
+                        _description,
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: Theme.of(
+                            context,
+                          ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
+                        ),
+                      ),
+                      Divider(thickness: 1.0, height: 20.0),
                       ElevatedButton(
                         onPressed: openAction,
                         style: ButtonStyle(
