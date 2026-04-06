@@ -23,35 +23,35 @@ class _HomePageState extends State<HomePage> {
       level: Level.intermediate,
       progress: 0.65,
       courseImage: "python.svg",
-    ).create(),
+    ),
     ProgressCard(
       title: "Flutter Framework Development",
       startDate: "15 Aug 2024",
       level: Level.expert,
       progress: 0.48,
       courseImage: "flutter.svg",
-    ).create(),
+    ),
     ProgressCard(
       title: "Java Development",
       startDate: "01 Oct 2024",
       level: Level.beginner,
       progress: 0.87,
       courseImage: "java.svg",
-    ).create(),
+    ),
     ProgressCard(
       title: "React JS Library",
       startDate: "20 Aug 2024",
       level: Level.intermediate,
       progress: 0.32,
       courseImage: "reactjs.svg",
-    ).create(),
+    ),
     ProgressCard(
       title: "Arduino Development",
       startDate: "10 Sept 2024",
       level: Level.expert,
       progress: 0.72,
       courseImage: "arduino.svg",
-    ).create(),
+    ),
   ];
 
   @override
@@ -77,7 +77,10 @@ class _HomePageState extends State<HomePage> {
                     if (carouselController.position.haveDimensions) {
                       scale = max(0.8, 1 - (carouselController.page! - index).abs() * 0.2);
                     }
-                    return Transform.scale(scale: scale, child: progressCardList[index]);
+                    return Transform.scale(
+                      scale: scale,
+                      child: progressCardList[index].create(context),
+                    );
                   },
                 );
               },
