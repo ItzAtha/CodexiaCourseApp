@@ -73,7 +73,7 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     return authUser;
   }
 
-  Future<void> updateDisplayName(String displayName) async {
+  Future<void> updateDisplayName(String? displayName) async {
     FirebaseManager firestore = FirebaseManager();
 
     if (state.value != null) {
