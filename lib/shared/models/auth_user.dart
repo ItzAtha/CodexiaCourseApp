@@ -31,7 +31,7 @@ class AuthUser {
   AuthUser copyWith({String? username, String? displayName, String? email, UserAvatar? avatar}) {
     return AuthUser(
       username: username ?? this.username,
-      displayName: displayName ?? this.displayName,
+      displayName: displayName,
       email: email ?? this.email,
       avatar: avatar ?? this.avatar,
     );
