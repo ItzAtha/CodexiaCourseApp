@@ -17,17 +17,10 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0x800984E3), Color(0xFF0984E3)],
+          colors: [Color(0x990984E3), Color(0xFF0984E3)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.shade200.withValues(alpha: 0.5),
-            blurRadius: 10.0,
-            offset: const Offset(0, 8.0),
-          ),
-        ],
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
