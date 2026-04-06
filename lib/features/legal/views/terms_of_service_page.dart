@@ -12,7 +12,25 @@ class TermsOfServicePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Terms of Service'), centerTitle: true, elevation: 0),
+      appBar: AppBar(
+        title: Text('Terms of Service'),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back),
+          style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
+        ),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0x990984E3), Color(0xFF0984E3)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: FutureBuilder<String>(
           future: _loadTermsText(),
