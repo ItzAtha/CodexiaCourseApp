@@ -13,6 +13,7 @@ import 'package:toastification/toastification.dart';
 
 import '../../../services/cloudinary_services.dart';
 import '../../../shared/models/user_avatar.dart';
+import '../../profile/view/user_profile.dart';
 
 class SettingPage extends ConsumerStatefulWidget {
   const SettingPage({super.key});
@@ -122,7 +123,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
               SizedBox(height: 15.0),
               OutlinedButton(
                 onPressed: () {
-                  DebugLogger(message: "Edit Profile", level: LogLevel.debug).log();
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => UserProfilePage()));
                 },
                 style: OutlinedButton.styleFrom(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -159,7 +160,6 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       SizedBox(height: 10.0),
                       ExpansionTile(
                         onExpansionChanged: (value) {
-                          DebugLogger(message: "Change Theme", level: LogLevel.debug).log();
                           setState(() => isThemeOptionOpened = value);
                         },
                         leading: Icon(Icons.color_lens, color: Theme.of(context).iconTheme.color),
