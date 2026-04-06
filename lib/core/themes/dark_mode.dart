@@ -47,6 +47,16 @@ class DarkMode {
         showDragHandle: true,
         modalBackgroundColor: Color(0xFF28282B),
       ),
+      pageTransitionsTheme: PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: FadeForwardsPageTransitionsBuilder(
+            backgroundColor: Color(0xFF212121),
+          ),
+          TargetPlatform.iOS: FadeForwardsPageTransitionsBuilder(
+            backgroundColor: Color(0xFF212121),
+          ),
+        },
+      ),
     );
   }
 }

@@ -47,6 +47,16 @@ class LightMode {
         showDragHandle: true,
         modalBackgroundColor: Color(0xFFFCFBFB),
       ),
+      pageTransitionsTheme: PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: FadeForwardsPageTransitionsBuilder(
+            backgroundColor: Color(0xFFF5F6FA),
+          ),
+          TargetPlatform.iOS: FadeForwardsPageTransitionsBuilder(
+            backgroundColor: Color(0xFFF5F6FA),
+          ),
+        },
+      ),
     );
   }
 }
