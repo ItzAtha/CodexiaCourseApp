@@ -99,7 +99,17 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                   style: TextStyle(
                     color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
                   ),
-                  decoration: InputDecoration(border: OutlineInputBorder(), isDense: true),
+                  cursorColor: Color(0xFF00CEC9),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0x8000CEC9), width: 1.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF00CEC9), width: 1.5),
+                    ),
+                  ),
                   textInputAction: TextInputAction.next,
                 ),
                 SizedBox(height: 15.0),
@@ -118,10 +128,17 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                   style: TextStyle(
                     color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
                   ),
+                  cursorColor: Color(0xFF00CEC9),
                   decoration: InputDecoration(
+                    isDense: true,
                     hintText: "example@gmail.com",
                     border: OutlineInputBorder(),
-                    isDense: true,
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0x8000CEC9), width: 1.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF00CEC9), width: 1.5),
+                    ),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
@@ -145,11 +162,13 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
             ElevatedButton(
               onPressed: () {
                 if (emailFieldKey.currentState?.validate() ?? false) {
-                  ref
-                      .read(authUserProvider.notifier)
-                      .updateDisplayName(
-                        displayNameController.text.isNotEmpty ? displayNameController.text : null,
-                      );
+                  if ((authUser?.displayName ?? "") != displayNameController.text) {
+                    ref
+                        .read(authUserProvider.notifier)
+                        .updateDisplayName(
+                          displayNameController.text.isNotEmpty ? displayNameController.text : null,
+                        );
+                  }
                   Navigator.pop(context);
                 }
               },
