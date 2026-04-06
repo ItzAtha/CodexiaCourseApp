@@ -8,11 +8,15 @@ class CommunityPage extends StatefulWidget {
 }
 
 class _CommunityPageState extends State<CommunityPage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: const Center(child: Text("Community Page Content")),
+      body: Center(
+        child: Text(
+          "Community Page Content",
+          style: TextStyle(fontSize: 20.0, color: Theme.of(context).textTheme.labelMedium?.color),
+        ),
+      ),
     );
   }
 }
