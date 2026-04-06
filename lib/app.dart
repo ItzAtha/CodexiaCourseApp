@@ -1,8 +1,10 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:codexia_course_learning/core/themes/light_mode.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
+import 'core/themes/dark_mode.dart';
 import 'features/auth/auth_router.dart';
 
 class MyApp extends StatefulWidget {
@@ -15,39 +17,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late ThemeData lightTheme;
-  late ThemeData darkTheme;
-
-  @override
-  void initState() {
-    super.initState();
-
-    lightTheme = ThemeData(
-      useMaterial3: true,
-      scaffoldBackgroundColor: Color(0xFFF5F6FA),
-      searchBarTheme: SearchBarThemeData(
-        backgroundColor: WidgetStatePropertyAll(Color(0xFFFCFBFB)),
-      ),
-      dividerColor: Colors.transparent,
-    );
-
-    darkTheme = ThemeData(
-      useMaterial3: true,
-      scaffoldBackgroundColor: Color(0xFFF5F6FA),
-      searchBarTheme: SearchBarThemeData(
-        backgroundColor: WidgetStatePropertyAll(Color(0xFFFCFBFB)),
-      ),
-      dividerColor: Colors.transparent,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return ToastificationWrapper(
       config: ToastificationConfig(),
       child: AdaptiveTheme(
-        light: lightTheme,
-        dark: darkTheme,
+        debugShowFloatingThemeButton: true,
+        light: LightMode.initialize(),
+        dark: DarkMode.initialize(),
         initial: widget._themeMode ?? AdaptiveThemeMode.system,
         builder: (theme, darkTheme) => MaterialApp(
           title: 'Codexia Learning Course',
