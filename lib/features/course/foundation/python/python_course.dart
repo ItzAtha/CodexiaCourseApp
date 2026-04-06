@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:codexia_course_learning/features/home/models/course_card.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +28,7 @@ class _PythonCourseState extends State<PythonCourse> {
                 courseImage: "python-background.png",
                 courseMenu: PythonBeginner(),
                 courseLevel: CourseLevel.beginner,
-              ).create(),
+              ).create(context),
               SizedBox(height: 10.0),
               CourseCard(
                 type: CardType.courseDetail,
@@ -38,7 +37,7 @@ class _PythonCourseState extends State<PythonCourse> {
                 courseImage: "python-background.png",
                 courseMenu: PythonBeginner(),
                 courseLevel: CourseLevel.intermediate,
-              ).create(),
+              ).create(context),
               SizedBox(height: 10.0),
               CourseCard(
                 type: CardType.courseDetail,
@@ -47,7 +46,7 @@ class _PythonCourseState extends State<PythonCourse> {
                 courseImage: "python-background.png",
                 courseMenu: PythonBeginner(),
                 courseLevel: CourseLevel.expert,
-              ).create(),
+              ).create(context),
             ],
           ),
         ),
