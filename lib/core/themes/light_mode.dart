@@ -13,6 +13,21 @@ class LightMode {
         labelMedium: TextStyle(color: Colors.grey.shade800),
         labelSmall: TextStyle(color: Colors.grey.shade800),
       ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: Color(0xFF28353F),
+        selectionColor: Color(0xFF28353F),
+        selectionHandleColor: Color(0xFF28353F),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        isDense: true,
+        border: OutlineInputBorder(),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Color(0x8000CEC9), width: 1.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFF00CEC9), width: 1.5),
+        ),
+      ),
       cardTheme: CardThemeData(
         elevation: 2.0,
         color: Color(0xFFFCFBFB),

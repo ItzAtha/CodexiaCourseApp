@@ -13,6 +13,21 @@ class DarkMode {
         labelMedium: TextStyle(color: Color(0xFFF5F6FA)),
         labelSmall: TextStyle(color: Color(0xFFF5F6FA)),
       ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: Color(0xFF00CEC9),
+        selectionColor: Color(0xFF00CEC9),
+        selectionHandleColor: Color(0xFF00CEC9),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        isDense: true,
+        border: OutlineInputBorder(),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Color(0x8000CEC9), width: 1.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFF00CEC9), width: 1.5),
+        ),
+      ),
       cardTheme: CardThemeData(
         elevation: 4.0,
         color: Color(0xFF28282B),
