@@ -88,7 +88,7 @@ class AuthService {
 
   Future<UserCredential?> signInWithGoogle() async {
     try {
-      await _googleAuth.initialize(serverClientId: dotenv.env['GOOGLE_CLIENT_ID']);
+      await _googleAuth.initialize(clientId: dotenv.env['GOOGLE_CLIENT_ID']);
 
       final GoogleSignInAccount googleUser = await _googleAuth.authenticate();
 
