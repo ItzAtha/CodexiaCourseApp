@@ -4,20 +4,22 @@ import 'package:codexia_course_learning/features/legal/views/terms_of_service_pa
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../../manager/firebase_manager.dart';
 import '../../../services/auth_services.dart';
+import '../../../shared/providers/auth_user_notifier.dart';
 import '../../home/dashboard_page.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _RegisterPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   bool passwordVisible = false;
 
   final TextEditingController emailController = TextEditingController();
@@ -27,32 +29,24 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final AuthService authService = AuthService();
 
-  void goToHomePage() {
-    Navigator.pushAndRemoveUntil(
-      context,
-      PageRouteBuilder(
-        reverseTransitionDuration: Duration(milliseconds: 500),
-        transitionDuration: Duration(milliseconds: 500),
-        pageBuilder: (context, animation, secondaryAnimation) => DashboardPage(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeThroughTransition(
-            animation: animation,
-            secondaryAnimation: secondaryAnimation,
-            child: child,
-          );
-        },
-      ),
-      (Route<dynamic> route) => false,
-    );
+  void goToDashboardPage() {
+    if (context.mounted) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
         elevation: 0.0,
+        backgroundColor: Colors.transparent,
         forceMaterialTransparency: true,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back, size: 24.0, color: Theme.of(context).iconTheme.color),
+          style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
+        ),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(24.0),
@@ -63,11 +57,11 @@ class _RegisterPageState extends State<RegisterPage> {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  Text("Sign Up", style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold)),
+                  Text("Sign Up", style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.labelLarge?.color)),
                   Text(
                     "Welcome Codexian! Please sign up your account to start your course journey.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                    style: TextStyle(fontSize: 16.0, color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.7)),
                   ),
                 ],
               ),
@@ -77,10 +71,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text("Username", style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                    Text("Username", style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.labelSmall?.color)),
                     TextFormField(
                       controller: usernameController,
-                      decoration: InputDecoration(border: OutlineInputBorder(), isDense: true),
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
+                      ),
                       textInputAction: TextInputAction.next,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
@@ -93,14 +89,15 @@ class _RegisterPageState extends State<RegisterPage> {
                     SizedBox(height: 15.0),
                     Text(
                       "Email Address",
-                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.labelSmall?.color),
                     ),
                     TextFormField(
                       controller: emailController,
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
+                      ),
                       decoration: InputDecoration(
                         hintText: "example@gmail.com",
-                        border: OutlineInputBorder(),
-                        isDense: true,
                       ),
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.next,
@@ -118,14 +115,16 @@ class _RegisterPageState extends State<RegisterPage> {
                       },
                     ),
                     SizedBox(height: 15.0),
-                    Text("Password", style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                    Text("Password", style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.labelSmall?.color)),
                     TextFormField(
                       controller: passwordController,
                       obscureText: !passwordVisible,
                       autocorrect: false,
                       enableSuggestions: false,
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
+                      ),
                       decoration: InputDecoration(
-                        border: OutlineInputBorder(),
                         suffixIcon: InkWell(
                           onTap: () {
                             setState(() {
@@ -133,9 +132,8 @@ class _RegisterPageState extends State<RegisterPage> {
                             });
                           },
                           customBorder: CircleBorder(),
-                          child: Icon(passwordVisible ? Icons.visibility : Icons.visibility_off),
+                          child: Icon(passwordVisible ? Icons.visibility : Icons.visibility_off, size: 24.0, color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.7)),
                         ),
-                        isDense: true,
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
@@ -151,7 +149,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               RichText(
                 text: TextSpan(
-                  style: TextStyle(fontSize: 12.0, color: Colors.grey),
+                  style: TextStyle(fontSize: 12.0, color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.7)),
                   children: <TextSpan>[
                     TextSpan(text: "By signing up, you agree to our "),
                     TextSpan(
@@ -269,7 +267,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   Expanded(
                     child: Divider(
                       height: 1.0,
-                      color: Colors.grey.shade400,
                       thickness: 1.0,
                       endIndent: 20.0,
                     ),
@@ -277,12 +274,11 @@ class _RegisterPageState extends State<RegisterPage> {
                   Text(
                     "or",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey.shade600),
+                    style: TextStyle(color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.7)),
                   ),
                   Expanded(
                     child: Divider(
                       height: 1.0,
-                      color: Colors.grey.shade400,
                       thickness: 1.0,
                       indent: 20.0,
                     ),
@@ -329,14 +325,18 @@ class _RegisterPageState extends State<RegisterPage> {
                     autoCloseDuration: Duration(seconds: 5),
                   );
 
-                  goToHomePage();
+                  goToDashboardPage();
+                  ref.invalidate(authUserProvider);
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFFCFBFB),
+                ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Image.asset("assets/images/google.png", width: 24.0),
                     SizedBox(width: 10.0),
-                    Text("Continue with Google", style: TextStyle(color: Colors.grey.shade600)),
+                    Text("Continue with Google", style: TextStyle(color: Colors.grey.shade800)),
                   ],
                 ),
               ),
@@ -378,14 +378,18 @@ class _RegisterPageState extends State<RegisterPage> {
                     autoCloseDuration: Duration(seconds: 5),
                   );
 
-                  goToHomePage();
+                  goToDashboardPage();
+                  ref.invalidate(authUserProvider);
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFFCFBFB),
+                ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Image.asset("assets/images/github.png", width: 24.0),
                     SizedBox(width: 10.0),
-                    Text("Continue with Github", style: TextStyle(color: Colors.grey.shade600)),
+                    Text("Continue with Github", style: TextStyle(color: Colors.grey.shade800)),
                   ],
                 ),
               ),
@@ -395,7 +399,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: <Widget>[
                   Text(
                     "Already have an account?",
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    style: TextStyle(fontSize: 14, color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.8)),
                   ),
                   SizedBox(width: 10.0),
                   GestureDetector(
