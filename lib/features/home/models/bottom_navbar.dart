@@ -109,7 +109,7 @@ class BottomNavbarItem {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              customBorder: CircleBorder(eccentricity: 0.3),
+              customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
               onTap: () => onPress(index),
               child: ValueListenableBuilder(
                 valueListenable: currentIndex,
@@ -119,7 +119,7 @@ class BottomNavbarItem {
                     duration: const Duration(milliseconds: 200),
                     curve: Curves.easeInOut,
                     child: Container(
-                      width: 82.0,
+                      width: 70.0,
                       height: double.infinity,
                       color: Colors.transparent,
                       child: Column(
