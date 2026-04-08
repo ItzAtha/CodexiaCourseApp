@@ -4,9 +4,7 @@ import '/features/auth/views/login_page.dart';
 import 'package:flutter/material.dart';
 
 class OpeningPage extends StatefulWidget {
-  const OpeningPage({super.key, required String title}) : _title = title;
-
-  final String _title;
+  const OpeningPage({super.key});
 
   @override
   State<StatefulWidget> createState() => _OpeningPageState();
@@ -42,7 +40,7 @@ class _OpeningPageState extends State<OpeningPage> {
       ),
     ),
     Container(
-      color: Colors.blue,
+      color: Colors.cyan,
       child: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -75,7 +73,10 @@ class _OpeningPageState extends State<OpeningPage> {
                         ),
                       );
                     },
-                    child: Text("Get Started"),
+                    child: Text(
+                      "Get Started",
+                      style: TextStyle(fontSize: 16.0, color: Colors.white),
+                    ),
                   ),
                 ),
               ],
@@ -91,7 +92,20 @@ class _OpeningPageState extends State<OpeningPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget._title)),
+      appBar: AppBar(
+        title: Text("Codexia Learning Course"),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0x990984E3), Color(0xFF0984E3)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+      ),
       body: Stack(
         children: [
           PageView.builder(
