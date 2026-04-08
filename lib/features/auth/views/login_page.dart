@@ -2,24 +2,25 @@ import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 
 import '../../../core/utils/logger.dart';
+import '../../../shared/providers/auth_user_notifier.dart';
 import './register_page.dart';
 import './reset_password_page.dart';
-import '../../home/dashboard_page.dart';
 import '../../../services/auth_services.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _LoginPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   bool rememberMe = false;
   bool passwordVisible = false;
   late SharedPreferencesAsync sharedPreferences;
@@ -30,23 +31,18 @@ class _LoginPageState extends State<LoginPage> {
 
   final AuthService authService = AuthService();
 
-  void goToHomePage() {
-    Navigator.pushAndRemoveUntil(
-      context,
-      PageRouteBuilder(
-        reverseTransitionDuration: Duration(milliseconds: 500),
-        transitionDuration: Duration(milliseconds: 500),
-        pageBuilder: (context, animation, secondaryAnimation) => DashboardPage(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeThroughTransition(
-            animation: animation,
-            secondaryAnimation: secondaryAnimation,
-            child: child,
-          );
-        },
-      ),
-      (Route<dynamic> route) => false,
-    );
+  void goToDashboardPage() {
+    if (context.mounted) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
+  }
+
+  Future<void> loadPreferences() async {
+    bool isRemembered = await sharedPreferences.getBool('rememberMe') ?? false;
+
+    setState(() {
+      rememberMe = isRemembered;
+    });
   }
 
   @override
@@ -61,15 +57,21 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     sharedPreferences = SharedPreferencesAsync(options: options);
+    loadPreferences();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
         elevation: 0.0,
+        backgroundColor: Colors.transparent,
         forceMaterialTransparency: true,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back, size: 24.0, color: Theme.of(context).iconTheme.color),
+          style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
+        ),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(24.0),
@@ -80,11 +82,21 @@ class _LoginPageState extends State<LoginPage> {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  Text("Sign In", style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold)),
+                  Text(
+                    "Sign In",
+                    style: TextStyle(
+                      fontSize: 32.0,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.labelLarge?.color,
+                    ),
+                  ),
                   Text(
                     "Welcome back Codexian! Please sign in your account to continue your last course.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.7),
+                    ),
                   ),
                 ],
               ),
@@ -96,15 +108,20 @@ class _LoginPageState extends State<LoginPage> {
                   children: <Widget>[
                     Text(
                       "Email Address",
-                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).textTheme.labelSmall?.color,
+                      ),
                     ),
                     TextFormField(
                       controller: emailController,
-                      decoration: InputDecoration(
-                        hintText: "example@gmail.com",
-                        border: OutlineInputBorder(),
-                        isDense: true,
+                      style: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
                       ),
+                      decoration: InputDecoration(hintText: "example@gmail.com"),
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.next,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -125,12 +142,20 @@ class _LoginPageState extends State<LoginPage> {
                       children: <Widget>[
                         Text(
                           "Password",
-                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
                         ),
                         Spacer(),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.push(
+                          onTap: () async {
+                            emailController.clear();
+                            passwordController.clear();
+                            setState(() => rememberMe = false);
+
+                            await Navigator.push(
                               context,
                               PageRouteBuilder(
                                 reverseTransitionDuration: Duration(milliseconds: 500),
@@ -148,6 +173,9 @@ class _LoginPageState extends State<LoginPage> {
                                     },
                               ),
                             );
+
+                            formKey.currentState?.reset();
+                            FocusManager.instance.primaryFocus?.unfocus();
                           },
                           child: Text(
                             "Forgot Password?",
@@ -161,8 +189,12 @@ class _LoginPageState extends State<LoginPage> {
                       obscureText: !passwordVisible,
                       autocorrect: false,
                       enableSuggestions: false,
+                      style: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
+                      ),
                       decoration: InputDecoration(
-                        border: OutlineInputBorder(),
                         suffixIcon: InkWell(
                           onTap: () {
                             setState(() {
@@ -170,9 +202,12 @@ class _LoginPageState extends State<LoginPage> {
                             });
                           },
                           customBorder: CircleBorder(),
-                          child: Icon(passwordVisible ? Icons.visibility : Icons.visibility_off),
+                          child: Icon(
+                            passwordVisible ? Icons.visibility : Icons.visibility_off,
+                            size: 24.0,
+                            color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.7),
+                          ),
                         ),
-                        isDense: true,
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
@@ -193,24 +228,23 @@ class _LoginPageState extends State<LoginPage> {
                     child: Checkbox(
                       value: rememberMe,
                       onChanged: (value) {
-                        setState(() async {
-                          rememberMe = value ?? false;
-                          await sharedPreferences.setBool('rememberMe', rememberMe);
-                        });
+                        setState(() => rememberMe = value ?? false);
                       },
                     ),
                   ),
                   SizedBox(width: 8.0),
-                  Text("Remember Me", style: TextStyle(fontSize: 14.0)),
+                  Text(
+                    "Remember Me",
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: Theme.of(context).textTheme.labelSmall?.color,
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: 10.0),
               ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all<Color>(Colors.blue.shade600),
-                ),
                 onPressed: () async {
-                  Toastification().dismissAll();
                   FocusScope.of(context).unfocus();
 
                   if (formKey.currentState!.validate()) {
@@ -230,6 +264,7 @@ class _LoginPageState extends State<LoginPage> {
                           style: TextStyle(color: Colors.white),
                         ),
                         type: ToastificationType.error,
+                        alignment: Alignment.topCenter,
                         backgroundColor: Colors.red.shade400,
                         icon: Icon(Icons.error, color: Colors.white),
                         autoCloseDuration: Duration(seconds: 5),
@@ -254,6 +289,7 @@ class _LoginPageState extends State<LoginPage> {
                           style: TextStyle(color: Colors.white),
                         ),
                         type: ToastificationType.error,
+                        alignment: Alignment.topCenter,
                         backgroundColor: Colors.red.shade400,
                         icon: Icon(Icons.error, color: Colors.white),
                         autoCloseDuration: Duration(seconds: 5),
@@ -271,41 +307,34 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(color: Colors.white),
                       ),
                       type: ToastificationType.success,
+                      alignment: Alignment.topCenter,
                       backgroundColor: Colors.green.shade400,
                       icon: Icon(Icons.check_circle, color: Colors.white),
                       autoCloseDuration: Duration(seconds: 5),
                     );
 
-                    goToHomePage();
+                    goToDashboardPage();
+                    ref.invalidate(authUserProvider);
+                    await sharedPreferences.setBool('rememberMe', rememberMe);
+
                     formKey.currentState!.save();
                   }
                 },
-                child: Text('Login', style: TextStyle(color: Colors.white)),
+                child: Text('Login', style: TextStyle(fontSize: 14.0, color: Colors.white)),
               ),
               SizedBox(height: 15.0),
               Row(
                 children: <Widget>[
-                  Expanded(
-                    child: Divider(
-                      height: 1.0,
-                      color: Colors.grey.shade400,
-                      thickness: 1.0,
-                      endIndent: 20.0,
-                    ),
-                  ),
+                  Expanded(child: Divider(height: 1.0, thickness: 1.0, endIndent: 20.0)),
                   Text(
                     "or",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey.shade600),
-                  ),
-                  Expanded(
-                    child: Divider(
-                      height: 1.0,
-                      color: Colors.grey.shade400,
-                      thickness: 1.0,
-                      indent: 20.0,
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.7),
                     ),
                   ),
+                  Expanded(child: Divider(height: 1.0, thickness: 1.0, indent: 20.0)),
                 ],
               ),
               SizedBox(height: 15.0),
@@ -326,6 +355,7 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(color: Colors.white),
                       ),
                       type: ToastificationType.error,
+                      alignment: Alignment.topCenter,
                       backgroundColor: Colors.red.shade400,
                       icon: Icon(Icons.error, color: Colors.white),
                       autoCloseDuration: Duration(seconds: 5),
@@ -343,19 +373,25 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(color: Colors.white),
                     ),
                     type: ToastificationType.success,
+                    alignment: Alignment.topCenter,
                     backgroundColor: Colors.green.shade400,
                     icon: Icon(Icons.check_circle, color: Colors.white),
                     autoCloseDuration: Duration(seconds: 5),
                   );
 
-                  goToHomePage();
+                  goToDashboardPage();
+                  ref.invalidate(authUserProvider);
                 },
+                style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFFCFBFB)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Image.asset("assets/images/google.png", width: 24.0),
                     SizedBox(width: 10.0),
-                    Text("Continue with Google", style: TextStyle(color: Colors.grey.shade600)),
+                    Text(
+                      "Continue with Google",
+                      style: TextStyle(fontSize: 14.0, color: Colors.grey.shade800),
+                    ),
                   ],
                 ),
               ),
@@ -375,6 +411,7 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(color: Colors.white),
                       ),
                       type: ToastificationType.error,
+                      alignment: Alignment.topCenter,
                       backgroundColor: Colors.red.shade400,
                       icon: Icon(Icons.error, color: Colors.white),
                       autoCloseDuration: Duration(seconds: 5),
@@ -392,19 +429,25 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(color: Colors.white),
                     ),
                     type: ToastificationType.success,
+                    alignment: Alignment.topCenter,
                     backgroundColor: Colors.green.shade400,
                     icon: Icon(Icons.check_circle, color: Colors.white),
                     autoCloseDuration: Duration(seconds: 5),
                   );
 
-                  goToHomePage();
+                  goToDashboardPage();
+                  ref.invalidate(authUserProvider);
                 },
+                style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFFCFBFB)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Image.asset("assets/images/github.png", width: 24.0),
                     SizedBox(width: 10.0),
-                    Text("Continue with Github", style: TextStyle(color: Colors.grey.shade600)),
+                    Text(
+                      "Continue with Github",
+                      style: TextStyle(fontSize: 14.0, color: Colors.grey.shade800),
+                    ),
                   ],
                 ),
               ),
@@ -414,12 +457,19 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   Text(
                     "Don't have an account?",
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
+                    ),
                   ),
                   SizedBox(width: 10.0),
                   GestureDetector(
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      emailController.clear();
+                      passwordController.clear();
+                      setState(() => rememberMe = false);
+
+                      await Navigator.push(
                         context,
                         PageRouteBuilder(
                           reverseTransitionDuration: Duration(milliseconds: 500),
@@ -435,6 +485,9 @@ class _LoginPageState extends State<LoginPage> {
                           },
                         ),
                       );
+
+                      formKey.currentState?.reset();
+                      FocusManager.instance.primaryFocus?.unfocus();
                     },
                     child: Text("Sign Up", style: TextStyle(fontSize: 14, color: Colors.blue)),
                   ),
