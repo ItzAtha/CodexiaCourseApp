@@ -9,9 +9,7 @@ import 'views/opening_page.dart';
 import '../home/dashboard_page.dart';
 
 class AuthenticationGate extends ConsumerWidget {
-  final String _title;
-
-  const AuthenticationGate({super.key, required String title}) : _title = title;
+  const AuthenticationGate({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,7 +51,7 @@ class AuthenticationGate extends ConsumerWidget {
             return const DashboardPage();
           }
 
-          return OpeningPage(title: _title);
+          return OpeningPage();
         },
       ),
     );
