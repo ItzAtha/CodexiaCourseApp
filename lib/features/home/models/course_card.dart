@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:animations/animations.dart';
+import 'package:toastification/toastification.dart';
 
 enum CardType { course, courseDetail }
 
@@ -14,6 +15,7 @@ class CourseCard {
   final String _courseImage;
   final Widget _courseMenu;
   final CourseLevel? _courseLevel;
+  final bool? _isMaintainable;
 
   String? get title => _title;
 
@@ -25,7 +27,9 @@ class CourseCard {
     required String courseImage,
     required Widget courseMenu,
     CourseLevel? courseLevel,
-  }) : _courseLevel = courseLevel,
+    bool? isMaintainable,
+  }) : _isMaintainable = isMaintainable,
+       _courseLevel = courseLevel,
        _courseMenu = courseMenu,
        _courseImage = courseImage,
        _overview = overview,
@@ -170,18 +174,25 @@ class CourseCard {
                       ),
                       SizedBox(height: 20.0),
                       ElevatedButton(
-                        onPressed: openAction,
-                        style: ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll(Color(0xFF0984E3)),
-                          padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 4.0)),
-                          shape: WidgetStatePropertyAll(
-                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                          ),
-                          fixedSize: WidgetStatePropertyAll(Size(150.0, 36.0)),
-                        ),
+                        onPressed: () {
+                          if (_isMaintainable ?? false) {
+                            Toastification().show(
+                              title: Text("Coming Soon"),
+                              description: Text("This course is under development. Stay tuned!"),
+                              type: ToastificationType.info,
+                              style: ToastificationStyle.flat,
+                              alignment: Alignment.topCenter,
+                              autoCloseDuration: Duration(seconds: 3),
+                              animationDuration: Duration(milliseconds: 500),
+                            );
+                            return;
+                          }
+
+                          openAction();
+                        },
                         child: Text(
                           "See Details",
-                          style: TextStyle(color: Color(0xFFF5F6FA), fontSize: 14.0),
+                          style: TextStyle(fontSize: 14.0, color: Color(0xFFF5F6FA)),
                         ),
                       ),
                     ],
@@ -234,15 +245,9 @@ class CourseCard {
                       Divider(thickness: 1.0, height: 20.0),
                       ElevatedButton(
                         onPressed: openAction,
-                        style: ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll(Color(0xFF0984E3)),
-                          shape: WidgetStatePropertyAll(
-                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                          ),
-                        ),
                         child: Text(
                           "Get Started",
-                          style: TextStyle(color: Color(0xFFF5F6FA), fontSize: 16.0),
+                          style: TextStyle(fontSize: 14.0, color: Color(0xFFF5F6FA)),
                         ),
                       ),
                     ],
