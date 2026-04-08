@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:toastification/toastification.dart';
 
+import '../../../services/auth_services.dart';
 import '../../../services/cloudinary_services.dart';
 import '../../../shared/models/user_avatar.dart';
 import '../../profile/view/user_profile.dart';
@@ -123,12 +124,11 @@ class _SettingPageState extends ConsumerState<SettingPage> {
               SizedBox(height: 15.0),
               OutlinedButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => UserProfilePage()));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UserProfilePage()),
+                  );
                 },
-                style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                  minimumSize: Size(180.0, 40.0),
-                ),
                 child: Text(
                   "Edit Profile",
                   style: TextStyle(
@@ -655,10 +655,9 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           DebugLogger(message: "Reset Course", level: LogLevel.debug).log();
                         },
                         style: OutlinedButton.styleFrom(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                          side: BorderSide(color: Colors.redAccent),
                           foregroundColor: Colors.redAccent,
-                          minimumSize: Size(double.infinity, 42.0),
+                          minimumSize: Size(double.infinity, 40.0),
+                          side: BorderSide(color: Colors.redAccent),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -671,14 +670,40 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       ),
                       SizedBox(height: 5.0),
                       OutlinedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           DebugLogger(message: "Logout Account", level: LogLevel.debug).log();
+                          bool successLogout = await AuthService().signOut();
+
+                          if (successLogout) {
+                            Toastification().show(
+                              title: Text("Logout Success"),
+                              description: Text("You have successfully logged out."),
+                              type: ToastificationType.success,
+                              style: ToastificationStyle.flat,
+                              alignment: Alignment.topCenter,
+                              autoCloseDuration: Duration(seconds: 3),
+                              animationDuration: Duration(milliseconds: 500),
+                            );
+
+                            if (context.mounted) {
+                              Navigator.of(context).popUntil((route) => route.isFirst);
+                            }
+                          } else {
+                            Toastification().show(
+                              title: Text("Logout Failed"),
+                              description: Text("An error occurred while logging out."),
+                              type: ToastificationType.error,
+                              style: ToastificationStyle.flat,
+                              alignment: Alignment.topCenter,
+                              autoCloseDuration: Duration(seconds: 3),
+                              animationDuration: Duration(milliseconds: 500),
+                            );
+                          }
                         },
                         style: OutlinedButton.styleFrom(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                          side: BorderSide(color: Colors.redAccent),
                           foregroundColor: Colors.redAccent,
-                          minimumSize: Size(double.infinity, 42.0),
+                          minimumSize: Size(double.infinity, 40.0),
+                          side: BorderSide(color: Colors.redAccent),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -695,10 +720,9 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           DebugLogger(message: "Delete Account", level: LogLevel.debug).log();
                         },
                         style: OutlinedButton.styleFrom(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                          side: BorderSide(color: Colors.redAccent),
                           foregroundColor: Colors.redAccent,
-                          minimumSize: Size(double.infinity, 42.0),
+                          minimumSize: Size(double.infinity, 40.0),
+                          side: BorderSide(color: Colors.redAccent),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
