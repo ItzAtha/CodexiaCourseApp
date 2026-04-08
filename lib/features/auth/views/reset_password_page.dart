@@ -17,9 +17,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0.0,
         backgroundColor: Colors.transparent,
-        elevation: 0,
         forceMaterialTransparency: true,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back, size: 24.0, color: Theme.of(context).iconTheme.color),
+          style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.all(24.0),
@@ -31,23 +36,36 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               SizedBox(height: 40.0),
               Text(
                 "Reset Password",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).textTheme.labelLarge?.color,
+                ),
                 textAlign: TextAlign.center,
               ),
               Text(
                 "Enter your email address to receive a password reset link.",
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.7),
+                ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 40.0),
-              Text("Email Address", style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+              Text(
+                "Email Address",
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).textTheme.labelSmall?.color,
+                ),
+              ),
               TextFormField(
                 controller: emailController,
-                decoration: InputDecoration(
-                  hintText: "example@gmail.com",
-                  border: OutlineInputBorder(),
-                  isDense: true,
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
                 ),
+                decoration: InputDecoration(hintText: "example@gmail.com"),
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -65,9 +83,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               ),
               SizedBox(height: 25.0),
               ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all<Color>(Colors.blue.shade600),
-                ),
                 onPressed: () async {
                   String email = emailController.text.trim();
 
