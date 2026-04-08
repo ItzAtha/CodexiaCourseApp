@@ -20,7 +20,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return ToastificationWrapper(
-      config: ToastificationConfig(),
+      config: ToastificationConfig(maxToastLimit: 1),
       child: AdaptiveTheme(
         debugShowFloatingThemeButton: true,
         light: LightMode.initialize(),
@@ -34,7 +34,7 @@ class _MyAppState extends State<MyApp> {
           locale: context.locale,
           theme: theme,
           darkTheme: darkTheme,
-          home: AuthenticationGate(title: "Codexia Learning Course"),
+          home: AuthenticationGate(),
         ),
       ),
     );
