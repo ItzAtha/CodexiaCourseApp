@@ -117,9 +117,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                   style: TextStyle(
                     color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
                   ),
-                  decoration: InputDecoration(
-                    hintText: "example@gmail.com",
-                  ),
+                  decoration: InputDecoration(hintText: "example@gmail.com"),
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -152,14 +150,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                   Navigator.pop(context);
                 }
               },
-              style: ButtonStyle(
-                shape: WidgetStatePropertyAll(
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                ),
-                minimumSize: WidgetStatePropertyAll(Size(double.infinity, 40.0)),
-                backgroundColor: WidgetStatePropertyAll(Color(0xFF0984E3)),
-              ),
-              child: Text("Save", style: TextStyle(fontSize: 16.0, color: Colors.white)),
+              style: ButtonStyle(minimumSize: WidgetStatePropertyAll(Size(double.infinity, 40.0))),
+              child: Text("Save", style: TextStyle(fontSize: 14.0, color: Colors.white)),
             ),
             SizedBox(height: 20.0),
           ],
