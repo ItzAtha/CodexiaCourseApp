@@ -1,16 +1,11 @@
-import 'package:animations/animations.dart';
-import 'package:codexia_course_learning/features/legal/views/privacy_policy_page.dart';
-import 'package:codexia_course_learning/features/legal/views/terms_of_service_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:toastification/toastification.dart';
 
-import '../../../manager/firebase_manager.dart';
 import '../../../services/auth_services.dart';
-import '../../../shared/providers/auth_user_notifier.dart';
-import '../../home/dashboard_page.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
@@ -29,12 +24,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   final AuthService authService = AuthService();
 
-  void goToDashboardPage() {
-    if (context.mounted) {
-      Navigator.of(context).popUntil((route) => route.isFirst);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +32,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         backgroundColor: Colors.transparent,
         forceMaterialTransparency: true,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
           icon: Icon(Icons.arrow_back, size: 24.0, color: Theme.of(context).iconTheme.color),
           style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
         ),
@@ -57,11 +46,21 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  Text("Sign Up", style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.labelLarge?.color)),
+                  Text(
+                    "Sign Up",
+                    style: TextStyle(
+                      fontSize: 32.0,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.labelLarge?.color,
+                    ),
+                  ),
                   Text(
                     "Welcome Codexian! Please sign up your account to start your course journey.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16.0, color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.7)),
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.7),
+                    ),
                   ),
                 ],
               ),
@@ -71,11 +70,20 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text("Username", style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.labelSmall?.color)),
+                    Text(
+                      "Username",
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).textTheme.labelSmall?.color,
+                      ),
+                    ),
                     TextFormField(
                       controller: usernameController,
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
+                        color: Theme.of(
+                          context,
+                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
                       ),
                       textInputAction: TextInputAction.next,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -89,16 +97,20 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     SizedBox(height: 15.0),
                     Text(
                       "Email Address",
-                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.labelSmall?.color),
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).textTheme.labelSmall?.color,
+                      ),
                     ),
                     TextFormField(
                       controller: emailController,
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
+                        color: Theme.of(
+                          context,
+                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
                       ),
-                      decoration: InputDecoration(
-                        hintText: "example@gmail.com",
-                      ),
+                      decoration: InputDecoration(hintText: "example@gmail.com"),
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.next,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -115,14 +127,23 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       },
                     ),
                     SizedBox(height: 15.0),
-                    Text("Password", style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.labelSmall?.color)),
+                    Text(
+                      "Password",
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).textTheme.labelSmall?.color,
+                      ),
+                    ),
                     TextFormField(
                       controller: passwordController,
                       obscureText: !passwordVisible,
                       autocorrect: false,
                       enableSuggestions: false,
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
+                        color: Theme.of(
+                          context,
+                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
                       ),
                       decoration: InputDecoration(
                         suffixIcon: InkWell(
@@ -132,7 +153,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             });
                           },
                           customBorder: CircleBorder(),
-                          child: Icon(passwordVisible ? Icons.visibility : Icons.visibility_off, size: 24.0, color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.7)),
+                          child: Icon(
+                            passwordVisible ? Icons.visibility : Icons.visibility_off,
+                            size: 24.0,
+                            color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.7),
+                          ),
                         ),
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -149,7 +174,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               ),
               RichText(
                 text: TextSpan(
-                  style: TextStyle(fontSize: 12.0, color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.7)),
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.7),
+                  ),
                   children: <TextSpan>[
                     TextSpan(text: "By signing up, you agree to our "),
                     TextSpan(
@@ -157,22 +185,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       style: TextStyle(color: Colors.blue),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              reverseTransitionDuration: Duration(milliseconds: 500),
-                              transitionDuration: Duration(milliseconds: 500),
-                              pageBuilder: (context, animation, secondaryAnimation) =>
-                                  TermsOfServicePage(),
-                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                return FadeThroughTransition(
-                                  animation: animation,
-                                  secondaryAnimation: secondaryAnimation,
-                                  child: child,
-                                );
-                              },
-                            ),
-                          );
+                          context.pushNamed('tos');
                         },
                     ),
                     TextSpan(text: " and "),
@@ -181,22 +194,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       style: TextStyle(color: Colors.blue),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              reverseTransitionDuration: Duration(milliseconds: 500),
-                              transitionDuration: Duration(milliseconds: 500),
-                              pageBuilder: (context, animation, secondaryAnimation) =>
-                                  PrivacyPolicyPage(),
-                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                return FadeThroughTransition(
-                                  animation: animation,
-                                  secondaryAnimation: secondaryAnimation,
-                                  child: child,
-                                );
-                              },
-                            ),
-                          );
+                          context.pushNamed('privacy-policy');
                         },
                     ),
                     TextSpan(text: "."),
@@ -209,7 +207,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   backgroundColor: WidgetStateProperty.all<Color>(Colors.blue.shade600),
                 ),
                 onPressed: () async {
-                  Toastification().dismissAll();
                   FocusScope.of(context).unfocus();
 
                   if (formKey.currentState!.validate()) {
@@ -231,6 +228,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           style: TextStyle(color: Colors.white),
                         ),
                         type: ToastificationType.error,
+                        alignment: Alignment.topCenter,
                         backgroundColor: Colors.red.shade400,
                         icon: Icon(Icons.error, color: Colors.white),
                         autoCloseDuration: Duration(seconds: 5),
@@ -248,15 +246,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         style: TextStyle(color: Colors.white),
                       ),
                       type: ToastificationType.success,
+                      alignment: Alignment.topCenter,
                       backgroundColor: Colors.green.shade400,
                       icon: Icon(Icons.check_circle, color: Colors.white),
                       autoCloseDuration: Duration(seconds: 5),
                     );
-
-                    if (!context.mounted) return;
-
-                    Navigator.pop(context);
-                    formKey.currentState!.save();
                   }
                 },
                 child: Text('Register', style: TextStyle(color: Colors.white)),
@@ -264,25 +258,15 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               SizedBox(height: 15.0),
               Row(
                 children: <Widget>[
-                  Expanded(
-                    child: Divider(
-                      height: 1.0,
-                      thickness: 1.0,
-                      endIndent: 20.0,
-                    ),
-                  ),
+                  Expanded(child: Divider(height: 1.0, thickness: 1.0, endIndent: 20.0)),
                   Text(
                     "or",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.7)),
-                  ),
-                  Expanded(
-                    child: Divider(
-                      height: 1.0,
-                      thickness: 1.0,
-                      indent: 20.0,
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.7),
                     ),
                   ),
+                  Expanded(child: Divider(height: 1.0, thickness: 1.0, indent: 20.0)),
                 ],
               ),
               SizedBox(height: 15.0),
@@ -303,6 +287,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         style: TextStyle(color: Colors.white),
                       ),
                       type: ToastificationType.error,
+                      alignment: Alignment.topCenter,
                       backgroundColor: Colors.red.shade400,
                       icon: Icon(Icons.error, color: Colors.white),
                       autoCloseDuration: Duration(seconds: 5),
@@ -320,17 +305,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       style: TextStyle(color: Colors.white),
                     ),
                     type: ToastificationType.success,
+                    alignment: Alignment.topCenter,
                     backgroundColor: Colors.green.shade400,
                     icon: Icon(Icons.check_circle, color: Colors.white),
                     autoCloseDuration: Duration(seconds: 5),
                   );
-
-                  goToDashboardPage();
-                  ref.invalidate(authUserProvider);
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFFCFBFB),
-                ),
+                style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFFCFBFB)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -356,6 +337,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         style: TextStyle(color: Colors.white),
                       ),
                       type: ToastificationType.error,
+                      alignment: Alignment.topCenter,
                       backgroundColor: Colors.red.shade400,
                       icon: Icon(Icons.error, color: Colors.white),
                       autoCloseDuration: Duration(seconds: 5),
@@ -373,17 +355,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       style: TextStyle(color: Colors.white),
                     ),
                     type: ToastificationType.success,
+                    alignment: Alignment.topCenter,
                     backgroundColor: Colors.green.shade400,
                     icon: Icon(Icons.check_circle, color: Colors.white),
                     autoCloseDuration: Duration(seconds: 5),
                   );
-
-                  goToDashboardPage();
-                  ref.invalidate(authUserProvider);
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFFCFBFB),
-                ),
+                style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFFCFBFB)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -399,11 +377,23 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 children: <Widget>[
                   Text(
                     "Already have an account?",
-                    style: TextStyle(fontSize: 14, color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.8)),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
+                    ),
                   ),
                   SizedBox(width: 10.0),
                   GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () async {
+                      emailController.clear();
+                      usernameController.clear();
+                      passwordController.clear();
+
+                      await context.pushNamed('login');
+
+                      formKey.currentState?.reset();
+                      FocusManager.instance.primaryFocus?.unfocus();
+                    },
                     child: Text("Sign In", style: TextStyle(fontSize: 14, color: Colors.blue)),
                   ),
                 ],
