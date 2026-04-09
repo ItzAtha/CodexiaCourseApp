@@ -1,5 +1,6 @@
 import 'package:codexia_course_learning/services/auth_services.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:toastification/toastification.dart';
 
 class ResetPasswordPage extends StatefulWidget {
@@ -21,7 +22,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         backgroundColor: Colors.transparent,
         forceMaterialTransparency: true,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
           icon: Icon(Icons.arrow_back, size: 24.0, color: Theme.of(context).iconTheme.color),
           style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
         ),
@@ -99,8 +100,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         autoCloseDuration: Duration(seconds: 5),
                       );
 
-                      if (!context.mounted) return;
-                      Navigator.pop(context);
+                      if (context.mounted) {
+                        context.pop();
+                      }
                     } else {
                       Toastification().show(
                         title: Text("Error"),
