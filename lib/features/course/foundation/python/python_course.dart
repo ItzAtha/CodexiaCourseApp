@@ -1,7 +1,6 @@
 import 'package:codexia_course_learning/features/home/models/course_card.dart';
 import 'package:flutter/material.dart';
-
-import './beginner/views/python_beginner.dart';
+import 'package:go_router/go_router.dart';
 
 class PythonCourse extends StatefulWidget {
   const PythonCourse({super.key});
@@ -19,7 +18,7 @@ class _PythonCourseState extends State<PythonCourse> {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
           icon: Icon(Icons.arrow_back),
           style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
         ),
@@ -44,7 +43,7 @@ class _PythonCourseState extends State<PythonCourse> {
                 description:
                     "In this course, you will learn the fundamentals of python programming language: python syntax, data type, operator, conditional statements, looping, conditional looping, and functions.",
                 courseImage: "python-background.png",
-                courseMenu: PythonBeginner(),
+                courseRoutePath: 'python-beginner',
                 courseLevel: CourseLevel.beginner,
               ).create(context),
               SizedBox(height: 10.0),
@@ -53,7 +52,7 @@ class _PythonCourseState extends State<PythonCourse> {
                 description:
                     "In this course, you will learn advanced of the Python programming language: Collections, Processing data in files, Modules, Class, Inheritance, Polymorphism, Encapsulation, Abstraction, Enum, and Exception handling.",
                 courseImage: "python-background.png",
-                courseMenu: PythonBeginner(),
+                courseRoutePath: 'python-intermediate',
                 courseLevel: CourseLevel.intermediate,
               ).create(context),
               SizedBox(height: 10.0),
@@ -62,9 +61,18 @@ class _PythonCourseState extends State<PythonCourse> {
                 description:
                     "In this course, you will learn the top-level Python programming language: GUI, HTTP, and Web Server.",
                 courseImage: "python-background.png",
-                courseMenu: PythonBeginner(),
+                courseRoutePath: 'python-expert',
                 courseLevel: CourseLevel.expert,
               ).create(context),
+              CourseCard(
+                type: CardType.courseDetail,
+                description:
+                    "In this course, you will learn the top-level Python programming language: GUI, HTTP, and Web Server.",
+                courseImage: "python-background.png",
+                courseRoutePath: 'python-master',
+                courseLevel: CourseLevel.master,
+              ).create(context),
+              SizedBox(height: 80.0),
             ],
           ),
         ),
