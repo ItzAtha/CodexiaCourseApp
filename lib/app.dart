@@ -1,11 +1,11 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:codexia_course_learning/core/themes/light_mode.dart';
+import 'package:codexia_course_learning/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
 import 'core/themes/dark_mode.dart';
-import 'features/auth/auth_router.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key, required AdaptiveThemeMode? themeMode}) : _themeMode = themeMode;
@@ -26,7 +26,7 @@ class _MyAppState extends State<MyApp> {
         light: LightMode.initialize(),
         dark: DarkMode.initialize(),
         initial: widget._themeMode ?? AdaptiveThemeMode.system,
-        builder: (theme, darkTheme) => MaterialApp(
+        builder: (theme, darkTheme) => MaterialApp.router(
           title: 'Codexia Learning Course',
           debugShowCheckedModeBanner: false,
           localizationsDelegates: context.localizationDelegates,
@@ -34,7 +34,7 @@ class _MyAppState extends State<MyApp> {
           locale: context.locale,
           theme: theme,
           darkTheme: darkTheme,
-          home: AuthenticationGate(),
+          routerConfig: AppRouter.router,
         ),
       ),
     );
