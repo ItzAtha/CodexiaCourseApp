@@ -1,16 +1,14 @@
-import 'package:animations/animations.dart';
-
-import '/features/auth/views/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class OpeningPage extends StatefulWidget {
-  const OpeningPage({super.key});
+class AuthLandingPage extends StatefulWidget {
+  const AuthLandingPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _OpeningPageState();
+  State<StatefulWidget> createState() => _AuthLandingPageState();
 }
 
-class _OpeningPageState extends State<OpeningPage> {
+class _AuthLandingPageState extends State<AuthLandingPage> {
   late final List<Widget> carouselPage = [
     Container(
       color: Colors.red,
@@ -56,22 +54,7 @@ class _OpeningPageState extends State<OpeningPage> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          reverseTransitionDuration: Duration(milliseconds: 500),
-                          transitionDuration: Duration(milliseconds: 500),
-                          pageBuilder: (context, animation, secondaryAnimation) => LoginPage(),
-                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                            return SharedAxisTransition(
-                              animation: animation,
-                              secondaryAnimation: secondaryAnimation,
-                              transitionType: SharedAxisTransitionType.horizontal,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
+                      context.goNamed('register');
                     },
                     child: Text(
                       "Get Started",
