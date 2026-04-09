@@ -1,16 +1,13 @@
-import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:toastification/toastification.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
+import 'package:toastification/toastification.dart';
 
 import '../../../core/utils/logger.dart';
-import '../../../shared/providers/auth_user_notifier.dart';
-import './register_page.dart';
-import './reset_password_page.dart';
 import '../../../services/auth_services.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -30,12 +27,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   final AuthService authService = AuthService();
-
-  void goToDashboardPage() {
-    if (context.mounted) {
-      Navigator.of(context).popUntil((route) => route.isFirst);
-    }
-  }
 
   Future<void> loadPreferences() async {
     bool isRemembered = await sharedPreferences.getBool('rememberMe') ?? false;
@@ -68,7 +59,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         backgroundColor: Colors.transparent,
         forceMaterialTransparency: true,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
           icon: Icon(Icons.arrow_back, size: 24.0, color: Theme.of(context).iconTheme.color),
           style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
         ),
@@ -155,24 +146,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             passwordController.clear();
                             setState(() => rememberMe = false);
 
-                            await Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                reverseTransitionDuration: Duration(milliseconds: 500),
-                                transitionDuration: Duration(milliseconds: 500),
-                                pageBuilder: (context, animation, secondaryAnimation) =>
-                                    ResetPasswordPage(),
-                                transitionsBuilder:
-                                    (context, animation, secondaryAnimation, child) {
-                                      return SharedAxisTransition(
-                                        animation: animation,
-                                        secondaryAnimation: secondaryAnimation,
-                                        transitionType: SharedAxisTransitionType.horizontal,
-                                        child: child,
-                                      );
-                                    },
-                              ),
-                            );
+                            await context.pushNamed('reset-password');
 
                             formKey.currentState?.reset();
                             FocusManager.instance.primaryFocus?.unfocus();
@@ -227,8 +201,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     width: 24.0,
                     child: Checkbox(
                       value: rememberMe,
-                      onChanged: (value) {
+                      onChanged: (value) async {
                         setState(() => rememberMe = value ?? false);
+                        await sharedPreferences.setBool('rememberMe', rememberMe);
                       },
                     ),
                   ),
@@ -279,6 +254,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     final UserCredential? userCredential = await authService
                         .signInWithEmailAndPassword(emailController.text, passwordController.text);
                     if (userCredential == null) {
+                      await sharedPreferences.remove('rememberMe');
+
                       Toastification().show(
                         title: Text(
                           "Login Failed",
@@ -312,12 +289,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       icon: Icon(Icons.check_circle, color: Colors.white),
                       autoCloseDuration: Duration(seconds: 5),
                     );
-
-                    goToDashboardPage();
-                    ref.invalidate(authUserProvider);
-                    await sharedPreferences.setBool('rememberMe', rememberMe);
-
-                    formKey.currentState!.save();
                   }
                 },
                 child: Text('Login', style: TextStyle(fontSize: 14.0, color: Colors.white)),
@@ -378,9 +349,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     icon: Icon(Icons.check_circle, color: Colors.white),
                     autoCloseDuration: Duration(seconds: 5),
                   );
-
-                  goToDashboardPage();
-                  ref.invalidate(authUserProvider);
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFFCFBFB)),
                 child: Row(
@@ -434,9 +402,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     icon: Icon(Icons.check_circle, color: Colors.white),
                     autoCloseDuration: Duration(seconds: 5),
                   );
-
-                  goToDashboardPage();
-                  ref.invalidate(authUserProvider);
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFFCFBFB)),
                 child: Row(
@@ -464,31 +429,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
                   SizedBox(width: 10.0),
                   GestureDetector(
-                    onTap: () async {
-                      emailController.clear();
-                      passwordController.clear();
-                      setState(() => rememberMe = false);
-
-                      await Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          reverseTransitionDuration: Duration(milliseconds: 500),
-                          transitionDuration: Duration(milliseconds: 500),
-                          pageBuilder: (context, animation, secondaryAnimation) => RegisterPage(),
-                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                            return SharedAxisTransition(
-                              animation: animation,
-                              secondaryAnimation: secondaryAnimation,
-                              transitionType: SharedAxisTransitionType.horizontal,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-
-                      formKey.currentState?.reset();
-                      FocusManager.instance.primaryFocus?.unfocus();
-                    },
+                    onTap: () => context.pop(),
                     child: Text("Sign Up", style: TextStyle(fontSize: 14, color: Colors.blue)),
                   ),
                 ],
