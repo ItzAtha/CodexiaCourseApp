@@ -1,11 +1,10 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:codexia_course_learning/core/utils/logger.dart';
-import 'package:codexia_course_learning/features/legal/views/privacy_policy_page.dart';
-import 'package:codexia_course_learning/features/legal/views/terms_of_service_page.dart';
 import 'package:codexia_course_learning/shared/models/auth_user.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -14,7 +13,6 @@ import 'package:toastification/toastification.dart';
 import '../../../services/auth_services.dart';
 import '../../../services/cloudinary_services.dart';
 import '../../../shared/models/user_avatar.dart';
-import '../../profile/view/user_profile.dart';
 
 class SettingPage extends ConsumerStatefulWidget {
   const SettingPage({super.key});
@@ -40,6 +38,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
     MediaQueryData mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Center(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(12.0),
@@ -89,6 +88,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                                 onPressed: () {
                                   showModalBottomSheet(
                                     context: context,
+                                    useRootNavigator: true,
                                     builder: (context) {
                                       return AvatarSelector();
                                     },
@@ -124,10 +124,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
               SizedBox(height: 15.0),
               OutlinedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => UserProfilePage()),
-                  );
+                  context.pushNamed('edit-profile');
                 },
                 child: Text(
                   "Edit Profile",
@@ -555,10 +552,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "Privacy Policy", level: LogLevel.debug).log();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const PrivacyPolicyPage()),
-                          );
+                          context.pushNamed('privacy-policy');
                         },
                         leading: Icon(Icons.policy, color: Theme.of(context).iconTheme.color),
                         title: Text(
@@ -578,10 +572,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "Term of Service", level: LogLevel.debug).log();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const TermsOfServicePage()),
-                          );
+                          context.pushNamed('tos');
                         },
                         leading: Icon(Icons.privacy_tip, color: Theme.of(context).iconTheme.color),
                         title: Text(
