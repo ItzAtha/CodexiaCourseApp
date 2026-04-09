@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../shared/models/auth_user.dart';
 import '../../../shared/providers/auth_user_notifier.dart';
@@ -39,7 +40,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
           icon: Icon(Icons.arrow_back),
           style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
         ),
@@ -147,7 +148,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                           displayNameController.text.isNotEmpty ? displayNameController.text : null,
                         );
                   }
-                  Navigator.pop(context);
+                  context.pop();
                 }
               },
               style: ButtonStyle(minimumSize: WidgetStatePropertyAll(Size(double.infinity, 40.0))),
