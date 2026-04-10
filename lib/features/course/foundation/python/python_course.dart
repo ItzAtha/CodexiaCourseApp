@@ -41,7 +41,7 @@ class _PythonCourseState extends State<PythonCourse> {
               CourseCard(
                 type: CardType.courseDetail,
                 description:
-                    "In this course, you will learn the fundamentals of python programming language: python syntax, data type, operator, conditional statements, looping, conditional looping, and functions.",
+                    "In this course, you will learn the fundamentals of Python programming language: python syntax, data type, operator, conditional statements, looping, conditional looping, and functions.",
                 courseImage: "python-background.png",
                 courseRoutePath: 'python-beginner',
                 courseLevel: CourseLevel.beginner,
@@ -67,7 +67,7 @@ class _PythonCourseState extends State<PythonCourse> {
               CourseCard(
                 type: CardType.courseDetail,
                 description:
-                    "In this course, you will learn the top-level Python programming language: GUI, HTTP, and Web Server.",
+                    "In this course, you will learning mastering of Python programming language.",
                 courseImage: "python-background.png",
                 courseRoutePath: 'python-master',
                 courseLevel: CourseLevel.master,
