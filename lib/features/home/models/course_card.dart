@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:toastification/toastification.dart';
 
-enum CardType { course, courseDetail }
+import '../../../shared/enums/course_level.dart';
 
-enum CourseLevel { beginner, intermediate, expert, master }
+enum CardType { course, courseDetail }
 
 class CourseCard {
   final CardType _type;
@@ -72,7 +72,7 @@ class CourseCard {
           leading: CircleAvatar(
             radius: 20.0,
             backgroundColor: Colors.transparent,
-            child: SvgPicture.asset("assets/icons/$_courseImage"),
+            backgroundImage: Svg('assets/icons/$_courseImage'),
           ),
           shape: const Border(),
           collapsedShape: const Border(),
