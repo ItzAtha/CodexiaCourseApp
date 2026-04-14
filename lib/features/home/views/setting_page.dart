@@ -675,10 +675,6 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                               autoCloseDuration: Duration(seconds: 3),
                               animationDuration: Duration(milliseconds: 500),
                             );
-
-                            if (context.mounted) {
-                              Navigator.of(context).popUntil((route) => route.isFirst);
-                            }
                           } else {
                             Toastification().show(
                               title: Text("Logout Failed"),
