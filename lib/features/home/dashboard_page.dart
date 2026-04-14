@@ -63,6 +63,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final String location = GoRouterState.of(context).uri.path;
+    final int segmentCount = location.split('/').where((s) => s.isNotEmpty).length;
+    final bool hideNavbar = segmentCount > 1;
+
     ref.listen(authUserProvider, (previous, next) {
       next.when(
         data: (data) {
@@ -100,45 +104,61 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         extendBody: true,
         resizeToAvoidBottomInset: false,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: SpeedDial(
-          icon: Icons.add,
-          activeIcon: Icons.close,
-          spacing: 3,
-          foregroundColor: Color(0xFFF5F6FA),
-          backgroundColor: Color(0xFF00CEC9),
-          childPadding: const EdgeInsets.all(5),
-          spaceBetweenChildren: 4,
-          overlayColor: Colors.black,
-          overlayOpacity: 0.5,
-          elevation: 8.0,
-          animationCurve: Curves.easeInOut,
-          labelTransitionBuilder: (widget, animation) =>
-              ScaleTransition(scale: animation, child: widget),
-          animationDuration: const Duration(milliseconds: 300),
-          children: [
-            SpeedDialChild(
-              child: const Icon(Icons.code),
-              backgroundColor: Colors.redAccent,
-              foregroundColor: Colors.white,
-              label: 'Code Sandbox',
-              onTap: () => DebugLogger(message: 'Code Sandbox', level: LogLevel.debug).log(),
-            ),
-            SpeedDialChild(
-              child: const Icon(Icons.question_answer),
-              backgroundColor: Colors.orangeAccent,
-              foregroundColor: Colors.white,
-              label: 'Challenges',
-              onTap: () => DebugLogger(message: 'Challenges', level: LogLevel.debug).log(),
-            ),
-          ],
-        ),
-        bottomNavigationBar: BottomNavbar(
-          onItemSelected: (index) {
-            setState(() => selectedIndex = index);
-            _onItemTapped(selectedIndex);
-          },
-          onItemSelectedNotifier: ValueNotifier(selectedIndex),
-        ),
+        floatingActionButton: !hideNavbar
+            ? SpeedDial(
+                icon: Icons.add,
+                activeIcon: Icons.close,
+                spacing: 3,
+                foregroundColor: Color(0xFFF5F6FA),
+                backgroundColor: Color(0xFF00CEC9),
+                childPadding: const EdgeInsets.all(5),
+                spaceBetweenChildren: 4,
+                overlayColor: Colors.black,
+                overlayOpacity: 0.5,
+                elevation: 8.0,
+                animationCurve: Curves.easeInOut,
+                labelTransitionBuilder: (widget, animation) =>
+                    ScaleTransition(scale: animation, child: widget),
+                animationDuration: const Duration(milliseconds: 300),
+                children: [
+                  SpeedDialChild(
+                    child: const Icon(Icons.code),
+                    backgroundColor: Colors.redAccent,
+                    foregroundColor: Colors.white,
+                    label: 'Code Sandbox',
+                    onTap: () {
+                      DebugLogger(message: 'Code Sandbox', level: LogLevel.debug).log();
+                    },
+                  ),
+                  SpeedDialChild(
+                    child: const Icon(Icons.question_answer),
+                    backgroundColor: Colors.orangeAccent,
+                    foregroundColor: Colors.white,
+                    label: 'Challenges',
+                    onTap: () => DebugLogger(message: 'Challenges', level: LogLevel.debug).log(),
+                  ),
+                  SpeedDialChild(
+                    child: const Icon(Icons.psychology),
+                    backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
+                    label: 'AI Chat Bot',
+                    onTap: () {
+                      DebugLogger(message: 'AI Chat Bot', level: LogLevel.debug).log();
+                      context.pushNamed('ai-chat');
+                    },
+                  ),
+                ],
+              )
+            : null,
+        bottomNavigationBar: !hideNavbar
+            ? BottomNavbar(
+                onItemSelected: (index) {
+                  setState(() => selectedIndex = index);
+                  _onItemTapped(selectedIndex);
+                },
+                onItemSelectedNotifier: ValueNotifier(selectedIndex),
+              )
+            : null,
         body: widget._navigationShell,
       ),
     );
