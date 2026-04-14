@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:toastification/toastification.dart';
 
 import '../../../shared/models/auth_user.dart';
 import '../../../shared/providers/auth_user_notifier.dart';
@@ -148,6 +149,16 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                           displayNameController.text.isNotEmpty ? displayNameController.text : null,
                         );
                   }
+
+                  Toastification().show(
+                    context: context,
+                    title: Text("Profile updated successfully"),
+                    type: ToastificationType.success,
+                    style: ToastificationStyle.minimal,
+                    alignment: Alignment.topCenter,
+                    autoCloseDuration: Duration(seconds: 2),
+                    animationDuration: Duration(milliseconds: 500),
+                  );
                   context.pop();
                 }
               },
