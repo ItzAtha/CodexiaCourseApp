@@ -1,19 +1,19 @@
+import 'package:codexia_course_learning/shared/enums/course_level.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-
-enum Level { beginner, intermediate, expert }
+import 'package:flutter_svg_provider/flutter_svg_provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class ProgressCard {
   final String _title;
   final String _startDate;
-  final Level _level;
+  final CourseLevel _level;
   final double _progress;
   final String _courseImage;
 
   ProgressCard({
     required String title,
     required String startDate,
-    required Level level,
+    required CourseLevel level,
     required double progress,
     required String courseImage,
   }) : _courseImage = courseImage,
@@ -32,20 +32,22 @@ class ProgressCard {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    const Icon(Icons.calendar_today, size: 16.0, color: Color(0xFF0984E3)),
-                    const SizedBox(width: 5.0),
-                    Text(
-                      _startDate,
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        color: Theme.of(context).textTheme.labelSmall?.color,
+                Skeleton.unite(
+                  child: Row(
+                    children: <Widget>[
+                      const Icon(Icons.calendar_today, size: 16.0, color: Color(0xFF0984E3)),
+                      const SizedBox(width: 5.0),
+                      Text(
+                        _startDate,
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: Theme.of(context).textTheme.labelSmall?.color,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                _getLevelBadge(_level),
+                Skeleton.leaf(child: _getLevelBadge(_level)),
               ],
             ),
             Divider(thickness: 1.0, color: Colors.grey.shade300, height: 20.0),
@@ -55,7 +57,7 @@ class ProgressCard {
                 CircleAvatar(
                   radius: 20.0,
                   backgroundColor: Colors.transparent,
-                  child: SvgPicture.asset("assets/icons/$_courseImage"),
+                  backgroundImage: Svg('assets/icons/$_courseImage'),
                 ),
                 const SizedBox(width: 10.0),
                 Expanded(
@@ -76,19 +78,21 @@ class ProgressCard {
               children: <Widget>[
                 Text("Progress", style: TextStyle(fontSize: 14.0, color: Colors.grey.shade600)),
                 const SizedBox(width: 10.0),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.blue.shade50, Colors.blue.shade100],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                Skeleton.leaf(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.blue.shade50, Colors.blue.shade100],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12.0),
                     ),
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: Text(
-                    "${(_progress * 100).toInt()}% Completed",
-                    style: const TextStyle(fontSize: 12.0, color: Colors.blue),
+                    child: Text(
+                      "${(_progress * 100).toInt()}% Completed",
+                      style: const TextStyle(fontSize: 12.0, color: Colors.blue),
+                    ),
                   ),
                 ),
               ],
@@ -106,22 +110,26 @@ class ProgressCard {
     );
   }
 
-  Widget _getLevelBadge(Level level) {
+  Widget _getLevelBadge(CourseLevel level) {
     String text;
     MaterialColor color;
 
     switch (level) {
-      case Level.beginner:
+      case CourseLevel.beginner:
         text = "Beginner Level";
         color = Colors.green;
         break;
-      case Level.intermediate:
+      case CourseLevel.intermediate:
         text = "Intermediate Level";
         color = Colors.orange;
         break;
-      case Level.expert:
+      case CourseLevel.expert:
         text = "Expert Level";
         color = Colors.red;
+        break;
+      case CourseLevel.master:
+        text = "Master Level";
+        color = Colors.purple;
         break;
     }
 
