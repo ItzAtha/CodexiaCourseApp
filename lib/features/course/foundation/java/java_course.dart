@@ -2,6 +2,8 @@ import 'package:codexia_course_learning/features/home/models/course_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../shared/enums/course_level.dart';
+
 class JavaCourse extends StatefulWidget {
   const JavaCourse({super.key});
 

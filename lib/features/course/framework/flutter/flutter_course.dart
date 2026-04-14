@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../shared/enums/course_level.dart';
 import '../../../home/models/course_card.dart';
 
 class FlutterCourse extends StatefulWidget {
