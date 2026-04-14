@@ -1,12 +1,20 @@
 import 'package:codexia_course_learning/shared/models/user_avatar.dart';
+import 'package:codexia_course_learning/shared/models/user_course.dart';
 
 class AuthUser {
   String username;
   String? displayName;
   String email;
   UserAvatar? avatar;
+  UserCourseList? courses;
 
-  AuthUser({required this.username, this.displayName, required this.email, this.avatar});
+  AuthUser({
+    required this.username,
+    this.displayName,
+    required this.email,
+    this.avatar,
+    this.courses,
+  });
 
   AuthUser.defaultUser() : username = 'Guest', email = '';
 
@@ -16,6 +24,7 @@ class AuthUser {
       displayName: json['displayName'],
       email: json['email'],
       avatar: json['avatar'],
+      courses: json['courses'],
     );
   }
 
@@ -25,15 +34,23 @@ class AuthUser {
       'displayName': displayName,
       'email': email,
       'avatar': avatar?.toJson(),
+      'courses': courses?.toJson(),
     };
   }
 
-  AuthUser copyWith({String? username, String? displayName, String? email, UserAvatar? avatar}) {
+  AuthUser copyWith({
+    String? username,
+    String? displayName,
+    String? email,
+    UserAvatar? avatar,
+    UserCourseList? courses,
+  }) {
     return AuthUser(
       username: username ?? this.username,
       displayName: displayName,
       email: email ?? this.email,
       avatar: avatar ?? this.avatar,
+      courses: courses ?? this.courses,
     );
   }
 }
