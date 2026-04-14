@@ -23,7 +23,10 @@ class FirebaseManager {
         .doc(docId)
         .set(data, options)
         .then((_) {
-          DebugLogger(message: 'Data added with ID: $docId', level: LogLevel.info).log();
+          DebugLogger(
+            message: 'Data added with ID $docId to collection $collection successfully.',
+            level: LogLevel.info,
+          ).log();
         })
         .catchError((error) {
           DebugLogger(
@@ -93,5 +96,26 @@ class FirebaseManager {
             level: LogLevel.error,
           ).log();
         });
+  }
+
+  Future<bool> isDataExist(String collection, String docId) async {
+    final docRef = FirebaseFirestore.instance.collection(collection).doc(docId);
+    try {
+      final docSnapshot = await docRef.get();
+
+      DebugLogger(
+        message:
+            'Document with ID $docId from collection $collection exists: ${docSnapshot.exists}',
+        level: LogLevel.info,
+      ).log();
+      return docSnapshot.exists;
+    } catch (error) {
+      DebugLogger(
+        message: 'Failed to check data existence: $error',
+        stackTrace: StackTrace.current,
+        level: LogLevel.error,
+      ).log();
+      return false;
+    }
   }
 }
