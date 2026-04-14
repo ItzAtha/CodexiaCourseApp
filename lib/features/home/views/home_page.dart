@@ -1,61 +1,45 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:codexia_course_learning/features/home/models/app_bar.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
+import '../../../shared/enums/course_level.dart';
+import '../../../shared/models/auth_user.dart';
+import '../../../shared/models/user_course.dart';
+import '../../../shared/providers/auth_user_notifier.dart';
 import '../models/progress_card.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _HomePageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   final carouselController = PageController(viewportFraction: 0.85);
-
-  final progressCardList = [
-    ProgressCard(
-      title: "Python Development",
-      startDate: "07 Sept 2024",
-      level: Level.intermediate,
-      progress: 0.65,
-      courseImage: "python.svg",
-    ),
-    ProgressCard(
-      title: "Flutter Framework Development",
-      startDate: "15 Aug 2024",
-      level: Level.expert,
-      progress: 0.48,
-      courseImage: "flutter.svg",
-    ),
-    ProgressCard(
-      title: "Java Development",
-      startDate: "01 Oct 2024",
-      level: Level.beginner,
-      progress: 0.87,
-      courseImage: "java.svg",
-    ),
-    ProgressCard(
-      title: "React JS Library",
-      startDate: "20 Aug 2024",
-      level: Level.intermediate,
-      progress: 0.32,
-      courseImage: "reactjs.svg",
-    ),
-    ProgressCard(
-      title: "Arduino Development",
-      startDate: "10 Sept 2024",
-      level: Level.expert,
-      progress: 0.72,
-      courseImage: "arduino.svg",
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
+    final authUserState = ref.watch(authUserProvider);
+    AuthUser? authUser = authUserState.value;
+
+    UserCourseList? userCourseList = authUser?.courses;
+    List<UserCourse> courseList =
+        userCourseList?.courses ??
+        [
+          UserCourse(
+            courseName: "Java Development",
+            courseLevel: CourseLevel.beginner,
+            progress: 0.0,
+            startDate: Timestamp.now(),
+          ),
+        ];
+
     return Scaffold(
       appBar: HomeAppBar(),
       resizeToAvoidBottomInset: false,
@@ -66,8 +50,10 @@ class _HomePageState extends State<HomePage> {
             ExpandablePageView.builder(
               controller: carouselController,
               clipBehavior: Clip.none,
-              itemCount: progressCardList.length,
+              itemCount: courseList.length,
               itemBuilder: (BuildContext context, int index) {
+                UserCourse course = courseList[index];
+
                 if (!carouselController.position.haveDimensions) {
                   return const SizedBox();
                 }
@@ -78,9 +64,20 @@ class _HomePageState extends State<HomePage> {
                     if (carouselController.position.haveDimensions) {
                       scale = max(0.8, 1 - (carouselController.page! - index).abs() * 0.2);
                     }
+
                     return Transform.scale(
                       scale: scale,
-                      child: progressCardList[index].create(context),
+                      child: Skeletonizer(
+                        enabled: authUserState.isLoading,
+                        enableSwitchAnimation: true,
+                        child: ProgressCard(
+                          title: course.courseName,
+                          startDate: course.startDate.toDate().toIso8601String().split('T')[0],
+                          level: course.courseLevel,
+                          progress: course.progress,
+                          courseImage: '${course.courseName.toLowerCase().split(' ')[0]}.svg',
+                        ).create(context),
+                      ),
                     );
                   },
                 );
