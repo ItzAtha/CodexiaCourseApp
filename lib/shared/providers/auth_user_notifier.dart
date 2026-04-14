@@ -6,10 +6,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../core/utils/logger.dart';
 import '../../manager/firebase_manager.dart';
 import '../models/user_avatar.dart';
+import '../models/user_course.dart';
 
 part 'auth_user_notifier.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class AuthUserNotifier extends _$AuthUserNotifier {
   @override
   Future<AuthUser> build() async {
@@ -38,6 +39,14 @@ class AuthUserNotifier extends _$AuthUserNotifier {
               userData.update(
                 'avatar',
                 (value) => UserAvatar.fromJson(avatarSnapshot.data() as Map<String, dynamic>),
+              );
+
+              DocumentReference userCoursesRef = userData['courses'];
+              DocumentSnapshot coursesSnapshot = await userCoursesRef.get();
+
+              userData.update(
+                'courses',
+                (value) => UserCourseList.fromJson(coursesSnapshot.data() as Map<String, dynamic>),
               );
 
               try {
@@ -95,7 +104,13 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     }
   }
 
-  void logout() {
-    state = AsyncData(AuthUser.defaultUser());
+  Future<void> updateCourses(UserCourseList courses) async {
+    FirebaseManager firestore = FirebaseManager();
+
+    if (state.value != null) {
+      state = AsyncData(state.value!.copyWith(courses: courses));
+
+      await firestore.updateData('UserCourse', state.value!.email, state.value!.courses!.toJson());
+    }
   }
 }
