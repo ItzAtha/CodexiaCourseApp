@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:codexia_course_learning/features/auth/auth_router.dart';
 import 'package:codexia_course_learning/features/course/foundation/python/python_course_router.dart';
 import 'package:codexia_course_learning/features/home/dashboard_page.dart';
+import 'package:codexia_course_learning/features/home/views/ai_chat_bot_page.dart';
 import 'package:codexia_course_learning/features/home/views/community_page.dart';
 import 'package:codexia_course_learning/features/home/views/course_page.dart';
 import 'package:codexia_course_learning/features/home/views/home_page.dart';
@@ -25,7 +26,9 @@ class AppRouter {
       final isAuthenticated = user != null;
 
       final isOnAuthPath = state.uri.path.startsWith('/auth');
-      final isOnTermsPath = state.uri.path.startsWith('/term-of-service') || state.uri.path.startsWith('/privacy-policy');
+      final isOnTermsPath =
+          state.uri.path.startsWith('/term-of-service') ||
+          state.uri.path.startsWith('/privacy-policy');
 
       if (!isAuthenticated && !(isOnAuthPath || isOnTermsPath)) {
         return '/auth';
@@ -74,9 +77,7 @@ class AppRouter {
                 builder: (context, state) {
                   return CoursePage();
                 },
-                routes: <RouteBase>[
-                  PythonCourseRouter.initialize(),
-                ],
+                routes: <RouteBase>[PythonCourseRouter.initialize()],
               ),
             ],
           ),
@@ -99,16 +100,25 @@ class AppRouter {
                 builder: (context, state) {
                   return SettingPage();
                 },
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'user-profile',
+                    name: 'edit-profile',
+                    builder: (context, state) {
+                      return const UserProfilePage();
+                    },
+                  ),
+                ],
               ),
             ],
           ),
         ],
       ),
       GoRoute(
-        path: '/user-profile',
-        name: 'edit-profile',
+        path: '/ai-chat-bot',
+        name: 'ai-chat',
         builder: (context, state) {
-          return const UserProfilePage();
+          return const AIChatBotPage();
         },
       ),
       GoRoute(
