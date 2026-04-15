@@ -1,14 +1,17 @@
 import 'dart:async';
+import 'dart:developer';
 
-import 'package:codexia_course_learning/manager/firebase_manager.dart';
 import 'package:codexia_course_learning/shared/models/ai_chat_bot.dart';
 import 'package:codexia_course_learning/shared/models/auth_user.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
+import 'package:codexia_course_learning/shared/widgets/ai_chat_text.dart';
 import 'package:firebase_ai/firebase_ai.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../manager/firebase_manager.dart';
 
 class AIChatBotPage extends ConsumerStatefulWidget {
   const AIChatBotPage({super.key});
@@ -20,18 +23,43 @@ class AIChatBotPage extends ConsumerStatefulWidget {
 class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
   String? cacheEmail;
   Timer? autoSaveTimer;
+  Timer? aiWriteTextTimer;
+  final ValueNotifier<bool> showScrollableButton = ValueNotifier<bool>(false);
 
   final List<AIChatBot> chatBotList = [];
+  final ScrollController scrollController = ScrollController();
   final TextEditingController textEditingController = TextEditingController();
 
   late ChatSession chat;
   late GenerativeModel model;
 
-  void createMessage(String message, bool isUser) {
+  Future<void> createMessage(String message, bool isUser, {bool thinkingMode = false}) async {
     Role role = isUser ? Role.user : Role.model;
 
-    AIChatBot chatBot = AIChatBot(message: message, role: role);
-    setState(() => chatBotList.add(chatBot));
+    if (role == Role.user) {
+      AIChatBot chatBot = AIChatBot(message: message, role: role);
+      setState(() => chatBotList.add(chatBot));
+    } else if (role == Role.model) {
+      if (thinkingMode) {
+        AIChatBot chatBot = AIChatBot(message: message, role: role);
+        setState(() => chatBotList.add(chatBot));
+        return;
+      }
+
+      List<String> separateText = message.split('');
+      List<String> addedText = [];
+
+      for (var text in separateText) {
+        addedText.add(text);
+        log("Text Added: $text => $addedText");
+
+        String newMessage = addedText.join('');
+        await Future.delayed(Duration(microseconds: 500));
+
+        if (!mounted) break;
+        setState(() => chatBotList.last = AIChatBot(message: newMessage, role: role));
+      }
+    }
   }
 
   List<Widget> getMessageCard() {
@@ -50,13 +78,17 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
                   constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
-                  child: Text(
-                    chatBot.message,
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      color: Theme.of(context).textTheme.labelSmall?.color,
-                    ),
-                  ),
+                  child: chatBot.role == Role.user
+                      ? Text(
+                          chatBot.message,
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
+                          ),
+                        )
+                      : Text.rich(
+                          TextSpan(children: [...AIChatText(chatBot.message).format(context)]),
+                        ),
                 ),
               ),
             ),
@@ -79,6 +111,7 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
         Map<String, dynamic>? data = await manager.getData('AIChatBot', authUser.email);
         if (data != null) {
           chatHistory = [];
+
           AIChatBotList aiChatBotList = AIChatBotList.fromJson(data);
           setState(() => chatBotList.addAll(aiChatBotList.aiChatBotList));
 
@@ -122,6 +155,12 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
 
     loadChatData();
     startAutoSaveChatData();
+
+    scrollController.addListener(() {
+      bool isReachBottom =
+          scrollController.position.pixels == scrollController.position.minScrollExtent;
+      showScrollableButton.value = !isReachBottom;
+    });
   }
 
   @override
@@ -133,12 +172,16 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
     }
 
     autoSaveTimer?.cancel();
+    scrollController.dispose();
     textEditingController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final authUserState = ref.watch(authUserProvider);
+    AuthUser? authUser = authUserState.value;
+
     return Scaffold(
       body: Stack(
         children: <Widget>[
@@ -154,7 +197,7 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       Text(
-                        "Hello, ItzAtha!",
+                        "Hello, ${authUser?.displayName ?? authUser?.username ?? "Guest"}!",
                         style: TextStyle(
                           fontSize: 24.0,
                           fontWeight: FontWeight.bold,
@@ -179,12 +222,41 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
 
           Positioned.fill(
             child: SingleChildScrollView(
+              controller: scrollController,
+              primary: false,
               reverse: true,
               child: Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
-                  children: [SizedBox(height: 20.0), ...getMessageCard(), SizedBox(height: 80.0)],
+                  children: [
+                    SizedBox(height: 32.0),
+                    ...getMessageCard(),
+                    Text.rich(
+                      TextSpan(
+                        text: "Powered by ",
+                        style: TextStyle(
+                          fontSize: 12.0,
+                          color: Theme.of(
+                            context,
+                          ).textTheme.labelSmall?.color?.withValues(alpha: 0.6),
+                        ),
+                        children: [
+                          TextSpan(
+                            text: "Google Gemini",
+                            style: TextStyle(
+                              fontSize: 12.0,
+                              color: Theme.of(
+                                context,
+                              ).textTheme.labelSmall?.color?.withValues(alpha: 0.6),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 80.0),
+                  ],
                 ),
               ),
             ),
@@ -193,7 +265,7 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
           Align(
             alignment: Alignment.topLeft,
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 32.0, horizontal: 20.0),
+              padding: EdgeInsets.symmetric(vertical: 40.0, horizontal: 20.0),
               child: Material(
                 elevation: 4.0,
                 color: Theme.of(context).cardColor,
@@ -212,64 +284,101 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
             ),
           ),
 
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Card(
-              clipBehavior: Clip.antiAlias,
-              margin: EdgeInsets.all(0.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(16.0),
-                  topRight: Radius.circular(16.0),
-                ),
-              ),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                constraints: BoxConstraints(minWidth: double.infinity, minHeight: 80.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    TextField(
-                      controller: textEditingController,
-                      minLines: 1,
-                      maxLines: null,
-                      decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          onPressed: () {
-                            String value = textEditingController.text;
-
-                            if (value.isEmpty) return;
-
-                            createMessage(value, true);
-                            textEditingController.clear();
-
-                            chat
-                                .sendMessage(Content.text(value))
-                                .then((value) {
-                                  String outputText = value.text ?? "";
-
-                                  setState(() {
-                                    createMessage(outputText, false);
-                                  });
-                                })
-                                .catchError((error) {
-                                  print(error);
-                                });
-                          },
-                          icon: Icon(Icons.send),
-                          iconSize: 20.0,
-                          color: Theme.of(context).iconTheme.color,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              ValueListenableBuilder<bool>(
+                valueListenable: showScrollableButton,
+                builder: (context, value, child) {
+                  return Visibility(
+                    visible: value,
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: Material(
+                          elevation: 4.0,
+                          color: Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(32.0),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(32.0),
+                            onTap: () {
+                              scrollController.animateTo(
+                                scrollController.position.minScrollExtent,
+                                duration: Duration(seconds: 1),
+                                curve: Curves.easeOut,
+                              );
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(8.0),
+                              child: Icon(
+                                Icons.keyboard_arrow_down,
+                                size: 24.0,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
                         ),
-                        suffixIconConstraints: BoxConstraints(minWidth: 40.0, minHeight: 40.0),
-                        hintText: 'Write prompt here',
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
                       ),
                     ),
-                  ],
+                  );
+                },
+              ),
+
+              Card(
+                clipBehavior: Clip.antiAlias,
+                margin: EdgeInsets.all(0.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16.0),
+                    topRight: Radius.circular(16.0),
+                  ),
+                ),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  constraints: BoxConstraints(minWidth: double.infinity, minHeight: 80.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      TextField(
+                        controller: textEditingController,
+                        minLines: 1,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              String value = textEditingController.text.trim();
+                              if (value.isEmpty) return;
+
+                              createMessage(value, true);
+                              createMessage("Thinking....", false, thinkingMode: true);
+                              textEditingController.clear();
+
+                              chat
+                                  .sendMessage(Content.text(value))
+                                  .then((value) {
+                                    String outputText = value.text ?? "";
+                                    createMessage(outputText, false);
+                                  })
+                                  .catchError((error) {
+                                    print(error);
+                                  });
+                            },
+                            icon: Icon(Icons.send),
+                            iconSize: 20.0,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
+                          suffixIconConstraints: BoxConstraints(minWidth: 40.0, minHeight: 40.0),
+                          hintText: 'Write prompt here',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ],
       ),
