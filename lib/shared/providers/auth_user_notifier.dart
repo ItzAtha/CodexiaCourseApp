@@ -88,9 +88,11 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     if (state.value != null) {
       state = AsyncData(state.value!.copyWith(displayName: displayName));
 
-      await firestore.updateData('Users', state.value!.email, {
-        'displayName': state.value!.displayName,
-      });
+      await firestore.updateData(
+        'Users',
+        state.value!.email,
+        newData: {'displayName': state.value!.displayName},
+      );
     }
   }
 
@@ -100,7 +102,11 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     if (state.value != null) {
       state = AsyncData(state.value!.copyWith(avatar: avatar));
 
-      await firestore.updateData('Avatars', state.value!.email, state.value!.avatar!.toJson());
+      await firestore.updateData(
+        'Avatars',
+        state.value!.email,
+        newData: state.value!.avatar!.toJson(),
+      );
     }
   }
 
@@ -110,7 +116,11 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     if (state.value != null) {
       state = AsyncData(state.value!.copyWith(courses: courses));
 
-      await firestore.updateData('UserCourse', state.value!.email, state.value!.courses!.toJson());
+      await firestore.updateData(
+        'UserCourse',
+        state.value!.email,
+        newData: state.value!.courses!.toJson(),
+      );
     }
   }
 }
