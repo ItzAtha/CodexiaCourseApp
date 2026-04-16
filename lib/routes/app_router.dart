@@ -2,7 +2,6 @@ import 'package:animations/animations.dart';
 import 'package:codexia_course_learning/features/auth/auth_router.dart';
 import 'package:codexia_course_learning/features/course/foundation/python/python_course_router.dart';
 import 'package:codexia_course_learning/features/home/dashboard_page.dart';
-import 'package:codexia_course_learning/features/home/views/ai_chat_bot_page.dart';
 import 'package:codexia_course_learning/features/home/views/community_page.dart';
 import 'package:codexia_course_learning/features/home/views/course_page.dart';
 import 'package:codexia_course_learning/features/home/views/home_page.dart';
@@ -14,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/chat/aibot/views/ai_chat_bot_page.dart';
 import '../features/profile/view/user_profile.dart';
 
 class AppRouter {
