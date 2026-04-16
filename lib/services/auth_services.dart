@@ -212,16 +212,23 @@ class AuthService {
     );
 
     if (existingUserData == null) {
-      await firebaseManager.addData("Users", userInfo.email!, {
-        "email": userInfo.email!,
-        "displayName": userInfo.displayName ?? displayName,
-        "createdAt": DateTime.now().toIso8601String(),
-        "lastSignIn": DateTime.now().toIso8601String(),
-      });
+      await firebaseManager.addData(
+        "Users",
+        userInfo.email!,
+        data: {
+          "email": userInfo.email!,
+          "displayName": userInfo.displayName ?? displayName,
+          "createdAt": DateTime.now().toIso8601String(),
+          "lastSignIn": DateTime.now().toIso8601String(),
+        },
+      );
     } else {
-      await firebaseManager.addData("Users", userInfo.email!, {
-        "lastSignIn": DateTime.now().toIso8601String(),
-      }, SetOptions(merge: true));
+      await firebaseManager.addData(
+        "Users",
+        userInfo.email!,
+        data: {"lastSignIn": DateTime.now().toIso8601String()},
+        options: SetOptions(merge: true),
+      );
     }
   }
 }
