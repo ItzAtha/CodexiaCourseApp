@@ -141,7 +141,7 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
       if (cacheEmail != null) {
         FirebaseManager manager = FirebaseManager();
         AIChatBotList aiChatBotList = AIChatBotList(aiChatBotList: chatBotList);
-        manager.updateData('AIChatBot', cacheEmail!, aiChatBotList.toJson());
+        manager.updateData('AIChatBot', cacheEmail!, newData: aiChatBotList.toJson());
       }
     });
   }
@@ -168,7 +168,7 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
     if (cacheEmail != null) {
       FirebaseManager manager = FirebaseManager();
       AIChatBotList aiChatBotList = AIChatBotList(aiChatBotList: chatBotList);
-      manager.updateData('AIChatBot', cacheEmail!, aiChatBotList.toJson());
+      manager.updateData('AIChatBot', cacheEmail!, newData: aiChatBotList.toJson());
     }
 
     autoSaveTimer?.cancel();
