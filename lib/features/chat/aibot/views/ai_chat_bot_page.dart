@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:codexia_course_learning/shared/models/ai_chat_bot.dart';
 import 'package:codexia_course_learning/shared/models/auth_user.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
 import 'package:codexia_course_learning/shared/widgets/ai_chat_text.dart';
@@ -11,7 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../manager/firebase_manager.dart';
+import '../../../../manager/firebase_manager.dart';
+import '../models/ai_chat_bot.dart';
 
 class AIChatBotPage extends ConsumerStatefulWidget {
   const AIChatBotPage({super.key});
