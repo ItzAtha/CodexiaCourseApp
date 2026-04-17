@@ -27,53 +27,43 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     if (currentUser != null) {
       final String? userId = currentUser.providerData[0].email;
 
-      await usersCollection
-          .doc(userId)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) async {
-            if (documentSnapshot.exists) {
-              final Map<String, dynamic> userData = documentSnapshot.data() as Map<String, dynamic>;
+      final (usersData, coursesData) = await (
+        usersCollection.doc(userId).get(),
+        usersCollection.doc(userId).collection('Courses').get(),
+      ).wait;
 
-              DocumentReference userCoursesRef = userData['courses'];
-              DocumentSnapshot coursesSnapshot = await userCoursesRef.get();
+      if (usersData.exists) {
+        final Map<String, dynamic> userData = usersData.data() as Map<String, dynamic>;
 
-              userData.update('avatar', (value) {
-                if (value != null) {
-                  return UserAvatar.fromJson(value as Map<String, dynamic>);
-                }
-              });
+        userData.update('avatar', (value) {
+          if (value != null) {
+            return UserAvatar.fromJson(value as Map<String, dynamic>);
+          }
+        });
 
-              userData.update(
-                'courses',
-                (value) => UserCourseList.fromJson(coursesSnapshot.data() as Map<String, dynamic>),
-              );
+        userData.update(
+          'courses',
+          (value) => UserCourseList.fromJson(coursesData.docs.map((doc) => doc.data()).toList()),
+        );
 
-              try {
-                authUser = AuthUser.fromJson(userData);
-                Map<String, dynamic> authUserDetail = authUser.toJson();
+        try {
+          authUser = AuthUser.fromJson(userData);
+          Map<String, dynamic> authUserDetail = authUser.toJson();
 
-                DebugLogger(message: authUserDetail, level: LogLevel.trace).log();
-              } catch (error, stackTrace) {
-                DebugLogger(
-                  message: 'Error parsing user data: $error',
-                  stackTrace: stackTrace,
-                  level: LogLevel.error,
-                ).log();
-              }
-            } else {
-              DebugLogger(
-                message: 'User data not found for user ID: $userId',
-                level: LogLevel.info,
-              ).log();
-            }
-          })
-          .catchError((error) {
-            DebugLogger(
-              message: 'Error getting user data: $error',
-              stackTrace: StackTrace.current,
-              level: LogLevel.error,
-            ).log();
-          });
+          DebugLogger(message: authUserDetail, level: LogLevel.trace).log();
+        } catch (error, stackTrace) {
+          DebugLogger(
+            message: 'Error parsing user data: $error',
+            stackTrace: stackTrace,
+            level: LogLevel.error,
+          ).log();
+        }
+      } else {
+        DebugLogger(
+          message: 'User data not found for user ID: $userId',
+          level: LogLevel.info,
+        ).log();
+      }
     } else {
       DebugLogger(message: 'No user is currently signed in.', level: LogLevel.info).log();
     }
@@ -115,11 +105,17 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     if (state.value != null) {
       state = AsyncData(state.value!.copyWith(courses: courses));
 
-      await firestore.updateData(
-        'UserCourse',
-        state.value!.email,
-        newData: state.value!.courses.toJson(),
-      );
+      for (var course in courses.courseList) {
+        await firestore.updateData(
+          'Users',
+          state.value!.email,
+          subCollectionQuery: SubCollectionQuery(
+            collection: 'Courses',
+            docId: course.courseId,
+            data: courses.toJson(),
+          ),
+        );
+      }
     }
   }
 }
