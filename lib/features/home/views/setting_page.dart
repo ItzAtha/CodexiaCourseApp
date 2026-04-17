@@ -33,8 +33,8 @@ class _SettingPageState extends ConsumerState<SettingPage> {
   @override
   Widget build(BuildContext context) {
     final authUserState = ref.watch(authUserProvider);
-    AuthUser? authUser = authUserState.value;
 
+    AuthUser? authUser = authUserState.value;
     MediaQueryData mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
@@ -755,19 +755,18 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
 
       if (image != null) {
         final croppedImage = await cropAvatarImage(image.path);
-
         if (croppedImage == null) {
           DebugLogger(message: "Cropped image is null", level: LogLevel.info).log();
           return;
         }
 
-        (String?, String?)? userAvatar = await CloudinaryServices().uploadImage(croppedImage.path);
-
+        final userAvatar = await CloudinaryServices().uploadImage(croppedImage.path);
         if (userAvatar != null) {
           DebugLogger(message: "Public Id: ${userAvatar.$1}", level: LogLevel.info).log();
           DebugLogger(message: "URL: ${userAvatar.$2}", level: LogLevel.info).log();
 
           await deleteCurrentAvatar(publicId);
+
           UserAvatar avatar = UserAvatar(publicId: userAvatar.$1!, avatarPath: userAvatar.$2!);
           ref.read(authUserProvider.notifier).updateAvatar(avatar);
 
@@ -804,7 +803,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
   }
 
   Future<void> deleteCurrentAvatar(String? publicId) async {
-    if (publicId == null || publicId.isEmpty) {
+    if (publicId == null) {
       DebugLogger(message: "No avatar to delete", level: LogLevel.info).log();
       return;
     }
@@ -812,7 +811,8 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
     bool isDeleted = await CloudinaryServices().deleteImage(publicId);
 
     if (isDeleted) {
-      ref.read(authUserProvider.notifier).updateAvatar(UserAvatar(publicId: ''));
+      ref.read(authUserProvider.notifier).updateAvatar(null);
+
       if (isDeleteButtonPress) {
         Toastification().show(
           title: Text("Avatar Deleted"),
@@ -874,8 +874,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
 
   @override
   Widget build(BuildContext context) {
-    final authUserState = ref.watch(authUserProvider);
-    AuthUser? authUser = authUserState.value;
+    final userAvatar = ref.watch(authUserProvider.select((value) => value.value?.avatar));
 
     return Padding(
       padding: EdgeInsets.only(bottom: 10.0),
@@ -883,8 +882,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           InkWell(
-            onTap: () =>
-                selectAvatarImage(ImageSource.camera, publicId: authUser?.avatar?.publicId),
+            onTap: () => selectAvatarImage(ImageSource.camera, publicId: userAvatar?.publicId),
             customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
             child: SizedBox(
               height: 100.0,
@@ -906,8 +904,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
             ),
           ),
           InkWell(
-            onTap: () =>
-                selectAvatarImage(ImageSource.gallery, publicId: authUser?.avatar?.publicId),
+            onTap: () => selectAvatarImage(ImageSource.gallery, publicId: userAvatar?.publicId),
             customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
             child: SizedBox(
               height: 100.0,
@@ -932,7 +929,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
             onTap: () async {
               setState(() => isDeleteButtonPress = true);
 
-              await deleteCurrentAvatar(authUser?.avatar?.publicId);
+              await deleteCurrentAvatar(userAvatar?.publicId);
 
               setState(() => isDeleteButtonPress = false);
             },
