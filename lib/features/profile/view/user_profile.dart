@@ -148,17 +148,17 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                         .updateDisplayName(
                           displayNameController.text.isNotEmpty ? displayNameController.text : null,
                         );
-                  }
 
-                  Toastification().show(
-                    context: context,
-                    title: Text("Profile updated successfully"),
-                    type: ToastificationType.success,
-                    style: ToastificationStyle.minimal,
-                    alignment: Alignment.topCenter,
-                    autoCloseDuration: Duration(seconds: 2),
-                    animationDuration: Duration(milliseconds: 500),
-                  );
+                    Toastification().show(
+                      context: context,
+                      title: Text("Profile updated successfully"),
+                      type: ToastificationType.success,
+                      style: ToastificationStyle.minimal,
+                      alignment: Alignment.topCenter,
+                      autoCloseDuration: Duration(seconds: 2),
+                      animationDuration: Duration(milliseconds: 500),
+                    );
+                  }
                   context.pop();
                 }
               },
