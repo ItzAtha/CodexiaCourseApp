@@ -6,17 +6,17 @@ class AuthUser {
   String? displayName;
   String email;
   UserAvatar? avatar;
-  UserCourseList? courses;
+  UserCourseList courses;
 
   AuthUser({
     required this.username,
     this.displayName,
     required this.email,
     this.avatar,
-    this.courses,
+    required this.courses,
   });
 
-  AuthUser.defaultUser() : username = 'Guest', email = '';
+  AuthUser.defaultUser() : username = 'Guest', email = '', courses = UserCourseList(courses: []);
 
   factory AuthUser.fromJson(Map<String, dynamic> json) {
     return AuthUser(
@@ -34,22 +34,22 @@ class AuthUser {
       'displayName': displayName,
       'email': email,
       'avatar': avatar?.toJson(),
-      'courses': courses?.toJson(),
+      'courses': courses.toJson(),
     };
   }
 
   AuthUser copyWith({
     String? username,
-    String? displayName,
+    String? Function()? displayName,
     String? email,
-    UserAvatar? avatar,
+    UserAvatar? Function()? avatar,
     UserCourseList? courses,
   }) {
     return AuthUser(
       username: username ?? this.username,
-      displayName: displayName,
+      displayName: displayName != null ? displayName() : this.displayName,
       email: email ?? this.email,
-      avatar: avatar ?? this.avatar,
+      avatar: avatar != null ? avatar() : this.avatar,
       courses: courses ?? this.courses,
     );
   }
