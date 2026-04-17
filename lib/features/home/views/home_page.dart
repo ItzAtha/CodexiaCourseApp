@@ -30,9 +30,10 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     UserCourseList? userCourseList = authUser?.courses;
     List<UserCourse> courseList =
-        userCourseList?.courses ??
+        userCourseList?.courseList ??
         [
           UserCourse(
+            courseId: "1",
             courseName: "Java Development",
             courseLevel: CourseLevel.beginner,
             progress: 0.0,
