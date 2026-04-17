@@ -5,11 +5,11 @@ class UserAvatar {
   UserAvatar({required this.publicId, this.avatarPath});
 
   factory UserAvatar.fromJson(Map<String, dynamic> json) {
-    return UserAvatar(publicId: json['public_id'], avatarPath: json['avatarPath']);
+    return UserAvatar(publicId: json['public_id'], avatarPath: json['path']);
   }
 
   Map<String, dynamic> toJson() {
-    return {'public_id': publicId, 'avatarPath': avatarPath};
+    return {'public_id': publicId, 'path': avatarPath};
   }
 
   UserAvatar copyWith({String? publicId, String? avatarPath}) {
