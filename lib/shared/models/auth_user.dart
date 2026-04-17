@@ -16,7 +16,7 @@ class AuthUser {
     required this.courses,
   });
 
-  AuthUser.defaultUser() : username = 'Guest', email = '', courses = UserCourseList(courses: []);
+  AuthUser.defaultUser() : username = 'Guest', email = '', courses = UserCourseList(courseList: []);
 
   factory AuthUser.fromJson(Map<String, dynamic> json) {
     return AuthUser(
