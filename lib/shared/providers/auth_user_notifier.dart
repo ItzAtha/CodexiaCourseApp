@@ -34,15 +34,14 @@ class AuthUserNotifier extends _$AuthUserNotifier {
             if (documentSnapshot.exists) {
               final Map<String, dynamic> userData = documentSnapshot.data() as Map<String, dynamic>;
 
-              DocumentReference userAvatarRef = userData['avatar'];
-              DocumentSnapshot avatarSnapshot = await userAvatarRef.get();
-              userData.update(
-                'avatar',
-                (value) => UserAvatar.fromJson(avatarSnapshot.data() as Map<String, dynamic>),
-              );
-
               DocumentReference userCoursesRef = userData['courses'];
               DocumentSnapshot coursesSnapshot = await userCoursesRef.get();
+
+              userData.update('avatar', (value) {
+                if (value != null) {
+                  return UserAvatar.fromJson(value as Map<String, dynamic>);
+                }
+              });
 
               userData.update(
                 'courses',
@@ -86,7 +85,7 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     FirebaseManager firestore = FirebaseManager();
 
     if (state.value != null) {
-      state = AsyncData(state.value!.copyWith(displayName: displayName));
+      state = AsyncData(state.value!.copyWith(displayName: () => displayName));
 
       await firestore.updateData(
         'Users',
@@ -96,16 +95,16 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     }
   }
 
-  Future<void> updateAvatar(UserAvatar avatar) async {
+  Future<void> updateAvatar(UserAvatar? avatar) async {
     FirebaseManager firestore = FirebaseManager();
 
     if (state.value != null) {
-      state = AsyncData(state.value!.copyWith(avatar: avatar));
+      state = AsyncData(state.value!.copyWith(avatar: () => avatar));
 
       await firestore.updateData(
-        'Avatars',
+        'Users',
         state.value!.email,
-        newData: state.value!.avatar!.toJson(),
+        newData: {'avatar': state.value!.avatar?.toJson()},
       );
     }
   }
@@ -119,7 +118,7 @@ class AuthUserNotifier extends _$AuthUserNotifier {
       await firestore.updateData(
         'UserCourse',
         state.value!.email,
-        newData: state.value!.courses!.toJson(),
+        newData: state.value!.courses.toJson(),
       );
     }
   }
