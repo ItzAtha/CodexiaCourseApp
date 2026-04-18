@@ -18,10 +18,6 @@ class AIChatText {
       RegExp isHasHashtag = RegExp(r'(\#{3})');
       RegExp isHasAsterisk = RegExp(r'(\*{2})');
 
-      // TODO: Make support if text has both accent and asterisk
-      // if (line.contains(isHasAccent) && line.contains(isHasAsterisk)) {
-      //   log("Line contains both accent and asterisk: $line");
-      // }
       if (line.contains(isHasHashtag)) {
         String newLine = line.replaceAll(isHasHashtag, '').trim();
         widgetSpan.add(
@@ -35,43 +31,72 @@ class AIChatText {
           ),
         );
       } else if (line.contains(isHasAsterisk)) {
-        // TODO: Make support if in 1 text line there are 2 bold text
-        int startIndex = line.indexOf(isHasAsterisk);
-        int endIndex = line.lastIndexOf(isHasAsterisk) + 2;
+        int currentIndex = 0;
+        int nextIndex = currentIndex + 1;
+        bool isAsteriskFound = false;
 
-        String newFirstLine = line.substring(0, startIndex);
-        String newLastLine = line.substring(endIndex);
-        String newAsteriskLine = line.substring(startIndex, endIndex);
-        newAsteriskLine = newAsteriskLine.replaceAll(isHasAsterisk, '');
+        final List<String> currentText = [];
+        final List<String> separateText = line.split('');
 
-        widgetSpan.add(
-          TextSpan(
-            children: <InlineSpan>[
+        RegExp asterisk = RegExp(r'(\*)');
+
+        for (int i = 0; i < separateText.length - 1; i++) {
+          String currentChar = separateText[currentIndex];
+          String nextChar = separateText[nextIndex];
+
+          if (currentIndex == 0 && (currentChar.contains(asterisk) && nextChar.contains(" "))) {
+            currentText.add(currentChar);
+          }
+
+          if (!currentChar.contains(asterisk)) {
+            currentText.add(currentChar);
+          }
+
+          if (currentChar.contains(asterisk) && nextChar.contains(asterisk)) {
+            widgetSpan.add(
               TextSpan(
-                text: newFirstLine,
-                style: TextStyle(
-                  fontSize: 16.0,
-                  color: Theme.of(context).textTheme.labelSmall?.color,
-                ),
+                children: <InlineSpan>[
+                  TextSpan(
+                    text: currentText.join(),
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: isAsteriskFound ? FontWeight.bold : FontWeight.normal,
+                      color: Theme.of(context).textTheme.labelSmall?.color,
+                    ),
+                  ),
+                ],
               ),
+            );
+
+            isAsteriskFound = !isAsteriskFound;
+            currentText.clear();
+          }
+
+          nextIndex++;
+          currentIndex++;
+
+          if (currentIndex == separateText.length - 1) {
+            if (!nextChar.contains(asterisk)) {
+              currentText.add("$nextChar\n");
+            } else {
+              currentText.add("\n");
+            }
+
+            widgetSpan.add(
               TextSpan(
-                text: newAsteriskLine,
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.labelSmall?.color,
-                ),
+                children: <InlineSpan>[
+                  TextSpan(
+                    text: currentText.join(),
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Theme.of(context).textTheme.labelSmall?.color,
+                    ),
+                  ),
+                ],
               ),
-              TextSpan(
-                text: "$newLastLine\n",
-                style: TextStyle(
-                  fontSize: 16.0,
-                  color: Theme.of(context).textTheme.labelSmall?.color,
-                ),
-              ),
-            ],
-          ),
-        );
+            );
+          }
+        }
       } else if (line.contains(isHasAccent)) {
         RegExp threeAccent = RegExp(r'(\`{3})');
 
@@ -127,39 +152,24 @@ class AIChatText {
             indexCodeAsterisk2 = null;
           }
         } else {
-          int? indexAccent1;
-          int? indexAccent2;
-
           int currentIndex = 0;
-          List<String> textLine = [];
-          List<InlineSpan> textSpan = [];
-          List<String> separateAccent = line.split('');
+          bool isAccentFound = false;
 
-          for (var accent in separateAccent) {
-            if (accent.contains(isHasAccent)) {
-              if (indexAccent1 == null) {
-                indexAccent1 = currentIndex;
+          final List<String> currentText = [];
+          final List<String> separateText = line.split('');
 
-                textSpan.add(
-                  TextSpan(
-                    text: textLine.join(''),
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      color: Theme.of(context).textTheme.labelSmall?.color,
-                    ),
-                  ),
-                );
-                textLine.clear();
-              } else {
-                indexAccent2 = currentIndex;
-                List<String> separateAccentLine = separateAccent
-                    .getRange(indexAccent1, indexAccent2 + 1)
-                    .toList();
+          RegExp accent = RegExp(r'(\`)');
 
-                String accentLine = separateAccentLine.join('');
-                String newLine = accentLine.replaceAll(isHasAccent, '');
+          for (int i = 0; i < separateText.length - 1; i++) {
+            String currentChar = separateText[currentIndex];
 
-                textSpan.add(
+            if (!currentChar.contains(accent)) {
+              currentText.add(currentChar);
+            }
+
+            if (currentChar.contains(accent)) {
+              if (isAccentFound) {
+                widgetSpan.add(
                   WidgetSpan(
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 4.0),
@@ -169,7 +179,7 @@ class AIChatText {
                         borderRadius: BorderRadius.circular(4.0),
                       ),
                       child: Text(
-                        newLine,
+                        currentText.join(),
                         style: TextStyle(
                           fontSize: 16.0,
                           color: Theme.of(context).textTheme.labelSmall?.color,
@@ -178,30 +188,46 @@ class AIChatText {
                     ),
                   ),
                 );
+              } else {
+                widgetSpan.add(
+                  TextSpan(
+                    children: <InlineSpan>[
+                      TextSpan(
+                        text: currentText.join(),
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Theme.of(context).textTheme.labelSmall?.color,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
 
-                indexAccent1 = null;
-                indexAccent2 = null;
-              }
-            } else {
-              if (indexAccent1 == null) {
-                textLine.add(accent);
-              }
+              isAccentFound = !isAccentFound;
+              currentText.clear();
             }
 
             currentIndex++;
+
+            if (currentIndex == separateText.length - 1) {
+              currentText.add("\n");
+
+              widgetSpan.add(
+                TextSpan(
+                  children: <InlineSpan>[
+                    TextSpan(
+                      text: currentText.join(),
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Theme.of(context).textTheme.labelSmall?.color,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
           }
-
-          textSpan.add(
-            TextSpan(
-              text: '.\n',
-              style: TextStyle(
-                fontSize: 16.0,
-                color: Theme.of(context).textTheme.labelSmall?.color,
-              ),
-            ),
-          );
-
-          widgetSpan.addAll(textSpan);
         }
       } else {
         if (indexCodeAsterisk1 == null) {
