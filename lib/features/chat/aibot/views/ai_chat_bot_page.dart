@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'dart:developer';
 
+import 'package:codexia_course_learning/features/chat/widgets/chat_bubble.dart';
 import 'package:codexia_course_learning/shared/models/auth_user.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
-import 'package:codexia_course_learning/shared/widgets/ai_chat_text.dart';
 import 'package:firebase_ai/firebase_ai.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -51,10 +50,9 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
 
       for (var text in separateText) {
         addedText.add(text);
-        log("Text Added: $text => $addedText");
 
         String newMessage = addedText.join('');
-        await Future.delayed(Duration(microseconds: 500));
+        await Future.delayed(Duration(microseconds: 800));
 
         if (!mounted) break;
         setState(() => chatBotList.last = AIChatBot(message: newMessage, role: role));
@@ -71,26 +69,11 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
           children: <Widget>[
             Align(
               alignment: chatBot.role == Role.user ? Alignment.centerRight : Alignment.centerLeft,
-              child: Card(
-                elevation: 0.8,
-                clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
-                  constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
-                  child: chatBot.role == Role.user
-                      ? Text(
-                          chatBot.message,
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
-                        )
-                      : Text.rich(
-                          TextSpan(children: [...AIChatText(chatBot.message).format(context)]),
-                        ),
-                ),
-              ),
+              child: ChatBubble(
+                context: context,
+                message: chatBot.message,
+                isUser: chatBot.role == Role.user,
+              ).build(),
             ),
             SizedBox(height: 4.0),
           ],
