@@ -6,31 +6,38 @@ class AIChatText {
   AIChatText(this.text);
 
   List<InlineSpan> format(BuildContext context) {
-    int currentIndex = 0;
-    int? indexCodeAsterisk1;
-    int? indexCodeAsterisk2;
+    bool isCodeTextFound = false;
+
+    List<String> codeBlockText = [];
+    List<String> separateText = text.split('\n');
 
     List<InlineSpan> widgetSpan = [];
-    List<String> separateText = text.split('\n');
 
     for (var line in separateText) {
       RegExp isHasAccent = RegExp(r'(\`)');
       RegExp isHasHashtag = RegExp(r'(\#{3})');
       RegExp isHasAsterisk = RegExp(r'(\*{2})');
 
-      if (line.contains(isHasHashtag)) {
-        String newLine = line.replaceAll(isHasHashtag, '').trim();
+      if (!isCodeTextFound && line.contains(isHasHashtag)) {
+        RegExp twoHashtag = RegExp(r'(\#{2})');
+        RegExp threeHashtag = RegExp(r'(\#{3})');
+
+        String newLine = line.replaceAll(RegExp(r'(\#{2,3})'), '').trim();
         widgetSpan.add(
           TextSpan(
             text: "$newLine\n",
             style: TextStyle(
-              fontSize: 20.0,
+              fontSize: line.contains(threeHashtag)
+                  ? 22.0
+                  : line.contains(twoHashtag)
+                  ? 20.0
+                  : 18.0,
               fontWeight: FontWeight.bold,
               color: Theme.of(context).textTheme.labelMedium?.color,
             ),
           ),
         );
-      } else if (line.contains(isHasAsterisk)) {
+      } else if (!isCodeTextFound && line.contains(isHasAsterisk)) {
         int currentIndex = 0;
         int nextIndex = currentIndex + 1;
         bool isAsteriskFound = false;
@@ -101,16 +108,8 @@ class AIChatText {
         RegExp threeAccent = RegExp(r'(\`{3})');
 
         if (line.contains(threeAccent)) {
-          if (indexCodeAsterisk1 == null) {
-            indexCodeAsterisk1 = currentIndex;
-          } else {
-            indexCodeAsterisk2 = currentIndex;
-
-            List<String> separateCodeLine = separateText
-                .getRange(indexCodeAsterisk1 + 1, indexCodeAsterisk2 + 1)
-                .toList();
-            String codeLine = separateCodeLine.join('\n');
-            String newLine = codeLine.replaceAll(threeAccent, '');
+          if (isCodeTextFound) {
+            String newText = codeBlockText.join('\n').replaceAll(threeAccent, '');
 
             ScrollController scrollController = ScrollController();
             widgetSpan.add(
@@ -132,9 +131,9 @@ class AIChatText {
                       child: Padding(
                         padding: EdgeInsets.all(12.0),
                         child: Text(
-                          newLine,
+                          newText,
                           style: TextStyle(
-                            fontSize: newLine.split(' ').length > 15 ? 12.0 : 14.0,
+                            fontSize: newText.split(' ').length > 15 ? 12.0 : 14.0,
                             fontFamily: 'monospace',
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
@@ -146,11 +145,11 @@ class AIChatText {
               ),
             );
 
-            widgetSpan.add(TextSpan(text: "\n", style: TextStyle(fontSize: 16.0)));
-
-            indexCodeAsterisk1 = null;
-            indexCodeAsterisk2 = null;
+            widgetSpan.add(TextSpan(text: "\n"));
+            codeBlockText.clear();
           }
+
+          isCodeTextFound = !isCodeTextFound;
         } else {
           int currentIndex = 0;
           bool isAccentFound = false;
@@ -230,7 +229,9 @@ class AIChatText {
           }
         }
       } else {
-        if (indexCodeAsterisk1 == null) {
+        if (isCodeTextFound) {
+          codeBlockText.add(line);
+        } else {
           widgetSpan.add(
             TextSpan(
               text: "$line\n",
@@ -242,8 +243,6 @@ class AIChatText {
           );
         }
       }
-
-      currentIndex++;
     }
 
     return widgetSpan;
