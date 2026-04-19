@@ -41,10 +41,9 @@ class AuthUserNotifier extends _$AuthUserNotifier {
           }
         });
 
-        userData.update(
-          'courses',
-          (value) => UserCourseList.fromJson(coursesData.docs.map((doc) => doc.data()).toList()),
-        );
+        userData.addAll({
+          'courses': UserCourseList.fromJson(coursesData.docs.map((doc) => doc.data()).toList()),
+        });
 
         try {
           authUser = AuthUser.fromJson(userData);
@@ -109,11 +108,13 @@ class AuthUserNotifier extends _$AuthUserNotifier {
         await firestore.updateData(
           'Users',
           state.value!.email,
-          subCollectionQuery: SubCollectionQuery(
-            collection: 'Courses',
-            docId: course.courseId,
-            data: courses.toJson(),
-          ),
+          subCollectionQuery: [
+            SubCollectionQuery(
+              collection: 'Courses',
+              docId: course.courseId,
+              data: courses.toJson(),
+            ),
+          ],
         );
       }
     }
