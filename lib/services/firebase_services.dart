@@ -8,7 +8,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../core/utils/logger.dart';
 
-class CloudinaryServices {
+class FirebaseServices {
   final String _cloudName = dotenv.env['CLOUDINARY_CLOUD_NAME'] ?? "";
   final String _apiKey = dotenv.env['CLOUDINARY_API_KEY'] ?? "";
   final String _apiSecret = dotenv.env['CLOUDINARY_API_SECRET'] ?? "";
@@ -16,7 +16,7 @@ class CloudinaryServices {
 
   late Cloudinary cloudinary;
 
-  CloudinaryServices() {
+  FirebaseServices() {
     cloudinary = Cloudinary.fromCloudName(cloudName: _cloudName);
     cloudinary.config.cloudConfig = CloudConfig(_cloudName, _apiKey, _apiSecret);
   }
