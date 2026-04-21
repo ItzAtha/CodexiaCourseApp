@@ -214,7 +214,7 @@ class AuthService {
     if (existingUserData == null) {
       await firebaseManager.addData(
         "Users",
-        userInfo.email!,
+        docId: userInfo.email!,
         data: {
           "email": userInfo.email!,
           "displayName": userInfo.displayName ?? displayName,
@@ -225,7 +225,7 @@ class AuthService {
     } else {
       await firebaseManager.addData(
         "Users",
-        userInfo.email!,
+        docId: userInfo.email!,
         data: {"lastSignIn": DateTime.now().toIso8601String()},
         options: SetOptions(merge: true),
       );
