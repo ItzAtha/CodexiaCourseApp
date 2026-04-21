@@ -67,6 +67,7 @@ dependencies:
   google_fonts: ^8.0.2
   firebase_ai: ^3.10.0
   flutter_svg_provider: ^1.0.7
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
