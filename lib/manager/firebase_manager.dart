@@ -12,9 +12,9 @@ class FirebaseManager {
 
   FirebaseManager._internal();
 
-  Future<void> addData(
-    String collection,
-    String docId, {
+  Future<String?> addData(
+    String collection, {
+    String? docId,
     Map<String, dynamic>? data,
     List<SubCollectionQuery>? subCollectionQuery,
     SetOptions? options,
@@ -51,25 +51,18 @@ class FirebaseManager {
 
       try {
         final collectionRef = FirebaseFirestore.instance.collection(path);
-        await collectionRef
-            .doc(collectionQuery.docId)
-            .set(collectionQuery.data!, options)
-            .then((_) {
-              DebugLogger(
-                message:
-                    'Data added with ID ${collectionQuery.docId} '
-                    'to sub-collection ${collectionQuery.collection} '
-                    'parent collection $collection successfully.',
-                level: LogLevel.info,
-              ).log();
-            })
-            .catchError((error) {
-              DebugLogger(
-                message: 'Failed to add data: $error',
-                stackTrace: StackTrace.current,
-                level: LogLevel.error,
-              ).log();
-            });
+        final docRef = collectionRef.doc(collectionQuery.docId);
+
+        await docRef.set(collectionQuery.data!, options);
+        DebugLogger(
+          message:
+              'Data added with ID ${docRef.id} '
+              'to sub-collection ${collectionQuery.collection} '
+              'parent collection $collection successfully.',
+          level: LogLevel.info,
+        ).log();
+
+        return docRef.id;
       } catch (error, stackTrace) {
         DebugLogger(
           message: 'Failed to add data: $error',
@@ -84,22 +77,15 @@ class FirebaseManager {
 
       try {
         final collectionRef = FirebaseFirestore.instance.collection(collection);
-        await collectionRef
-            .doc(docId)
-            .set(data, options)
-            .then((_) {
-              DebugLogger(
-                message: 'Data added with ID $docId to collection $collection successfully.',
-                level: LogLevel.info,
-              ).log();
-            })
-            .catchError((error) {
-              DebugLogger(
-                message: 'Failed to add data: $error',
-                stackTrace: StackTrace.current,
-                level: LogLevel.error,
-              ).log();
-            });
+        final docRef = collectionRef.doc(docId);
+
+        await docRef.set(data, options);
+        DebugLogger(
+          message: 'Data added with ID $docId to collection $collection successfully.',
+          level: LogLevel.info,
+        ).log();
+
+        return docRef.id;
       } catch (error, stackTrace) {
         DebugLogger(
           message: 'Failed to add data: $error',
@@ -108,6 +94,7 @@ class FirebaseManager {
         ).log();
       }
     }
+    return null;
   }
 
   Future<Map<String, dynamic>?> getData(
@@ -185,53 +172,145 @@ class FirebaseManager {
     return null;
   }
 
-  Future<List<Map<String, dynamic>>> getDataWithCondition(
-    String collection,
-    List<FilterCondition> conditions, {
+  Future<(QueryDocumentSnapshot<Object?>, List<Map<String, dynamic>>)?> getDataWithCondition(
+    String collection, {
+    List<FilterCondition> conditions = const [],
+    String? docId,
+    List<SubCollectionQuery>? subCollectionQuery,
     DocumentSnapshot? lastDocument,
     OrderBy? orderBy,
     int? limit,
   }) async {
-    var collectionRef = FirebaseFirestore.instance.collection(collection) as Query;
+    assert(docId != null && subCollectionQuery != null, 'docId and subCollectionQuery must be provided.');
 
-    for (final condition in conditions) {
-      if (condition.isEqualTo != null) {
-        collectionRef = collectionRef.where(condition.field, isEqualTo: condition.isEqualTo);
+    if (subCollectionQuery != null) {
+      String path =
+          "$collection/$docId/${subCollectionQuery.map((query) {
+        bool isLast = subCollectionQuery.last == query;
+        String newPath = "";
+
+        if (isLast) {
+          newPath = query.collection;
+        } else {
+          newPath = "${query.collection}/${query.docId}";
+        }
+
+        return newPath;
+      }).join('/')}";
+
+      try {
+        var collectionRef = FirebaseFirestore.instance.collection(
+            path) as Query;
+
+        for (final condition in conditions) {
+          if (condition.isEqualTo != null) {
+            collectionRef = collectionRef.where(
+                condition.field, isEqualTo: condition.isEqualTo);
+          }
+
+          if (condition.isGreaterThan != null) {
+            collectionRef = collectionRef.where(
+              condition.field,
+              isGreaterThan: condition.isGreaterThan,
+            );
+          }
+
+          if (condition.isLessThan != null) {
+            collectionRef = collectionRef.where(
+                condition.field, isLessThan: condition.isLessThan);
+          }
+
+          if (condition.arraysContains != null) {
+            collectionRef = collectionRef.where(
+              condition.field,
+              arrayContains: condition.arraysContains,
+            );
+          }
+        }
+
+        if (orderBy != null) {
+          collectionRef = collectionRef.orderBy(
+              orderBy.field, descending: orderBy.descending);
+        }
+
+        if (lastDocument != null) {
+          collectionRef = collectionRef.startAfterDocument(lastDocument);
+          print("Last document loaded: ${lastDocument.id}");
+        }
+
+        if (limit != null) {
+          collectionRef = collectionRef.limit(limit);
+        }
+
+        final querySnapshot = await collectionRef.get();
+        return (querySnapshot.docs.last, querySnapshot.docs
+            .map((doc) => doc.data() as Map<String, dynamic>)
+            .toList());
+      } catch (error, stackTrace) {
+        DebugLogger(
+          message: 'Failed to get data: $error',
+          stackTrace: stackTrace,
+          level: LogLevel.error,
+        ).log();
       }
+    } else {
+      try {
+        var collectionRef = FirebaseFirestore.instance.collection(
+            collection) as Query;
 
-      if (condition.isGreaterThan != null) {
-        collectionRef = collectionRef.where(
-          condition.field,
-          isGreaterThan: condition.isGreaterThan,
-        );
-      }
+        for (final condition in conditions) {
+          if (condition.isEqualTo != null) {
+            collectionRef = collectionRef.where(
+                condition.field, isEqualTo: condition.isEqualTo);
+          }
 
-      if (condition.isLessThan != null) {
-        collectionRef = collectionRef.where(condition.field, isLessThan: condition.isLessThan);
-      }
+          if (condition.isGreaterThan != null) {
+            collectionRef = collectionRef.where(
+              condition.field,
+              isGreaterThan: condition.isGreaterThan,
+            );
+          }
 
-      if (condition.arraysContains != null) {
-        collectionRef = collectionRef.where(
-          condition.field,
-          arrayContains: condition.arraysContains,
-        );
+          if (condition.isLessThan != null) {
+            collectionRef = collectionRef.where(
+                condition.field, isLessThan: condition.isLessThan);
+          }
+
+          if (condition.arraysContains != null) {
+            collectionRef = collectionRef.where(
+              condition.field,
+              arrayContains: condition.arraysContains,
+            );
+          }
+        }
+
+        if (orderBy != null) {
+          collectionRef = collectionRef.orderBy(
+              orderBy.field, descending: orderBy.descending);
+        }
+
+        if (lastDocument != null) {
+          collectionRef = collectionRef.startAfterDocument(lastDocument);
+        }
+
+        if (limit != null) {
+          collectionRef = collectionRef.limit(limit);
+        }
+
+        final querySnapshot = await collectionRef.get();
+        return (querySnapshot.docs.last, querySnapshot.docs
+            .map((doc) => doc.data() as Map<String, dynamic>)
+            .toList());
+      } catch (error, stackTrace) {
+        DebugLogger(
+          message: 'Failed to get data: $error',
+          stackTrace: stackTrace,
+          level: LogLevel.error,
+        ).log();
       }
     }
 
-    if (orderBy != null) {
-      collectionRef = collectionRef.orderBy(orderBy.field, descending: orderBy.descending);
-    }
-
-    if (lastDocument != null) {
-      collectionRef = collectionRef.startAfterDocument(lastDocument);
-    }
-
-    if (limit != null) {
-      collectionRef = collectionRef.limit(limit);
-    }
-
-    final querySnapshot = await collectionRef.get();
-    return querySnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    return null;
   }
 
   Future<void> updateData(
