@@ -22,10 +22,6 @@ class AIChatBotPage extends ConsumerStatefulWidget {
 }
 
 class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
-  String? cacheEmail;
-  Timer? autoSaveTimer;
-  Timer? aiWriteTextTimer;
-
   int limitDataLoad = 10;
   final ValueNotifier<bool> showScrollableButton = ValueNotifier<bool>(false);
 
@@ -172,7 +168,6 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
 
   @override
   void dispose() {
-    autoSaveTimer?.cancel();
     scrollController.dispose();
     textEditingController.dispose();
     super.dispose();
