@@ -39,7 +39,7 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                       CircleAvatar(
                         radius: 20.0,
                         backgroundImage: NetworkImage(
-                          authUser?.avatar?.avatarPath ??
+                          authUser?.avatar ??
                               "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
                         ),
                       ),
