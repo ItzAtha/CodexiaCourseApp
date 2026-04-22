@@ -62,7 +62,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
             SizedBox(height: 40.0),
             ClipOval(
               child: Image.network(
-                authUser?.avatar?.avatarPath ??
+                authUser?.avatar ??
                     "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
                 width: 110.0,
                 height: 110.0,
