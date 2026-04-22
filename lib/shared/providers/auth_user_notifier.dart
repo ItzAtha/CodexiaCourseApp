@@ -5,7 +5,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/utils/logger.dart';
 import '../../manager/firebase_manager.dart';
-import '../models/user_avatar.dart';
 import '../models/user_course.dart';
 
 part 'auth_user_notifier.g.dart';
@@ -34,12 +33,6 @@ class AuthUserNotifier extends _$AuthUserNotifier {
 
       if (usersData.exists) {
         final Map<String, dynamic> userData = usersData.data() as Map<String, dynamic>;
-
-        userData.update('avatar', (value) {
-          if (value != null) {
-            return UserAvatar.fromJson(value as Map<String, dynamic>);
-          }
-        });
 
         userData.addAll({
           'courses': UserCourseList.fromJson(coursesData.docs.map((doc) => doc.data()).toList()),
@@ -84,17 +77,13 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     }
   }
 
-  Future<void> updateAvatar(UserAvatar? avatar) async {
+  Future<void> updateAvatar(String? avatar) async {
     FirebaseManager firestore = FirebaseManager();
 
     if (state.value != null) {
       state = AsyncData(state.value!.copyWith(avatar: () => avatar));
 
-      await firestore.updateData(
-        'Users',
-        state.value!.email,
-        newData: {'avatar': state.value!.avatar?.toJson()},
-      );
+      await firestore.updateData('Users', state.value!.email, newData: {'avatar': avatar});
     }
   }
 
