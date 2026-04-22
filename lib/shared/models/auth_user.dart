@@ -1,11 +1,10 @@
-import 'package:codexia_course_learning/shared/models/user_avatar.dart';
 import 'package:codexia_course_learning/shared/models/user_course.dart';
 
 class AuthUser {
   String username;
   String? displayName;
   String email;
-  UserAvatar? avatar;
+  String? avatar;
   UserCourseList courses;
 
   AuthUser({
@@ -33,7 +32,7 @@ class AuthUser {
       'username': username,
       'displayName': displayName,
       'email': email,
-      'avatar': avatar?.toJson(),
+      'avatar': avatar,
       'courses': courses.toJson(),
     };
   }
@@ -42,7 +41,7 @@ class AuthUser {
     String? username,
     String? Function()? displayName,
     String? email,
-    UserAvatar? Function()? avatar,
+    String? Function()? avatar,
     UserCourseList? courses,
   }) {
     return AuthUser(
