@@ -154,6 +154,7 @@ class ChatPaginationController {
             ),
           ],
         );
+        return true;
       }
     } else {
       print("No chat channel found for user: $userId");
