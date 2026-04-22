@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/utils/logger.dart';
+import '../../widgets/animations/typewriting_effect.dart';
 
 class AIChatBotPage extends ConsumerStatefulWidget {
   const AIChatBotPage({super.key});
@@ -52,15 +53,22 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
         return;
       }
 
-      controller.chatModelChannel!.messages.last = ChatModel(
-        message: message,
-        role: role,
-        timestamp: DateTime.now(),
+      TypeWritingEffect writingEffect = TypeWritingEffect(
+        text: message,
+        duration: Duration(microseconds: 900),
       );
+      await for (String text in writingEffect.animate()) {
+        controller.chatModelChannel!.messages.last.message = text;
+        setState(() {});
+      }
     }
 
-    await controller.saveMessageHistory(message, role);
-    setState(() {});
+    bool success = await controller.saveMessageHistory(message, role);
+    if (success) {
+      print("Message history saved");
+    } else {
+      print("Message history not saved");
+    }
   }
 
   List<Widget> getMessageCard() {
