@@ -12,7 +12,7 @@ class ChatBubble {
 
   Widget build() {
     return Card(
-      elevation: 0.8,
+      elevation: 3.0,
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
       child: Container(
