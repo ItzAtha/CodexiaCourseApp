@@ -1,7 +1,9 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:codexia_course_learning/core/utils/logger.dart';
+import 'package:codexia_course_learning/services/firebase_services.dart';
 import 'package:codexia_course_learning/shared/models/auth_user.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,8 +13,6 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../../services/auth_services.dart';
-import '../../../services/cloudinary_services.dart';
-import '../../../shared/models/user_avatar.dart';
 
 class SettingPage extends ConsumerStatefulWidget {
   const SettingPage({super.key});
@@ -24,11 +24,16 @@ class SettingPage extends ConsumerStatefulWidget {
 enum LanguageOptions { en, id }
 
 class _SettingPageState extends ConsumerState<SettingPage> {
+  bool isAvatarLoad = false;
   bool isFingerprintEnable = false;
   bool isThemeOptionOpened = false;
   bool isLanguageOptionOpened = false;
 
   LanguageOptions? languageOptions = LanguageOptions.en;
+
+  void updateAvatarLoadStatus(bool status) {
+    setState(() => isAvatarLoad = status);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,57 +55,46 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                 enableSwitchAnimation: true,
                 child: Column(
                   children: <Widget>[
-                    SizedBox(
-                      height: 150.0,
-                      width: 150.0,
-                      child: Stack(
-                        alignment: AlignmentGeometry.center,
-                        children: <Widget>[
-                          ClipOval(
-                            child: Image.network(
-                              authUser?.avatar?.avatarPath ??
-                                  "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
-                              width: 110.0,
-                              height: 110.0,
-                              fit: BoxFit.cover,
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                }
-
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    backgroundColor: Color(0xFF00CEC9),
-                                    value: loadingProgress.expectedTotalBytes != null
-                                        ? loadingProgress.cumulativeBytesLoaded /
-                                              loadingProgress.expectedTotalBytes!
-                                        : null,
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 12,
-                            right: 12,
-                            child: Skeleton.ignore(
-                              child: FloatingActionButton.small(
-                                onPressed: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    useRootNavigator: true,
-                                    builder: (context) {
-                                      return AvatarSelector();
-                                    },
-                                  );
-                                },
-                                shape: CircleBorder(),
-                                backgroundColor: Color(0xFF00CEC9),
-                                child: Icon(Icons.edit, color: Color(0xFFF5F6FA)),
+                    Skeletonizer(
+                      enabled: isAvatarLoad,
+                      enableSwitchAnimation: true,
+                      child: SizedBox(
+                        height: 150.0,
+                        width: 150.0,
+                        child: Stack(
+                          alignment: AlignmentGeometry.center,
+                          children: <Widget>[
+                            CircleAvatar(
+                              radius: 55.0,
+                              backgroundImage: NetworkImage(
+                                authUser?.avatar ??
+                                    "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
                               ),
                             ),
-                          ),
-                        ],
+                            Positioned(
+                              bottom: 12,
+                              right: 12,
+                              child: Skeleton.ignore(
+                                child: FloatingActionButton.small(
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      useRootNavigator: true,
+                                      builder: (context) {
+                                        return AvatarSelector(
+                                          onStatusChange: updateAvatarLoadStatus,
+                                        );
+                                      },
+                                    );
+                                  },
+                                  shape: CircleBorder(),
+                                  backgroundColor: Color(0xFF00CEC9),
+                                  child: Icon(Icons.edit, color: Color(0xFFF5F6FA)),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     Text(
@@ -734,7 +728,9 @@ class _SettingPageState extends ConsumerState<SettingPage> {
 }
 
 class AvatarSelector extends ConsumerStatefulWidget {
-  const AvatarSelector({super.key});
+  const AvatarSelector({super.key, required this.onStatusChange});
+
+  final Function(bool) onStatusChange;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _AvatarSelectorState();
@@ -743,7 +739,11 @@ class AvatarSelector extends ConsumerStatefulWidget {
 class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
   bool isDeleteButtonPress = false;
 
-  Future<void> selectAvatarImage(ImageSource source, {String? publicId}) async {
+  final FirebaseServices services = FirebaseServices();
+
+  Future<void> selectAvatarImage(ImageSource source, {String? avatarPath}) async {
+    AuthUser? authUser = ref.read(authUserProvider).value;
+
     final imagePicker = ImagePicker();
     try {
       final XFile? image = await imagePicker.pickImage(
@@ -760,28 +760,49 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
           return;
         }
 
-        final userAvatar = await CloudinaryServices().uploadImage(croppedImage.path);
-        if (userAvatar != null) {
-          DebugLogger(message: "Public Id: ${userAvatar.$1}", level: LogLevel.info).log();
-          DebugLogger(message: "URL: ${userAvatar.$2}", level: LogLevel.info).log();
+        final uploadProgress = await services.uploadFile(
+          croppedImage.path,
+          fileName: "${authUser?.username.toLowerCase()}_avatar.jpg",
+          savePath: 'Avatars',
+          metadata: SettableMetadata(contentType: 'image/jpeg'),
+        );
+        widget.onStatusChange(true);
+        uploadProgress.snapshotEvents.listen((taskSnapshot) async {
+          switch (taskSnapshot.state) {
+            case TaskState.paused:
+              print("Upload is paused.");
+              break;
+            case TaskState.running:
+              final progress = (100 * taskSnapshot.bytesTransferred) / taskSnapshot.totalBytes;
+              print("Upload is $progress% complete.");
+              break;
+            case TaskState.success:
+              String newPath = await taskSnapshot.ref.getDownloadURL();
+              ref.read(authUserProvider.notifier).updateAvatar(newPath);
 
-          await deleteCurrentAvatar(publicId);
+              Toastification().show(
+                title: Text("Avatar Updated"),
+                description: Text("Your avatar has been updated successfully."),
+                type: ToastificationType.success,
+                style: ToastificationStyle.flat,
+                alignment: Alignment.topCenter,
+                autoCloseDuration: Duration(seconds: 3),
+                animationDuration: Duration(milliseconds: 500),
+              );
 
-          UserAvatar avatar = UserAvatar(publicId: userAvatar.$1!, avatarPath: userAvatar.$2!);
-          ref.read(authUserProvider.notifier).updateAvatar(avatar);
-
-          Toastification().show(
-            title: Text("Avatar Updated"),
-            description: Text("Your avatar has been updated successfully."),
-            type: ToastificationType.success,
-            style: ToastificationStyle.flat,
-            alignment: Alignment.topCenter,
-            autoCloseDuration: Duration(seconds: 3),
-            animationDuration: Duration(milliseconds: 500),
-          );
-
-          DebugLogger(message: "Avatar updated successfully", level: LogLevel.info).log();
-        }
+              DebugLogger(message: "Avatar updated successfully", level: LogLevel.info).log();
+              widget.onStatusChange(false);
+              break;
+            case TaskState.canceled:
+              print("Upload was canceled.");
+              widget.onStatusChange(false);
+              break;
+            case TaskState.error:
+              print("Upload failed: ${taskSnapshot.toString()}");
+              widget.onStatusChange(false);
+              break;
+          }
+        });
       }
     } catch (error, stackTrace) {
       Toastification().show(
@@ -802,14 +823,13 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
     }
   }
 
-  Future<void> deleteCurrentAvatar(String? publicId) async {
-    if (publicId == null) {
+  Future<void> deleteCurrentAvatar(String? avatarPath) async {
+    if (avatarPath == null) {
       DebugLogger(message: "No avatar to delete", level: LogLevel.info).log();
       return;
     }
 
-    bool isDeleted = await CloudinaryServices().deleteImage(publicId);
-
+    bool isDeleted = await services.deleteFile(avatarPath);
     if (isDeleted) {
       ref.read(authUserProvider.notifier).updateAvatar(null);
 
@@ -882,7 +902,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           InkWell(
-            onTap: () => selectAvatarImage(ImageSource.camera, publicId: userAvatar?.publicId),
+            onTap: () => selectAvatarImage(ImageSource.camera, avatarPath: userAvatar),
             customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
             child: SizedBox(
               height: 100.0,
@@ -904,7 +924,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
             ),
           ),
           InkWell(
-            onTap: () => selectAvatarImage(ImageSource.gallery, publicId: userAvatar?.publicId),
+            onTap: () => selectAvatarImage(ImageSource.gallery, avatarPath: userAvatar),
             customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
             child: SizedBox(
               height: 100.0,
@@ -929,7 +949,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
             onTap: () async {
               setState(() => isDeleteButtonPress = true);
 
-              await deleteCurrentAvatar(userAvatar?.publicId);
+              await deleteCurrentAvatar(userAvatar);
 
               setState(() => isDeleteButtonPress = false);
             },
