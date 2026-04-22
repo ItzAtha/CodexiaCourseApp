@@ -1,62 +1,88 @@
 import 'dart:io';
 
-import 'package:cloudinary_api/uploader/cloudinary_uploader.dart';
-import 'package:cloudinary_api/src/request/model/uploader_params.dart';
-import 'package:cloudinary_url_gen/cloudinary.dart';
-import 'package:cloudinary_url_gen/config/cloud_config.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
-import '../core/utils/logger.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class FirebaseServices {
-  final String _cloudName = dotenv.env['CLOUDINARY_CLOUD_NAME'] ?? "";
-  final String _apiKey = dotenv.env['CLOUDINARY_API_KEY'] ?? "";
-  final String _apiSecret = dotenv.env['CLOUDINARY_API_SECRET'] ?? "";
-  final String _uploadPreset = "codexia_user_avatar";
+  // Singleton pattern
+  static final FirebaseServices _instance = FirebaseServices._internal();
 
-  late Cloudinary cloudinary;
-
-  FirebaseServices() {
-    cloudinary = Cloudinary.fromCloudName(cloudName: _cloudName);
-    cloudinary.config.cloudConfig = CloudConfig(_cloudName, _apiKey, _apiSecret);
+  factory FirebaseServices() {
+    return _instance;
   }
 
-  Future<(String?, String?)?> uploadImage(String path) async {
-    final file = File(path);
+  FirebaseServices._internal();
 
-    try {
-      final response = await cloudinary.uploader().upload(
-        file,
-        params: UploadParams(folder: "codexia_user_avatar", uploadPreset: _uploadPreset),
-      );
+  Future<UploadTask> uploadFile(
+    String filePath, {
+    String? fileName,
+    String savePath = "File",
+    SettableMetadata? metadata,
+  }) async {
+    final file = File(filePath);
+    await file.parent.create(recursive: true);
 
-      return (response?.data?.publicId, response?.data?.url);
-    } catch (error, stackTrace) {
-      DebugLogger(
-        message: "Error uploading image: $error",
-        stackTrace: stackTrace,
-        level: LogLevel.error,
-      ).log();
+    String name =
+        fileName ??
+        "${DateTime.now().millisecondsSinceEpoch.toString()}.${filePath.split('.').last}";
+
+    final storageRef = FirebaseStorage.instance.ref();
+    final uploadTask = storageRef.child("$savePath/$name").putFile(file, metadata);
+    return uploadTask;
+  }
+
+  Future<String?> downloadFile(String path) async {
+    String? extractedPath = _extractFilePathFromDownloadUrl(path);
+
+    if (extractedPath == null) {
       return null;
     }
+
+    final storageRef = FirebaseStorage.instance.ref();
+    final url = await storageRef.child(extractedPath).getDownloadURL();
+    return url;
   }
 
-  Future<bool> deleteImage(String publicId) async {
-    try {
-      final response = await cloudinary.uploader().destroy(
-        DestroyParams(publicId: publicId, invalidate: true),
-      );
+  Future<bool> deleteFile(String path) async {
+    String? extractedPath = _extractFilePathFromDownloadUrl(path);
 
-      if (response.responseCode == 200) {
+    if (extractedPath != null) {
+      try {
+        final storageRef = FirebaseStorage.instance.ref();
+        await storageRef.child(extractedPath).delete();
         return true;
+      } on FirebaseException catch (e) {
+        print('Firebase Storage deletion error: ${e.code} - ${e.message}');
+        if (e.code == 'object-not-found') {
+          print('The file you tried to delete does not exist.');
+        } else if (e.code == 'unauthorized') {
+          print(
+            'You do not have permission to delete this file. Check your Firebase Storage Security Rules.',
+          );
+        } else {
+          print('An unknown Firebase error occurred during deletion.');
+        }
+      } catch (e) {
+        print('An unknown error occurred during deletion: $e');
       }
-    } catch (error, stackTrace) {
-      DebugLogger(
-        message: "Error deleting image: $error",
-        stackTrace: stackTrace,
-        level: LogLevel.error,
-      ).log();
     }
     return false;
+  }
+
+  String? _extractFilePathFromDownloadUrl(String downloadUrl) {
+    try {
+      final uri = Uri.parse(downloadUrl);
+      final pathSegments = uri.pathSegments;
+      final oIndex = pathSegments.indexOf('o');
+
+      if (oIndex == -1 || oIndex == pathSegments.length - 1) {
+        return null;
+      }
+
+      final encodedFilePath = pathSegments.sublist(oIndex + 1).join('/');
+      return Uri.decodeFull(encodedFilePath);
+    } catch (e) {
+      print('Error parsing URL: $e');
+      return null;
+    }
   }
 }
