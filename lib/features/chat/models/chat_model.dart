@@ -1,8 +1,9 @@
 enum Role { user, model }
+
 enum ChatType { userToModel, userToUser }
 
 class ChatModel {
-  final String message;
+  String message;
   final Role role;
   final DateTime timestamp;
 
@@ -27,7 +28,12 @@ class ChatModelChannel {
   final DateTime lastUpdate;
   final List<ChatModel> messages;
 
-  ChatModelChannel({required this.chatId, this.title, required this.lastUpdate, required this.messages});
+  ChatModelChannel({
+    required this.chatId,
+    this.title,
+    required this.lastUpdate,
+    required this.messages,
+  });
 
   factory ChatModelChannel.fromJson(Map<String, dynamic> json) {
     return ChatModelChannel(
@@ -39,6 +45,11 @@ class ChatModelChannel {
   }
 
   Map<String, dynamic> toJson() {
-    return {'chatId': chatId, 'title': title, 'lastUpdate': lastUpdate.toIso8601String(), 'messages': messages.map((message) => message.toJson()).toList()};
+    return {
+      'chatId': chatId,
+      'title': title,
+      'lastUpdate': lastUpdate.toIso8601String(),
+      'messages': messages.map((message) => message.toJson()).toList(),
+    };
   }
 }
