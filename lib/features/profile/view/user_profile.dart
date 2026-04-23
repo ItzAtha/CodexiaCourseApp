@@ -62,8 +62,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
             SizedBox(height: 40.0),
             ClipOval(
               child: Image.network(
-                authUser?.avatar ??
-                    "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
+                authUser?.avatar ?? "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
                 width: 110.0,
                 height: 110.0,
                 fit: BoxFit.cover,
@@ -150,7 +149,6 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                         );
 
                     Toastification().show(
-                      context: context,
                       title: Text("Profile updated successfully"),
                       type: ToastificationType.success,
                       style: ToastificationStyle.minimal,
