@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -35,6 +36,7 @@ class ChatBubble {
     int currentTableLine = 1;
     bool isCodeTextFound = false;
 
+    String? codeLanguage;
     List<String> codeBlockText = [];
     List<String> separateText = message.split('\n');
 
@@ -401,43 +403,90 @@ class ChatBubble {
         RegExp threeAccent = RegExp(r'(\`{3})');
 
         if (line.contains(threeAccent)) {
+          codeLanguage ??= line.replaceAll(threeAccent, '').trim();
+          String capitalizedCodeLang = codeLanguage[0].toUpperCase() + codeLanguage.substring(1);
+
           if (isCodeTextFound) {
             String newText = codeBlockText.join('\n').replaceAll(threeAccent, '');
 
             ScrollController scrollController = ScrollController();
             widgetSpan.add(
               WidgetSpan(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black26,
-                    border: Border.all(color: Colors.black),
-                    borderRadius: BorderRadius.circular(4.0),
-                  ),
-                  child: RawScrollbar(
-                    controller: scrollController,
-                    thumbColor: Colors.grey.shade700,
-                    child: SingleChildScrollView(
-                      controller: scrollController,
-                      scrollDirection: Axis.horizontal,
-                      physics: BouncingScrollPhysics(),
-                      child: Padding(
-                        padding: EdgeInsets.all(12.0),
-                        child: Text(
-                          newText,
-                          style: GoogleFonts.sourceCodePro(
-                            fontSize: newText.split(' ').length > 15 ? 12.0 : 14.0,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                      decoration: BoxDecoration(
+                        color: Colors.black26,
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(4.0),
+                          topRight: Radius.circular(4.0),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            capitalizedCodeLang,
+                            style: GoogleFonts.sourceCodePro(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).textTheme.labelSmall?.color,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              Clipboard.setData(ClipboardData(text: newText));
+                            },
+                            icon: Icon(Icons.copy),
+                            color: Color(0xFF00CEC9),
+                            iconSize: 20.0,
+                            style: ButtonStyle(
+                              minimumSize: WidgetStatePropertyAll(Size(40.0, 40.0)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black26,
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(4.0),
+                          bottomRight: Radius.circular(4.0),
+                        ),
+                      ),
+                      child: RawScrollbar(
+                        controller: scrollController,
+                        thumbColor: Colors.grey.shade700,
+                        child: SingleChildScrollView(
+                          controller: scrollController,
+                          scrollDirection: Axis.horizontal,
+                          physics: BouncingScrollPhysics(),
+                          child: Padding(
+                            padding: EdgeInsets.all(12.0),
+                            child: Text(
+                              newText,
+                              style: GoogleFonts.sourceCodePro(
+                                fontSize: newText.split(' ').length > 15 ? 12.0 : 14.0,
+                                color: Theme.of(context).textTheme.labelSmall?.color,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             );
 
             widgetSpan.add(TextSpan(text: "\n"));
             codeBlockText.clear();
+            codeLanguage = null;
           }
 
           isCodeTextFound = !isCodeTextFound;
