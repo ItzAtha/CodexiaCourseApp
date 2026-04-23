@@ -24,19 +24,25 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     final CollectionReference usersCollection = firestore.collection('Users');
 
     if (currentUser != null) {
-      final String? userId = currentUser.providerData[0].email;
+      final String userId = currentUser.uid;
+      String provider = currentUser.providerData.isNotEmpty
+          ? currentUser.providerData[0].providerId
+          : 'anonymous';
 
+      final String docId = '${userId}_$provider';
       final (usersData, coursesData) = await (
-        usersCollection.doc(userId).get(),
-        usersCollection.doc(userId).collection('Courses').get(),
+        usersCollection.doc(docId).get(),
+        usersCollection.doc(docId).collection('Courses').get(),
       ).wait;
 
       if (usersData.exists) {
         final Map<String, dynamic> userData = usersData.data() as Map<String, dynamic>;
 
-        userData.addAll({
-          'courses': UserCourseList.fromJson(coursesData.docs.map((doc) => doc.data()).toList()),
-        });
+        if (coursesData.docs.isNotEmpty) {
+          userData.addAll({
+            'courses': UserCourseList.fromJson(coursesData.docs.map((doc) => doc.data()).toList()),
+          });
+        }
 
         try {
           authUser = AuthUser.fromJson(userData);
@@ -64,39 +70,56 @@ class AuthUserNotifier extends _$AuthUserNotifier {
   }
 
   Future<void> updateDisplayName(String? displayName) async {
-    FirebaseManager firestore = FirebaseManager();
+    FirebaseManager manager = FirebaseManager();
+    User? currentUser = FirebaseAuth.instance.currentUser;
 
-    if (state.value != null) {
+    if (state.value != null && currentUser != null) {
+      final String userId = currentUser.uid;
+      String provider = currentUser.providerData.isNotEmpty
+          ? currentUser.providerData[0].providerId
+          : 'anonymous';
+
+      final String docId = '${userId}_$provider';
       state = AsyncData(state.value!.copyWith(displayName: () => displayName));
 
-      await firestore.updateData(
-        'Users',
-        state.value!.email,
-        newData: {'displayName': state.value!.displayName},
-      );
+      await manager.updateData('Users', docId, newData: {'displayName': state.value!.displayName});
     }
   }
 
   Future<void> updateAvatar(String? avatar) async {
-    FirebaseManager firestore = FirebaseManager();
+    FirebaseManager manager = FirebaseManager();
+    User? currentUser = FirebaseAuth.instance.currentUser;
 
-    if (state.value != null) {
+    if (state.value != null && currentUser != null) {
+      final String userId = currentUser.uid;
+      String provider = currentUser.providerData.isNotEmpty
+          ? currentUser.providerData[0].providerId
+          : 'anonymous';
+
+      final String docId = '${userId}_$provider';
       state = AsyncData(state.value!.copyWith(avatar: () => avatar));
 
-      await firestore.updateData('Users', state.value!.email, newData: {'avatar': avatar});
+      await manager.updateData('Users', docId, newData: {'avatar': avatar});
     }
   }
 
   Future<void> updateCourses(UserCourseList courses) async {
-    FirebaseManager firestore = FirebaseManager();
+    FirebaseManager manager = FirebaseManager();
+    User? currentUser = FirebaseAuth.instance.currentUser;
 
-    if (state.value != null) {
+    if (state.value != null && currentUser != null) {
+      final String userId = currentUser.uid;
+      String provider = currentUser.providerData.isNotEmpty
+          ? currentUser.providerData[0].providerId
+          : 'anonymous';
+
+      final String docId = '${userId}_$provider';
       state = AsyncData(state.value!.copyWith(courses: courses));
 
       for (var course in courses.courseList) {
-        await firestore.updateData(
+        await manager.updateData(
           'Users',
-          state.value!.email,
+          docId,
           subCollectionQuery: [
             SubCollectionQuery(
               collection: 'Courses',
