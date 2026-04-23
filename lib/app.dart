@@ -26,16 +26,20 @@ class _MyAppState extends State<MyApp> {
         light: LightMode.initialize(),
         dark: DarkMode.initialize(),
         initial: widget._themeMode ?? AdaptiveThemeMode.system,
-        builder: (theme, darkTheme) => MaterialApp.router(
-          title: 'Codexia Learning Course',
-          debugShowCheckedModeBanner: false,
-          localizationsDelegates: context.localizationDelegates,
-          supportedLocales: context.supportedLocales,
-          locale: context.locale,
-          theme: theme,
-          darkTheme: darkTheme,
-          routerConfig: AppRouter.router,
-        ),
+        builder: (theme, darkTheme) => GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          behavior: HitTestBehavior.opaque,
+          child: MaterialApp.router(
+            title: 'Codexia Learning Course',
+            debugShowCheckedModeBanner: false,
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            theme: theme,
+            darkTheme: darkTheme,
+            routerConfig: AppRouter.router,
+          ),
+        )
       ),
     );
   }
