@@ -42,10 +42,12 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
     if (role == Role.user) {
       ChatModel chatBot = ChatModel(message: message, role: role, timestamp: DateTime.now());
       controller.chatModelChannel!.messages.add(chatBot);
+      setState(() {});
     } else if (role == Role.model) {
       if (thinkingMode) {
         ChatModel chatBot = ChatModel(message: message, role: role, timestamp: DateTime.now());
         controller.chatModelChannel!.messages.add(chatBot);
+        setState(() {});
         return;
       }
 
@@ -270,7 +272,7 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
               padding: EdgeInsets.symmetric(vertical: 40.0, horizontal: 20.0),
               child: Material(
                 elevation: 4.0,
-                color: Theme.of(context).cardColor,
+                surfaceTintColor: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(32.0),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(32.0),
@@ -279,7 +281,11 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
                   },
                   child: Container(
                     padding: EdgeInsets.all(12.0),
-                    child: Icon(Icons.arrow_back, size: 20.0, color: Colors.black),
+                    child: Icon(
+                      Icons.arrow_back,
+                      size: 20.0,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
                   ),
                 ),
               ),
@@ -300,7 +306,7 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
                         padding: EdgeInsets.all(20.0),
                         child: Material(
                           elevation: 4.0,
-                          color: Theme.of(context).cardColor,
+                          surfaceTintColor: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.circular(32.0),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(32.0),
@@ -315,8 +321,8 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
                               padding: EdgeInsets.all(8.0),
                               child: Icon(
                                 Icons.keyboard_arrow_down,
-                                size: 24.0,
-                                color: Colors.black,
+                                size: 28.0,
+                                color: Theme.of(context).iconTheme.color,
                               ),
                             ),
                           ),
@@ -337,7 +343,7 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
                   ),
                 ),
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: EdgeInsets.all(16.0),
                   constraints: BoxConstraints(minWidth: double.infinity, minHeight: 80.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -346,7 +352,10 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
                       TextField(
                         controller: textEditingController,
                         minLines: 1,
-                        maxLines: null,
+                        maxLines: 5,
+                        keyboardType: TextInputType.multiline,
+                        textInputAction: TextInputAction.send,
+                        style: TextStyle(color: Theme.of(context).textTheme.labelSmall?.color),
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
                             onPressed: () async {
@@ -381,6 +390,24 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
                           hintText: 'Write prompt here',
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
                         ),
+                        contextMenuBuilder:
+                            (BuildContext context, EditableTextState editableTextState) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  iconButtonTheme: IconButtonThemeData(
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor: Colors.black,
+                                      shape: const RoundedRectangleBorder(),
+                                      elevation: 0,
+                                    ),
+                                  ),
+                                ),
+                                child: AdaptiveTextSelectionToolbar.editableText(
+                                  editableTextState: editableTextState,
+                                ),
+                              );
+                            },
                       ),
                     ],
                   ),
