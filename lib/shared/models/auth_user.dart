@@ -5,7 +5,7 @@ class AuthUser {
   String? displayName;
   String email;
   String? avatar;
-  UserCourseList courses;
+  UserCourseList? courses;
 
   AuthUser({
     required this.username,
@@ -33,7 +33,7 @@ class AuthUser {
       'displayName': displayName,
       'email': email,
       'avatar': avatar,
-      'courses': courses.toJson(),
+      'courses': courses?.toJson() ?? UserCourseList(courseList: []).toJson(),
     };
   }
 
