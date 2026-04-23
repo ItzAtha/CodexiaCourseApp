@@ -16,7 +16,7 @@ class DarkMode {
       ),
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: Color(0xFF00CEC9),
-        selectionColor: Color(0xFF00CEC9),
+        selectionColor: Color(0x8000CEC9),
         selectionHandleColor: Color(0xFF00CEC9),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(

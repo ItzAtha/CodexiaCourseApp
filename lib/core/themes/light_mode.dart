@@ -15,9 +15,9 @@ class LightMode {
         labelSmall: TextStyle(color: Colors.grey.shade800),
       ),
       textSelectionTheme: TextSelectionThemeData(
-        cursorColor: Color(0xCC00CEC9),
-        selectionColor: Color(0xCC00CEC9),
-        selectionHandleColor: Color(0xCC00CEC9),
+        cursorColor: Color(0xFF00CEC9),
+        selectionColor: Color(0x8000CEC9),
+        selectionHandleColor: Color(0xFF00CEC9),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
