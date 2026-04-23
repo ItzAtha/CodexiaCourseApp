@@ -1,12 +1,21 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../core/utils/logger.dart';
 import '../manager/firebase_manager.dart';
 
+part 'auth_services.g.dart';
+
+@Riverpod(keepAlive: true)
+AuthService authService(Ref ref) {
+  return AuthService(reference: ref);
+}
+
 class AuthService {
+  final Ref? reference;
   final GoogleSignIn _googleAuth = GoogleSignIn.instance;
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
@@ -14,18 +23,21 @@ class AuthService {
 
   String get getErrorMessage => _errorMessage;
 
+  AuthService({this.reference});
+
   Future<UserCredential?> signUpWithEmailAndPassword(
     String email,
     String password,
     String displayName,
   ) async {
     try {
-      UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential userCredential = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .then((value) async {
+            await _addCredentialToFirestore(value, displayName);
+            return value;
+          });
 
-      await _addCredentialToFirestore(userCredential, displayName);
       return userCredential;
     } on FirebaseAuthException catch (error, stackTrace) {
       if (error.code == 'email-already-in-use') {
@@ -55,12 +67,13 @@ class AuthService {
 
   Future<UserCredential?> signInWithEmailAndPassword(String email, String password) async {
     try {
-      UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential userCredential = await _firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password)
+          .then((value) async {
+            await _addCredentialToFirestore(value);
+            return value;
+          });
 
-      await _addCredentialToFirestore(userCredential);
       return userCredential;
     } on FirebaseAuthException catch (error, stackTrace) {
       if (error.code == 'user-not-found') {
@@ -104,9 +117,13 @@ class AuthService {
         accessToken: accessToken,
       );
 
-      final UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
+      final UserCredential userCredential = await _firebaseAuth
+          .signInWithCredential(credential)
+          .then((value) async {
+            await _addCredentialToFirestore(value);
+            return value;
+          });
 
-      await _addCredentialToFirestore(userCredential);
       return userCredential;
     } on GoogleSignInException catch (error, stackTrace) {
       if (error.code != GoogleSignInExceptionCode.canceled) {
@@ -134,9 +151,13 @@ class AuthService {
 
       githubProvider.addScope('user:email');
 
-      final UserCredential userCredential = await _firebaseAuth.signInWithProvider(githubProvider);
+      final UserCredential userCredential = await _firebaseAuth
+          .signInWithProvider(githubProvider)
+          .then((value) async {
+            await _addCredentialToFirestore(value);
+            return value;
+          });
 
-      await _addCredentialToFirestore(userCredential);
       return userCredential;
     } on FirebaseAuthException catch (error, stackTrace) {
       _errorMessage = error.message ?? 'An unknown error occurred during Github Sign-In.';
@@ -201,33 +222,40 @@ class AuthService {
 
   Future<void> _addCredentialToFirestore(
     UserCredential userCredential, [
-    String? displayName = "Anonym User",
+    String? displayName,
   ]) async {
-    FirebaseManager firebaseManager = FirebaseManager();
+    FirebaseManager manager = FirebaseManager();
     UserInfo userInfo = userCredential.user!.providerData.first;
 
-    Map<String, dynamic>? existingUserData = await firebaseManager.getData(
-      "Users",
-      userInfo.email!,
-    );
+    final String userId = userCredential.user!.uid;
+    String provider = userInfo.providerId;
+
+    final String docId = '${userId}_$provider';
+    Map<String, dynamic>? existingUserData = await manager.getData("Users", docId);
 
     if (existingUserData == null) {
-      await firebaseManager.addData(
+      await manager.addData(
         "Users",
-        docId: userInfo.email!,
+        docId: docId,
         data: {
           "email": userInfo.email!,
-          "displayName": userInfo.displayName ?? displayName,
+          "username": userInfo.displayName ?? displayName,
+          "displayName": null,
+          "avatar": null,
           "createdAt": DateTime.now().toIso8601String(),
           "lastSignIn": DateTime.now().toIso8601String(),
         },
       );
+
+      final ref = reference;
+      if (ref != null) {
+        ref.invalidate(authUserProvider);
+      }
     } else {
-      await firebaseManager.addData(
+      await manager.updateData(
         "Users",
-        docId: userInfo.email!,
-        data: {"lastSignIn": DateTime.now().toIso8601String()},
-        options: SetOptions(merge: true),
+        docId,
+        newData: {"lastSignIn": DateTime.now().toIso8601String()},
       );
     }
   }
