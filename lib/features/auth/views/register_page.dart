@@ -22,8 +22,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final TextEditingController passwordController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  final AuthService authService = AuthService();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -210,6 +208,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   FocusScope.of(context).unfocus();
 
                   if (formKey.currentState!.validate()) {
+                    final authService = ref.read(authServiceProvider);
                     final UserCredential? userCredential = await authService
                         .signUpWithEmailAndPassword(
                           emailController.text,
@@ -272,6 +271,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               SizedBox(height: 15.0),
               ElevatedButton(
                 onPressed: () async {
+                  final authService = ref.read(authServiceProvider);
                   final UserCredential? userCredential = await authService.signInWithGoogle();
 
                   if (userCredential == null) {
@@ -324,6 +324,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               SizedBox(height: 10.0),
               ElevatedButton(
                 onPressed: () async {
+                  final authService = ref.read(authServiceProvider);
                   final UserCredential? userCredential = await authService.signInWithGithub();
 
                   if (userCredential == null) {

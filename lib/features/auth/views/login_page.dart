@@ -26,8 +26,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  final AuthService authService = AuthService();
-
   Future<void> loadPreferences() async {
     bool isRemembered = await sharedPreferences.getBool('rememberMe') ?? false;
 
@@ -251,6 +249,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       return;
                     }
 
+                    final authService = ref.read(authServiceProvider);
                     final UserCredential? userCredential = await authService
                         .signInWithEmailAndPassword(emailController.text, passwordController.text);
                     if (userCredential == null) {
@@ -311,6 +310,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               SizedBox(height: 15.0),
               ElevatedButton(
                 onPressed: () async {
+                  final authService = ref.read(authServiceProvider);
                   final UserCredential? userCredential = await authService.signInWithGoogle();
 
                   if (userCredential == null) {
@@ -366,6 +366,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               SizedBox(height: 10.0),
               ElevatedButton(
                 onPressed: () async {
+                  final authService = ref.read(authServiceProvider);
                   final UserCredential? userCredential = await authService.signInWithGithub();
 
                   if (userCredential == null) {
