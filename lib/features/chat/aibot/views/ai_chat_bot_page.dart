@@ -100,10 +100,16 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
 
   Future<void> loadChatData() async {
     List<Content>? chatHistory;
-    AuthUser? authUser = ref.read(authUserProvider).value;
+    User? currentUser = FirebaseAuth.instance.currentUser;
 
-    if (authUser != null) {
-      controller = ChatPaginationController(userId: authUser.email, chatType: "model");
+    if (currentUser != null) {
+      final String userId = currentUser.uid;
+      String provider = currentUser.providerData.isNotEmpty
+          ? currentUser.providerData[0].providerId
+          : 'anonymous';
+
+      final String docId = '${userId}_$provider';
+      controller = ChatPaginationController(userId: docId, chatType: "model");
 
       await controller.initialUserChatChannel().then((value) async {
         print("User chat channel has been initialized!");
