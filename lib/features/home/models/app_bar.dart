@@ -14,6 +14,8 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final authUserState = ref.watch(authUserProvider);
     AuthUser? authUser = authUserState.value;
 
+    final UniqueKey skeletonizerKey = UniqueKey();
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -32,6 +34,7 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Skeletonizer(
+                  key: skeletonizerKey,
                   enabled: authUserState.isLoading,
                   enableSwitchAnimation: true,
                   child: Row(
@@ -48,8 +51,9 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          const Skeleton.keep(
-                            child: Text(
+                          Skeleton.keep(
+                            key: skeletonizerKey,
+                            child: const Text(
                               "Welcome Back,",
                               style: TextStyle(fontSize: 14.0, color: Color(0xFFF5F6FA)),
                             ),
