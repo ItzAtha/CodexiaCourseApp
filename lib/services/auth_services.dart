@@ -221,9 +221,12 @@ class AuthService {
     return false;
   }
 
-  Future<bool> deleteAccount() async {
+  Future<bool> deleteAccount({String? password}) async {
+    User? user = _firebaseAuth.currentUser;
+    if (user == null) return false;
+
     try {
-      await _firebaseAuth.currentUser!.delete();
+      await user.delete();
       final ref = reference;
       if (ref != null) {
         ref.invalidate(authUserProvider);
@@ -231,7 +234,7 @@ class AuthService {
       return true;
     } on FirebaseAuthException catch (error) {
       if (error.code == 'requires-recent-login') {
-        bool success = await _reauthenticateAndDelete();
+        bool success = await _reauthenticateAndDelete(password: password);
         if (success) {
           final ref = reference;
           if (ref != null) {
@@ -293,7 +296,7 @@ class AuthService {
     }
   }
 
-  Future<bool> _reauthenticateAndDelete() async {
+  Future<bool> _reauthenticateAndDelete({String? password}) async {
     User? user = _firebaseAuth.currentUser;
     if (user == null) return false;
 
@@ -353,13 +356,13 @@ class AuthService {
         }
       } else {
         AuthCredential credential = EmailAuthProvider.credential(
-          email: _firebaseAuth.currentUser!.email!,
-          password: _firebaseAuth.currentUser!.email!,
+          email: user.email!,
+          password: password!,
         );
-        await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
+        await user.reauthenticateWithCredential(credential);
       }
 
-      await _firebaseAuth.currentUser?.delete();
+      await user.delete();
       return true;
     } catch (error, stackTrace) {
       DebugLogger(
