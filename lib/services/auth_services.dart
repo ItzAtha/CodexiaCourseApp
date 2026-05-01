@@ -1,5 +1,6 @@
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -220,6 +221,38 @@ class AuthService {
     return false;
   }
 
+  Future<bool> deleteAccount() async {
+    try {
+      await _firebaseAuth.currentUser!.delete();
+      final ref = reference;
+      if (ref != null) {
+        ref.invalidate(authUserProvider);
+      }
+      return true;
+    } on FirebaseAuthException catch (error) {
+      if (error.code == 'requires-recent-login') {
+        bool success = await _reauthenticateAndDelete();
+        if (success) {
+          final ref = reference;
+          if (ref != null) {
+            ref.invalidate(authUserProvider);
+          }
+        }
+        return success;
+      } else {
+        _errorMessage = error.message ?? 'An unknown error occurred during account deletion.';
+      }
+    } catch (error, stackTrace) {
+      DebugLogger(
+        message: 'An error occurred during account deletion: $error',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
+    }
+
+    return false;
+  }
+
   Future<void> _addCredentialToFirestore(
     UserCredential userCredential, [
     String? displayName,
@@ -258,5 +291,84 @@ class AuthService {
         newData: {"lastSignIn": DateTime.now().toIso8601String()},
       );
     }
+  }
+
+  Future<bool> _reauthenticateAndDelete() async {
+    User? user = _firebaseAuth.currentUser;
+    if (user == null) return false;
+
+    try {
+      final providerData = user.providerData.first;
+
+      if (GoogleAuthProvider().providerId == providerData.providerId) {
+        try {
+          await _googleAuth.initialize(clientId: dotenv.env['GOOGLE_CLIENT_ID']);
+
+          final GoogleSignInAccount googleUser = await _googleAuth.authenticate();
+
+          String? idToken = googleUser.authentication.idToken;
+          const List<String> scopes = ['email', 'profile'];
+
+          GoogleSignInClientAuthorization? clientAuth = await googleUser.authorizationClient
+              .authorizeScopes(scopes);
+
+          final String accessToken = clientAuth.accessToken;
+          final AuthCredential credential = GoogleAuthProvider.credential(
+            idToken: idToken,
+            accessToken: accessToken,
+          );
+
+          await user.reauthenticateWithCredential(credential);
+        } on GoogleSignInException catch (error, stackTrace) {
+          if (error.code != GoogleSignInExceptionCode.canceled) {
+            _errorMessage =
+                error.description ??
+                'An unknown error occurred during reauthentication with Google Sign-In.';
+          }
+          DebugLogger(
+            message: 'Reauthentication with Google Sign-In failed: ${error.description}',
+            stackTrace: stackTrace,
+            level: LogLevel.error,
+          ).log();
+        }
+      } else if (GithubAuthProvider().providerId == providerData.providerId) {
+        try {
+          GithubAuthProvider githubProvider = GithubAuthProvider();
+          githubProvider.addScope('user:email');
+
+          if (kIsWeb) {
+            await user.reauthenticateWithPopup(githubProvider);
+          } else {
+            await user.reauthenticateWithProvider(githubProvider);
+          }
+        } on FirebaseAuthException catch (error, stackTrace) {
+          _errorMessage =
+              error.message ??
+              'An unknown error occurred during reauthentication with Github Sign-In.';
+          DebugLogger(
+            message: 'Reauthentication with Github Sign-In failed: ${error.message}',
+            stackTrace: stackTrace,
+            level: LogLevel.error,
+          ).log();
+        }
+      } else {
+        AuthCredential credential = EmailAuthProvider.credential(
+          email: _firebaseAuth.currentUser!.email!,
+          password: _firebaseAuth.currentUser!.email!,
+        );
+        await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
+      }
+
+      await _firebaseAuth.currentUser?.delete();
+      return true;
+    } catch (error, stackTrace) {
+      DebugLogger(
+        message: 'An error occurred during account deletion: $error',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
+    }
+
+    return false;
   }
 }
