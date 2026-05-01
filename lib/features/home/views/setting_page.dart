@@ -3,6 +3,7 @@ import 'package:codexia_course_learning/core/utils/logger.dart';
 import 'package:codexia_course_learning/services/firebase_services.dart';
 import 'package:codexia_course_learning/shared/models/auth_user.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -699,8 +700,14 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           showModalBottomSheet(
                             context: context,
                             useRootNavigator: true,
+                            isScrollControlled: true,
                             builder: (context) {
-                              return AccountDeleteConfirmation();
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                                ),
+                                child: AccountDeleteConfirmation(),
+                              );
                             },
                           );
                         },
@@ -983,15 +990,83 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
   }
 }
 
-class AccountDeleteConfirmation extends ConsumerWidget {
+class AccountDeleteConfirmation extends ConsumerStatefulWidget {
   const AccountDeleteConfirmation({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
+  ConsumerState<ConsumerStatefulWidget> createState() => _AccountDeleteConfirmationState();
+}
+
+class _AccountDeleteConfirmationState extends ConsumerState<AccountDeleteConfirmation> {
+  bool passwordVisible = false;
+
+  final User? user = FirebaseAuth.instance.currentUser;
+  final TextEditingController passwordController = TextEditingController();
+  final GlobalKey<FormFieldState> passwordFieldKey = GlobalKey<FormFieldState>();
+
+  Widget buildEmailField() {
+    return Column(
+      children: <Widget>[
+        SizedBox(height: 15.0),
+        Text(
+          "To protect your account, please enter your password to confirm deletion.",
+          textAlign: TextAlign.justify,
+          style: TextStyle(
+            fontSize: 16.0,
+            fontStyle: FontStyle.italic,
+            color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
+          ),
+        ),
+        SizedBox(height: 10.0),
+        TextFormField(
+          key: passwordFieldKey,
+          controller: passwordController,
+          obscureText: !passwordVisible,
+          autocorrect: false,
+          enableSuggestions: false,
+          style: TextStyle(
+            color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
+          ),
+          decoration: InputDecoration(
+            suffixIcon: InkWell(
+              onTap: () {
+                setState(() {
+                  passwordVisible = !passwordVisible;
+                });
+              },
+              customBorder: CircleBorder(),
+              child: Icon(
+                passwordVisible ? Icons.visibility : Icons.visibility_off,
+                size: 24.0,
+                color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your password';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String? providerId = user?.providerData.firstOrNull?.providerId;
+
+    return SingleChildScrollView(
       padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0, top: 10.0),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(
             "Are you sure you want to delete your account? All data include Course "
@@ -999,6 +1074,7 @@ class AccountDeleteConfirmation extends ConsumerWidget {
             textAlign: TextAlign.justify,
             style: TextStyle(fontSize: 16.0, color: Theme.of(context).textTheme.labelSmall?.color),
           ),
+          if (providerId == "password") buildEmailField(),
           SizedBox(height: 15.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1014,8 +1090,15 @@ class AccountDeleteConfirmation extends ConsumerWidget {
               ),
               OutlinedButton(
                 onPressed: () async {
+                  String? password;
+                  if (providerId == "password" && !passwordFieldKey.currentState!.validate()) {
+                    return;
+                  } else if (providerId == "password") {
+                    password = passwordController.text.trim();
+                  }
+
                   final authService = ref.read(authServiceProvider);
-                  final bool successDelete = await authService.deleteAccount();
+                  final bool successDelete = await authService.deleteAccount(password: password);
 
                   if (successDelete) {
                     Toastification().show(
