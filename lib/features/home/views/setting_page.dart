@@ -656,9 +656,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       SizedBox(height: 5.0),
                       OutlinedButton(
                         onPressed: () async {
-                          DebugLogger(message: "Logout Account", level: LogLevel.debug).log();
                           bool successLogout = await AuthService().signOut();
-
                           if (successLogout) {
                             Toastification().show(
                               title: Text("Logout Success"),
@@ -698,7 +696,13 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       SizedBox(height: 5.0),
                       OutlinedButton(
                         onPressed: () {
-                          DebugLogger(message: "Delete Account", level: LogLevel.debug).log();
+                          showModalBottomSheet(
+                            context: context,
+                            useRootNavigator: true,
+                            builder: (context) {
+                              return AccountDeleteConfirmation();
+                            },
+                          );
                         },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.redAccent,
@@ -972,6 +976,77 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
                 ],
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AccountDeleteConfirmation extends ConsumerWidget {
+  const AccountDeleteConfirmation({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0, top: 10.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            "Are you sure you want to delete your account? All data include Course "
+            "Progress and Chat will be deleted. This action cannot be undone.",
+            textAlign: TextAlign.justify,
+            style: TextStyle(fontSize: 16.0, color: Theme.of(context).textTheme.labelSmall?.color),
+          ),
+          SizedBox(height: 15.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              OutlinedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.grey,
+                  minimumSize: Size(120.0, 40.0),
+                  side: BorderSide(color: Colors.grey),
+                ),
+                child: Text("Cancel", style: TextStyle(color: Colors.grey)),
+              ),
+              OutlinedButton(
+                onPressed: () async {
+                  final authService = ref.read(authServiceProvider);
+                  final bool successDelete = await authService.deleteAccount();
+
+                  if (successDelete) {
+                    Toastification().show(
+                      title: Text("Delete Account Success"),
+                      description: Text("Your account has been deleted successfully."),
+                      type: ToastificationType.success,
+                      style: ToastificationStyle.flat,
+                      alignment: Alignment.topCenter,
+                      autoCloseDuration: Duration(seconds: 3),
+                      animationDuration: Duration(milliseconds: 500),
+                    );
+                  } else {
+                    Toastification().show(
+                      title: Text("Delete Account Failed"),
+                      description: Text("An error occurred while deleting your account."),
+                      type: ToastificationType.error,
+                      style: ToastificationStyle.flat,
+                      alignment: Alignment.topCenter,
+                      autoCloseDuration: Duration(seconds: 3),
+                      animationDuration: Duration(milliseconds: 500),
+                    );
+                  }
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.redAccent,
+                  minimumSize: Size(120.0, 40.0),
+                  side: BorderSide(color: Colors.redAccent),
+                ),
+                child: Text("Confirm", style: TextStyle(color: Colors.redAccent)),
+              ),
+            ],
           ),
         ],
       ),
