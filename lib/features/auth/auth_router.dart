@@ -1,35 +1,37 @@
-import 'package:codexia_course_learning/features/auth/widgets/auth_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import '../auth/widgets/auth_widget.dart';
+import '../../core/app_constants.dart' show AppRoutes;
 
 class AuthRouter {
   AuthRouter._();
 
   static GoRoute initialize() {
     GoRoute authRouter = GoRoute(
-      path: '/auth',
-      name: 'authentication',
+      path: AppRoutes.authRoute.path,
+      name: AppRoutes.authRoute.name,
       builder: (context, state) {
         return AuthLandingPage();
       },
       routes: <RouteBase>[
         GoRoute(
-          path: 'login',
-          name: 'login',
+          path: AppRoutes.loginRoute.path,
+          name: AppRoutes.loginRoute.name,
           builder: (context, state) {
             return const LoginPage();
           },
         ),
         GoRoute(
-          path: 'register',
-          name: 'register',
+          path: AppRoutes.registerRoute.path,
+          name: AppRoutes.registerRoute.name,
           builder: (context, state) {
             return const RegisterPage();
           },
         ),
         GoRoute(
-          path: 'reset-password',
-          name: 'reset-password',
+          path: AppRoutes.resetPassRoute.path,
+          name: AppRoutes.resetPassRoute.name,
           builder: (BuildContext context, GoRouterState state) {
             return const ResetPasswordPage();
           },
