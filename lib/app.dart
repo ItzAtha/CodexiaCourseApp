@@ -20,7 +20,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return ToastificationWrapper(
-      config: ToastificationConfig(maxToastLimit: 1),
+      config: const ToastificationConfig(maxToastLimit: 1),
       child: AdaptiveTheme(
         debugShowFloatingThemeButton: true,
         light: LightMode.initialize(),
