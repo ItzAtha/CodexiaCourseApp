@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/app_constants.dart' show AppColors;
+
 class BottomNavbar extends StatefulWidget {
   const BottomNavbar({
     super.key,
@@ -26,7 +28,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
         selectedIndex.value = value;
 
         return BottomAppBar(
-          color: Color(0xFF0984E3),
+          color: AppColors.primary,
           shape: const CircularNotchedRectangle(),
           clipBehavior: Clip.hardEdge,
           notchMargin: 8.0,
@@ -54,7 +56,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
                   widget._onItemSelected(index);
                 },
               ).build(),
-              SizedBox(width: 15.0),
+              const SizedBox(width: 15.0),
               BottomNavbarItem(
                 index: 2,
                 currentIndex: selectedIndex,
@@ -101,11 +103,11 @@ class BottomNavbarItem {
   Widget build() {
     return Center(
       child: Container(
-        width: 20,
+        width: 20.0,
         color: Colors.transparent,
         child: OverflowBox(
-          maxWidth: 100,
-          maxHeight: 60,
+          maxWidth: 100.0,
+          maxHeight: 60.0,
           child: Material(
             color: Colors.transparent,
             child: InkWell(
@@ -128,15 +130,15 @@ class BottomNavbarItem {
                         children: [
                           Icon(
                             icon,
-                            size: 24,
-                            color: value == index ? Color(0xFFF5F6FA) : Color(0xB3F5F6FA),
+                            size: 24.0,
+                            color: value == index ? const Color(0xFFF5F6FA) : const Color(0xB3F5F6FA),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 4.0),
                           Text(
                             label,
                             style: TextStyle(
-                              fontSize: 12,
-                              color: value == index ? Color(0xFFF5F6FA) : Color(0xB3F5F6FA),
+                              fontSize: 12.0,
+                              color: value == index ? const Color(0xFFF5F6FA) : const Color(0xB3F5F6FA),
                             ),
                           ),
                         ],
