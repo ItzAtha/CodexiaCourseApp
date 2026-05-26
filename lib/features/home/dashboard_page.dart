@@ -1,9 +1,12 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
 import 'package:toastification/toastification.dart';
 
+import '../../../core/app_constants.dart' hide AppSizes;
 import '../../core/utils/logger.dart';
 import '../../shared/providers/auth_user_notifier.dart';
 import './models/bottom_navbar.dart';
@@ -43,20 +46,20 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
 
     DateTime now = DateTime.now();
     if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
+        now.difference(currentBackPressTime!) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
       Toastification().show(
         context: context,
-        title: Text("Press back again to exit"),
+        title: const Text("Press back again to exit"),
         type: ToastificationType.info,
         style: ToastificationStyle.flat,
         alignment: Alignment.bottomCenter,
-        autoCloseDuration: Duration(seconds: 2),
-        animationDuration: Duration(milliseconds: 500),
+        autoCloseDuration: const Duration(seconds: 2),
+        animationDuration: const Duration(milliseconds: 500),
       );
 
       // Disable pop invoke and close the toast after 2s timeout
-      Future.delayed(Duration(seconds: 2), () => setState(() => canCloseApp = false));
+      Future.delayed(const Duration(seconds: 2), () => setState(() => canCloseApp = false));
       setState(() => canCloseApp = true);
     }
   }
@@ -66,6 +69,18 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     final String location = GoRouterState.of(context).uri.path;
     final int segmentCount = location.split('/').where((s) => s.isNotEmpty).length;
     final bool hideNavbar = segmentCount > 1;
+
+    bool isDarkMode = false;
+    final themeMode = AdaptiveTheme.of(context).mode;
+    if (themeMode == AdaptiveThemeMode.system) {
+      isDarkMode = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+    } else {
+      isDarkMode = themeMode == AdaptiveThemeMode.dark;
+    }
+
+    SystemChrome.setSystemUIOverlayStyle(
+      isDarkMode ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+    );
 
     ref.listen(authUserProvider, (previous, next) {
       next.when(
@@ -83,12 +98,12 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
           ).log();
           Toastification().show(
             context: context,
-            title: Text("Couldn't load profile"),
+            title: const Text("Couldn't load profile"),
             type: ToastificationType.error,
             style: ToastificationStyle.flat,
             alignment: Alignment.bottomCenter,
-            autoCloseDuration: Duration(seconds: 2),
-            animationDuration: Duration(milliseconds: 500),
+            autoCloseDuration: ToastAnimations.closeDuration,
+            animationDuration: ToastAnimations.animationDuration,
           );
         },
         loading: () {
@@ -109,10 +124,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 icon: Icons.add,
                 activeIcon: Icons.close,
                 spacing: 3,
-                foregroundColor: Color(0xFFF5F6FA),
-                backgroundColor: Color(0xFF00CEC9),
+                foregroundColor: Colors.white,
+                backgroundColor: AppColors.secondary,
                 childPadding: const EdgeInsets.all(5),
-                spaceBetweenChildren: 4,
+                spaceBetweenChildren: 4.0,
                 overlayColor: Colors.black,
                 overlayOpacity: 0.5,
                 elevation: 8.0,
@@ -144,22 +159,24 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                     label: 'AI Chat Bot',
                     onTap: () {
                       DebugLogger(message: 'AI Chat Bot', level: LogLevel.debug).log();
-                      context.pushNamed('ai-chat');
+                      context.pushNamed(AppRoutes.chatBotRoute.name);
                     },
                   ),
                 ],
               )
             : null,
         bottomNavigationBar: !hideNavbar
-            ? BottomNavbar(
-                onItemSelected: (index) {
-                  setState(() => selectedIndex = index);
-                  _onItemTapped(selectedIndex);
-                },
-                onItemSelectedNotifier: ValueNotifier(selectedIndex),
+            ? SafeArea(
+                child: BottomNavbar(
+                  onItemSelected: (index) {
+                    setState(() => selectedIndex = index);
+                    _onItemTapped(selectedIndex);
+                  },
+                  onItemSelectedNotifier: ValueNotifier(selectedIndex),
+                ),
               )
             : null,
-        body: widget._navigationShell,
+        body: SafeArea(child: widget._navigationShell),
       ),
     );
   }
