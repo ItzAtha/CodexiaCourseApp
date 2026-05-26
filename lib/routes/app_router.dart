@@ -13,29 +13,30 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/app_constants.dart' show AppRoutes;
 import '../features/chat/aibot/views/ai_chat_bot_page.dart';
 import '../features/profile/view/user_profile.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/auth',
+    initialLocation: AppRoutes.authRoute.path,
     debugLogDiagnostics: true,
     refreshListenable: GoRouterRefreshStream(FirebaseAuth.instance.authStateChanges()),
     redirect: (context, state) {
       final User? user = FirebaseAuth.instance.currentUser;
       final isAuthenticated = user != null;
 
-      final isOnAuthPath = state.uri.path.startsWith('/auth');
+      final isOnAuthPath = state.uri.path.startsWith(AppRoutes.authRoute.path);
       final isOnTermsPath =
-          state.uri.path.startsWith('/term-of-service') ||
-          state.uri.path.startsWith('/privacy-policy');
+          state.uri.path.startsWith(AppRoutes.tosRoute.path) ||
+          state.uri.path.startsWith(AppRoutes.privacyRoute.path);
 
       if (!isAuthenticated && !(isOnAuthPath || isOnTermsPath)) {
-        return '/auth';
+        return AppRoutes.authRoute.path;
       }
 
       if (isAuthenticated && isOnAuthPath) {
-        return '/home';
+        return AppRoutes.homeRoute.path;
       }
       return null;
     },
@@ -61,8 +62,8 @@ class AppRouter {
           StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                path: '/home',
-                name: 'home',
+                path: AppRoutes.homeRoute.path,
+                name: AppRoutes.homeRoute.name,
                 builder: (context, state) {
                   return HomePage();
                 },
@@ -72,8 +73,8 @@ class AppRouter {
           StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                path: '/course',
-                name: 'course',
+                path: AppRoutes.courseRoute.path,
+                name: AppRoutes.courseRoute.name,
                 builder: (context, state) {
                   return CoursePage();
                 },
@@ -84,8 +85,8 @@ class AppRouter {
           StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                path: '/community',
-                name: 'community',
+                path: AppRoutes.communityRoute.path,
+                name: AppRoutes.communityRoute.name,
                 builder: (context, state) {
                   return CommunityPage();
                 },
@@ -95,15 +96,15 @@ class AppRouter {
           StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                path: '/settings',
-                name: 'settings',
+                path: AppRoutes.settingsRoute.path,
+                name: AppRoutes.settingsRoute.name,
                 builder: (context, state) {
                   return SettingPage();
                 },
                 routes: <RouteBase>[
                   GoRoute(
-                    path: 'user-profile',
-                    name: 'edit-profile',
+                    path: AppRoutes.editProfileRoute.path,
+                    name: AppRoutes.editProfileRoute.name,
                     builder: (context, state) {
                       return const UserProfilePage();
                     },
@@ -115,22 +116,22 @@ class AppRouter {
         ],
       ),
       GoRoute(
-        path: '/ai-chat-bot',
-        name: 'ai-chat',
+        path: AppRoutes.chatBotRoute.path,
+        name: AppRoutes.chatBotRoute.name,
         builder: (context, state) {
           return const AIChatBotPage();
         },
       ),
       GoRoute(
-        path: '/term-of-service',
-        name: 'tos',
+        path: AppRoutes.tosRoute.path,
+        name: AppRoutes.tosRoute.name,
         builder: (context, state) {
           return const TermsOfServicePage();
         },
       ),
       GoRoute(
-        path: '/privacy-policy',
-        name: 'privacy-policy',
+        path: AppRoutes.privacyRoute.path,
+        name: AppRoutes.privacyRoute.name,
         builder: (context, state) {
           return const PrivacyPolicyPage();
         },
