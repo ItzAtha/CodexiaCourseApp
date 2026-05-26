@@ -13,6 +13,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:toastification/toastification.dart';
 
+import '../../../core/app_constants.dart';
+import '../../../core/utils/app_info.dart';
 import '../../../services/auth_services.dart';
 
 class SettingPage extends ConsumerStatefulWidget {
@@ -30,6 +32,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
   bool isThemeOptionOpened = false;
   bool isLanguageOptionOpened = false;
 
+  String appVersion = "";
   LanguageOptions? languageOptions = LanguageOptions.en;
 
   void updateAvatarLoadStatus(bool status) {
@@ -37,20 +40,30 @@ class _SettingPageState extends ConsumerState<SettingPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    loadAppVersion();
+  }
+
+  Future<void> loadAppVersion() async {
+    final versionInfo = await AppInfo.getAppVersion();
+    setState(() {
+      appVersion = versionInfo.version;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final authUserState = ref.watch(authUserProvider);
-
     AuthUser? authUser = authUserState.value;
-    MediaQueryData mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Center(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(AppSizes.p12),
           child: Column(
             children: <Widget>[
-              SizedBox(height: mediaQuery.orientation == Orientation.portrait ? 80.0 : 10.0),
               Skeletonizer(
                 enabled: authUserState.isLoading,
                 enableSwitchAnimation: true,
@@ -73,8 +86,8 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                               ),
                             ),
                             Positioned(
-                              bottom: 12,
-                              right: 12,
+                              bottom: 12.0,
+                              right: 12.0,
                               child: Skeleton.ignore(
                                 child: FloatingActionButton.small(
                                   onPressed: () {
@@ -88,9 +101,9 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                                       },
                                     );
                                   },
-                                  shape: CircleBorder(),
-                                  backgroundColor: Color(0xFF00CEC9),
-                                  child: Icon(Icons.edit, color: Color(0xFFF5F6FA)),
+                                  shape: const CircleBorder(),
+                                  backgroundColor: AppColors.secondary,
+                                  child: const Icon(Icons.edit, color: Colors.white),
                                 ),
                               ),
                             ),
@@ -101,7 +114,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                     Text(
                       authUser?.displayName ?? authUser?.username ?? "Guest",
                       style: TextStyle(
-                        fontSize: 28.0,
+                        fontSize: AppSizes.xxlTextSize,
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).textTheme.labelLarge?.color,
                       ),
@@ -109,30 +122,30 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                     Text(
                       authUser?.email ?? "guest@gmail.com",
                       style: TextStyle(
-                        fontSize: 16.0,
+                        fontSize: AppSizes.mTextSize,
                         color: Theme.of(context).textTheme.labelSmall?.color,
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 15.0),
+              const SizedBox(height: 15.0),
               OutlinedButton(
                 onPressed: () {
-                  context.pushNamed('edit-profile');
+                  context.pushNamed(AppRoutes.editProfileRoute.name);
                 },
                 child: Text(
                   "Edit Profile",
                   style: TextStyle(
-                    fontSize: 16.0,
+                    fontSize: AppSizes.mTextSize,
                     color: Theme.of(context).textTheme.labelSmall?.color,
                   ),
                 ),
               ),
-              SizedBox(height: 40.0),
+              const SizedBox(height: 40.0),
               Card(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 14.0),
+                  padding: const EdgeInsets.all(AppSizes.p16),
                   child: Column(
                     children: <Widget>[
                       Row(
@@ -140,16 +153,16 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Text(
                             "General",
                             style: TextStyle(
-                              fontSize: 20.0,
+                              fontSize: AppSizes.lTextSize,
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).textTheme.labelMedium?.color,
                             ),
                           ),
-                          SizedBox(width: 10.0),
-                          Expanded(child: Divider(thickness: 1.2, height: 20.0)),
+                          const SizedBox(width: 10.0),
+                          const Expanded(child: Divider(thickness: 1.2, height: 20.0)),
                         ],
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       ExpansionTile(
                         onExpansionChanged: (value) {
                           setState(() => isThemeOptionOpened = value);
@@ -158,22 +171,22 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         title: Text(
                           "Change Theme",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: AppSizes.mTextSize,
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
                         trailing: AnimatedRotation(
                           turns: isThemeOptionOpened ? 0.25 : 0.0,
-                          duration: Duration(milliseconds: 500),
+                          duration: const Duration(milliseconds: 500),
                           curve: Curves.easeInOut,
                           child: Icon(
                             Icons.arrow_forward_ios,
                             color: Theme.of(context).iconTheme.color,
                           ),
                         ),
-                        tilePadding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        tilePadding: const EdgeInsets.only(left: 10.0, right: 10.0),
                         iconColor: Colors.grey.shade800,
-                        expansionAnimationStyle: AnimationStyle(
+                        expansionAnimationStyle: const AnimationStyle(
                           curve: Curves.easeInOut,
                           duration: Duration(milliseconds: 500),
                         ),
@@ -194,41 +207,41 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                                   title: Text(
                                     "Auto",
                                     style: TextStyle(
-                                      fontSize: 16.0,
+                                      fontSize: AppSizes.mTextSize,
                                       color: Theme.of(context).textTheme.labelSmall?.color,
                                     ),
                                   ),
                                   value: AdaptiveThemeMode.system,
-                                  activeColor: Color(0xFF00CEC9),
+                                  activeColor: AppColors.secondary,
                                 ),
                                 RadioListTile<AdaptiveThemeMode>(
                                   title: Text(
                                     "Light",
                                     style: TextStyle(
-                                      fontSize: 16.0,
+                                      fontSize: AppSizes.mTextSize,
                                       color: Theme.of(context).textTheme.labelSmall?.color,
                                     ),
                                   ),
                                   value: AdaptiveThemeMode.light,
-                                  activeColor: Color(0xFF00CEC9),
+                                  activeColor: AppColors.secondary,
                                 ),
                                 RadioListTile<AdaptiveThemeMode>(
                                   title: Text(
                                     "Dark",
                                     style: TextStyle(
-                                      fontSize: 16.0,
+                                      fontSize: AppSizes.mTextSize,
                                       color: Theme.of(context).textTheme.labelSmall?.color,
                                     ),
                                   ),
                                   value: AdaptiveThemeMode.dark,
-                                  activeColor: Color(0xFF00CEC9),
+                                  activeColor: AppColors.secondary,
                                 ),
                               ],
                             ),
                           ),
                         ],
                       ),
-                      Divider(thickness: 1.0, height: 1.0),
+                      const Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "Notifications", level: LogLevel.debug).log();
@@ -240,7 +253,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         title: Text(
                           "Notifications",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: AppSizes.mTextSize,
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
@@ -248,9 +261,9 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        contentPadding: const EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
-                      Divider(thickness: 1.0, height: 1.0),
+                      const Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "Accessibility", level: LogLevel.debug).log();
@@ -262,7 +275,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         title: Text(
                           "Accessibility",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: AppSizes.mTextSize,
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
@@ -270,9 +283,9 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        contentPadding: const EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
-                      Divider(thickness: 1.0, height: 1.0),
+                      const Divider(thickness: 1.0, height: 1.0),
                       ExpansionTile(
                         onExpansionChanged: (value) {
                           DebugLogger(message: "Change Language", level: LogLevel.debug).log();
@@ -282,22 +295,22 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         title: Text(
                           "Change Language",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: AppSizes.mTextSize,
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
                         trailing: AnimatedRotation(
                           turns: isLanguageOptionOpened ? 0.25 : 0.0,
-                          duration: Duration(milliseconds: 500),
+                          duration: const Duration(milliseconds: 500),
                           curve: Curves.easeInOut,
                           child: Icon(
                             Icons.arrow_forward_ios,
                             color: Theme.of(context).iconTheme.color,
                           ),
                         ),
-                        tilePadding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        tilePadding: const EdgeInsets.only(left: 10.0, right: 10.0),
                         iconColor: Colors.grey.shade800,
-                        expansionAnimationStyle: AnimationStyle(
+                        expansionAnimationStyle: const AnimationStyle(
                           curve: Curves.easeInOut,
                           duration: Duration(milliseconds: 500),
                         ),
@@ -317,23 +330,23 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                                   title: Text(
                                     "English",
                                     style: TextStyle(
-                                      fontSize: 16.0,
+                                      fontSize: AppSizes.mTextSize,
                                       color: Theme.of(context).textTheme.labelSmall?.color,
                                     ),
                                   ),
                                   value: LanguageOptions.en,
-                                  activeColor: Color(0xFF00CEC9),
+                                  activeColor: AppColors.secondary,
                                 ),
                                 RadioListTile<LanguageOptions>(
                                   title: Text(
                                     "Indonesia",
                                     style: TextStyle(
-                                      fontSize: 16.0,
+                                      fontSize: AppSizes.mTextSize,
                                       color: Theme.of(context).textTheme.labelSmall?.color,
                                     ),
                                   ),
                                   value: LanguageOptions.id,
-                                  activeColor: Color(0xFF00CEC9),
+                                  activeColor: AppColors.secondary,
                                 ),
                               ],
                             ),
@@ -344,10 +357,10 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 20.0),
+              const SizedBox(height: 20.0),
               Card(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 14.0),
+                  padding: const EdgeInsets.all(AppSizes.p16),
                   child: Column(
                     children: <Widget>[
                       Row(
@@ -355,16 +368,16 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Text(
                             "Security",
                             style: TextStyle(
-                              fontSize: 20.0,
+                              fontSize: AppSizes.lTextSize,
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).textTheme.labelMedium?.color,
                             ),
                           ),
-                          SizedBox(width: 10.0),
-                          Expanded(child: Divider(thickness: 1.2, height: 20.0)),
+                          const SizedBox(width: 10.0),
+                          const Expanded(child: Divider(thickness: 1.2, height: 20.0)),
                         ],
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "Enable Fingerprint", level: LogLevel.debug).log();
@@ -379,7 +392,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         title: Text(
                           "Enable Fingerprint",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: AppSizes.mTextSize,
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
@@ -394,12 +407,12 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                                 level: LogLevel.debug,
                               ).log();
                             },
-                            activeTrackColor: Color(0xFF00CEC9),
+                            activeTrackColor: AppColors.secondary,
                           ),
                         ),
-                        contentPadding: EdgeInsets.only(left: 10.0, right: 5.0),
+                        contentPadding: const EdgeInsets.only(left: 10.0, right: 5.0),
                       ),
-                      Divider(thickness: 1.0, height: 1.0),
+                      const Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "Enable 2FA", level: LogLevel.debug).log();
@@ -408,7 +421,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         title: Text(
                           "Enable 2FA",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: AppSizes.mTextSize,
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
@@ -416,9 +429,9 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        contentPadding: const EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
-                      Divider(thickness: 1.0, height: 1.0),
+                      const Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "Device Management", level: LogLevel.debug).log();
@@ -427,7 +440,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         title: Text(
                           "Device Management",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: AppSizes.mTextSize,
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
@@ -435,9 +448,9 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        contentPadding: const EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
-                      Divider(thickness: 1.0, height: 1.0),
+                      const Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "App Permissions", level: LogLevel.debug).log();
@@ -449,7 +462,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         title: Text(
                           "App Permissions",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: AppSizes.mTextSize,
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
@@ -457,16 +470,16 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        contentPadding: const EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 20.0),
+              const SizedBox(height: 20.0),
               Card(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 14.0),
+                  padding: const EdgeInsets.all(AppSizes.p16),
                   child: Column(
                     children: <Widget>[
                       Row(
@@ -474,16 +487,16 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Text(
                             "Help Center",
                             style: TextStyle(
-                              fontSize: 20.0,
+                              fontSize: AppSizes.lTextSize,
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).textTheme.labelMedium?.color,
                             ),
                           ),
-                          SizedBox(width: 10.0),
-                          Expanded(child: Divider(thickness: 1.2, height: 20.0)),
+                          const SizedBox(width: 10.0),
+                          const Expanded(child: Divider(thickness: 1.2, height: 20.0)),
                         ],
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "FAQ", level: LogLevel.debug).log();
@@ -495,7 +508,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         title: Text(
                           "FAQ",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: AppSizes.mTextSize,
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
@@ -503,9 +516,9 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        contentPadding: const EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
-                      Divider(thickness: 1.0, height: 1.0),
+                      const Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "About Us", level: LogLevel.debug).log();
@@ -514,7 +527,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         title: Text(
                           "About Us",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: AppSizes.mTextSize,
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
@@ -522,9 +535,9 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        contentPadding: const EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
-                      Divider(thickness: 1.0, height: 1.0),
+                      const Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "Rate Us", level: LogLevel.debug).log();
@@ -533,7 +546,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         title: Text(
                           "Rate Us",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: AppSizes.mTextSize,
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
@@ -541,19 +554,19 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        contentPadding: const EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
-                      Divider(thickness: 1.0, height: 1.0),
+                      const Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "Privacy Policy", level: LogLevel.debug).log();
-                          context.pushNamed('privacy-policy');
+                          context.pushNamed(AppRoutes.privacyRoute.name);
                         },
                         leading: Icon(Icons.policy, color: Theme.of(context).iconTheme.color),
                         title: Text(
                           "Privacy Policy",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: AppSizes.mTextSize,
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
@@ -561,19 +574,19 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        contentPadding: const EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
-                      Divider(thickness: 1.0, height: 1.0),
+                      const Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "Term of Service", level: LogLevel.debug).log();
-                          context.pushNamed('tos');
+                          context.pushNamed(AppRoutes.tosRoute.name);
                         },
                         leading: Icon(Icons.privacy_tip, color: Theme.of(context).iconTheme.color),
                         title: Text(
                           "Term of Service",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: AppSizes.mTextSize,
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
@@ -581,9 +594,9 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        contentPadding: const EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
-                      Divider(thickness: 1.0, height: 1.0),
+                      const Divider(thickness: 1.0, height: 1.0),
                       ListTile(
                         onTap: () {
                           DebugLogger(message: "Contact Support", level: LogLevel.debug).log();
@@ -595,7 +608,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         title: Text(
                           "Contact Support",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: AppSizes.mTextSize,
                             color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
@@ -603,22 +616,27 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
+                        contentPadding: const EdgeInsets.only(left: 10.0, right: 10.0),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       Text(
-                        "Version 1.0.0",
-                        style: TextStyle(fontSize: 14.0, color: Colors.grey.shade600),
+                        "App Version $appVersion",
+                        style: TextStyle(
+                          fontSize: AppSizes.sTextSize,
+                          color: Theme.of(
+                            context,
+                          ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 20.0),
+              const SizedBox(height: 20.0),
               Card(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 14.0),
+                  padding: const EdgeInsets.all(AppSizes.p16),
                   child: Column(
                     children: <Widget>[
                       Row(
@@ -626,75 +644,75 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Text(
                             "Danger Zone",
                             style: TextStyle(
-                              fontSize: 20.0,
+                              fontSize: AppSizes.lTextSize,
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).textTheme.labelMedium?.color,
                             ),
                           ),
-                          SizedBox(width: 10.0),
-                          Expanded(child: Divider(thickness: 1.2, height: 20.0)),
+                          const SizedBox(width: 10.0),
+                          const Expanded(child: Divider(thickness: 1.2, height: 20.0)),
                         ],
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       OutlinedButton(
                         onPressed: () {
                           DebugLogger(message: "Reset Course", level: LogLevel.debug).log();
                         },
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.redAccent,
-                          minimumSize: Size(double.infinity, 40.0),
-                          side: BorderSide(color: Colors.redAccent),
+                          foregroundColor: AppColors.dangerZone,
+                          minimumSize: const Size(double.infinity, 40.0),
+                          side: const BorderSide(color: AppColors.dangerZone),
                         ),
-                        child: Row(
+                        child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Text("Reset Course", style: TextStyle(color: Colors.redAccent)),
+                            Text("Reset Course", style: TextStyle(color: AppColors.dangerZone)),
                             SizedBox(width: 10.0),
-                            Icon(Icons.restart_alt, color: Colors.redAccent),
+                            Icon(Icons.restart_alt, color: AppColors.dangerZone),
                           ],
                         ),
                       ),
-                      SizedBox(height: 5.0),
+                      const SizedBox(height: 5.0),
                       OutlinedButton(
                         onPressed: () async {
                           bool successLogout = await AuthService().signOut();
                           if (successLogout) {
                             Toastification().show(
-                              title: Text("Logout Success"),
-                              description: Text("You have successfully logged out."),
+                              title: const Text("Logout Success"),
+                              description: const Text("You have successfully logged out."),
                               type: ToastificationType.success,
                               style: ToastificationStyle.flat,
                               alignment: Alignment.topCenter,
-                              autoCloseDuration: Duration(seconds: 3),
-                              animationDuration: Duration(milliseconds: 500),
+                              autoCloseDuration: ToastAnimations.closeDuration,
+                              animationDuration: ToastAnimations.animationDuration,
                             );
                           } else {
                             Toastification().show(
-                              title: Text("Logout Failed"),
-                              description: Text("An error occurred while logging out."),
+                              title: const Text("Logout Failed"),
+                              description: const Text("An error occurred while logging out."),
                               type: ToastificationType.error,
                               style: ToastificationStyle.flat,
                               alignment: Alignment.topCenter,
-                              autoCloseDuration: Duration(seconds: 3),
-                              animationDuration: Duration(milliseconds: 500),
+                              autoCloseDuration: ToastAnimations.closeDuration,
+                              animationDuration: ToastAnimations.animationDuration,
                             );
                           }
                         },
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.redAccent,
-                          minimumSize: Size(double.infinity, 40.0),
-                          side: BorderSide(color: Colors.redAccent),
+                          foregroundColor: AppColors.dangerZone,
+                          minimumSize: const Size(double.infinity, 40.0),
+                          side: const BorderSide(color: AppColors.dangerZone),
                         ),
-                        child: Row(
+                        child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Text("Logout Account", style: TextStyle(color: Colors.redAccent)),
+                            Text("Logout Account", style: TextStyle(color: AppColors.dangerZone)),
                             SizedBox(width: 10.0),
-                            Icon(Icons.logout, color: Colors.redAccent),
+                            Icon(Icons.logout, color: AppColors.dangerZone),
                           ],
                         ),
                       ),
-                      SizedBox(height: 5.0),
+                      const SizedBox(height: 5.0),
                       OutlinedButton(
                         onPressed: () {
                           showModalBottomSheet(
@@ -702,26 +720,21 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                             useRootNavigator: true,
                             isScrollControlled: true,
                             builder: (context) {
-                              return Padding(
-                                padding: EdgeInsets.only(
-                                  bottom: MediaQuery.of(context).viewInsets.bottom,
-                                ),
-                                child: AccountDeleteConfirmation(),
-                              );
+                              return const AccountDeleteConfirmation();
                             },
                           );
                         },
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.redAccent,
-                          minimumSize: Size(double.infinity, 40.0),
-                          side: BorderSide(color: Colors.redAccent),
+                          foregroundColor: AppColors.dangerZone,
+                          minimumSize: const Size(double.infinity, 40.0),
+                          side: const BorderSide(color: AppColors.dangerZone),
                         ),
-                        child: Row(
+                        child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Text("Delete Account", style: TextStyle(color: Colors.redAccent)),
+                            Text("Delete Account", style: TextStyle(color: AppColors.dangerZone)),
                             SizedBox(width: 10.0),
-                            Icon(Icons.delete_forever, color: Colors.redAccent),
+                            Icon(Icons.delete_forever, color: AppColors.dangerZone),
                           ],
                         ),
                       ),
@@ -729,7 +742,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 90.0),
+              const SizedBox(height: 25.0),
             ],
           ),
         ),
@@ -781,35 +794,35 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
         uploadProgress.snapshotEvents.listen((taskSnapshot) async {
           switch (taskSnapshot.state) {
             case TaskState.paused:
-              print("Upload is paused.");
+              debugPrint("Upload is paused.");
               break;
             case TaskState.running:
               final progress = (100 * taskSnapshot.bytesTransferred) / taskSnapshot.totalBytes;
-              print("Upload is $progress% complete.");
+              debugPrint("Upload is $progress% complete.");
               break;
             case TaskState.success:
               String newPath = await taskSnapshot.ref.getDownloadURL();
               ref.read(authUserProvider.notifier).updateAvatar(newPath);
 
               Toastification().show(
-                title: Text("Avatar Updated"),
-                description: Text("Your avatar has been updated successfully."),
+                title: const Text("Avatar Updated"),
+                description: const Text("Your avatar has been updated successfully."),
                 type: ToastificationType.success,
                 style: ToastificationStyle.flat,
                 alignment: Alignment.topCenter,
-                autoCloseDuration: Duration(seconds: 3),
-                animationDuration: Duration(milliseconds: 500),
+                autoCloseDuration: ToastAnimations.closeDuration,
+                animationDuration: ToastAnimations.animationDuration,
               );
 
               DebugLogger(message: "Avatar updated successfully", level: LogLevel.info).log();
               widget.onStatusChange(false);
               break;
             case TaskState.canceled:
-              print("Upload was canceled.");
+              debugPrint("Upload was canceled.");
               widget.onStatusChange(false);
               break;
             case TaskState.error:
-              print("Upload failed: ${taskSnapshot.toString()}");
+              debugPrint("Upload failed: ${taskSnapshot.toString()}");
               widget.onStatusChange(false);
               break;
           }
@@ -817,13 +830,13 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
       }
     } catch (error, stackTrace) {
       Toastification().show(
-        title: Text("Error"),
-        description: Text("An error occurred while selecting the image."),
+        title: const Text("Error"),
+        description: const Text("An error occurred while selecting the image."),
         type: ToastificationType.error,
         style: ToastificationStyle.flat,
         alignment: Alignment.topCenter,
-        autoCloseDuration: Duration(seconds: 3),
-        animationDuration: Duration(milliseconds: 500),
+        autoCloseDuration: ToastAnimations.closeDuration,
+        animationDuration: ToastAnimations.animationDuration,
       );
 
       DebugLogger(
@@ -846,13 +859,13 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
 
       if (isDeleteButtonPress) {
         Toastification().show(
-          title: Text("Avatar Deleted"),
-          description: Text("Your avatar has been deleted successfully."),
+          title: const Text("Avatar Deleted"),
+          description: const Text("Your avatar has been deleted successfully."),
           type: ToastificationType.success,
           style: ToastificationStyle.flat,
           alignment: Alignment.topCenter,
-          autoCloseDuration: Duration(seconds: 3),
-          animationDuration: Duration(milliseconds: 500),
+          autoCloseDuration: ToastAnimations.closeDuration,
+          animationDuration: ToastAnimations.animationDuration,
         );
       }
 
@@ -860,13 +873,13 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
     } else {
       if (isDeleteButtonPress) {
         Toastification().show(
-          title: Text("Error"),
-          description: Text("An error occurred while deleting the avatar."),
+          title: const Text("Error"),
+          description: const Text("An error occurred while deleting the avatar."),
           type: ToastificationType.error,
           style: ToastificationStyle.flat,
           alignment: Alignment.topCenter,
-          autoCloseDuration: Duration(seconds: 3),
-          animationDuration: Duration(milliseconds: 500),
+          autoCloseDuration: ToastAnimations.closeDuration,
+          animationDuration: ToastAnimations.animationDuration,
         );
       }
 
@@ -879,7 +892,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
 
     final croppedImage = await cropper.cropImage(
       sourcePath: filePath,
-      aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+      aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
       compressQuality: 100,
       compressFormat: ImageCompressFormat.jpg,
       uiSettings: <PlatformUiSettings>[
@@ -887,8 +900,8 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
           toolbarTitle: 'Avatar Crop',
           cropStyle: CropStyle.circle,
           showCropGrid: true,
-          toolbarColor: Color(0xFF0984E3),
-          toolbarWidgetColor: Color(0xFFF5F6FA),
+          toolbarColor: const Color(0xFF0984E3),
+          toolbarWidgetColor: const Color(0xFFF5F6FA),
           initAspectRatio: CropAspectRatioPreset.original,
           lockAspectRatio: false,
         ),
@@ -908,7 +921,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
     final userAvatar = ref.watch(authUserProvider.select((value) => value.value?.avatar));
 
     return Padding(
-      padding: EdgeInsets.only(bottom: 10.0),
+      padding: const EdgeInsets.only(bottom: AppSizes.p12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
@@ -921,12 +934,12 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Icon(Icons.camera_alt, size: 40.0),
-                  SizedBox(height: 5.0),
+                  const Icon(Icons.camera_alt, size: 40.0),
+                  const SizedBox(height: 5.0),
                   Text(
                     "Camera",
                     style: TextStyle(
-                      fontSize: 16.0,
+                      fontSize: AppSizes.mTextSize,
                       color: Theme.of(context).textTheme.labelSmall?.color,
                     ),
                   ),
@@ -943,12 +956,12 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Icon(Icons.photo, size: 40.0),
-                  SizedBox(height: 5.0),
+                  const Icon(Icons.photo, size: 40.0),
+                  const SizedBox(height: 5.0),
                   Text(
                     "Gallery",
                     style: TextStyle(
-                      fontSize: 16.0,
+                      fontSize: AppSizes.mTextSize,
                       color: Theme.of(context).textTheme.labelSmall?.color,
                     ),
                   ),
@@ -971,12 +984,12 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Icon(Icons.delete, size: 40.0),
-                  SizedBox(height: 5.0),
+                  const Icon(Icons.delete, size: 40.0),
+                  const SizedBox(height: 5.0),
                   Text(
                     "Delete",
                     style: TextStyle(
-                      fontSize: 16.0,
+                      fontSize: AppSizes.mTextSize,
                       color: Theme.of(context).textTheme.labelSmall?.color,
                     ),
                   ),
@@ -1007,17 +1020,17 @@ class _AccountDeleteConfirmationState extends ConsumerState<AccountDeleteConfirm
   Widget buildEmailField() {
     return Column(
       children: <Widget>[
-        SizedBox(height: 15.0),
+        const SizedBox(height: 15.0),
         Text(
           "To protect your account, please enter your password to confirm deletion.",
           textAlign: TextAlign.justify,
           style: TextStyle(
-            fontSize: 16.0,
+            fontSize: AppSizes.mTextSize,
             fontStyle: FontStyle.italic,
             color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
           ),
         ),
-        SizedBox(height: 10.0),
+        const SizedBox(height: 10.0),
         TextFormField(
           key: passwordFieldKey,
           controller: passwordController,
@@ -1034,7 +1047,7 @@ class _AccountDeleteConfirmationState extends ConsumerState<AccountDeleteConfirm
                   passwordVisible = !passwordVisible;
                 });
               },
-              customBorder: CircleBorder(),
+              customBorder: const CircleBorder(),
               child: Icon(
                 passwordVisible ? Icons.visibility : Icons.visibility_off,
                 size: 24.0,
@@ -1065,17 +1078,20 @@ class _AccountDeleteConfirmationState extends ConsumerState<AccountDeleteConfirm
     String? providerId = user?.providerData.firstOrNull?.providerId;
 
     return SingleChildScrollView(
-      padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0, top: 10.0),
+      padding: const EdgeInsets.only(left: AppSizes.p16, right: AppSizes.p16, bottom: AppSizes.p24),
       child: Column(
         children: <Widget>[
           Text(
             "Are you sure you want to delete your account? All data include Course "
             "Progress and Chat will be deleted. This action cannot be undone.",
             textAlign: TextAlign.justify,
-            style: TextStyle(fontSize: 16.0, color: Theme.of(context).textTheme.labelSmall?.color),
+            style: TextStyle(
+              fontSize: AppSizes.mTextSize,
+              color: Theme.of(context).textTheme.labelSmall?.color,
+            ),
           ),
           if (providerId == "password") buildEmailField(),
-          SizedBox(height: 15.0),
+          const SizedBox(height: 15.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
@@ -1083,10 +1099,10 @@ class _AccountDeleteConfirmationState extends ConsumerState<AccountDeleteConfirm
                 onPressed: () => Navigator.of(context).pop(),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.grey,
-                  minimumSize: Size(120.0, 40.0),
-                  side: BorderSide(color: Colors.grey),
+                  minimumSize: const Size(120.0, 40.0),
+                  side: BorderSide(color: Colors.grey.shade600),
                 ),
-                child: Text("Cancel", style: TextStyle(color: Colors.grey)),
+                child: Text("Cancel", style: TextStyle(color: Colors.grey.shade600)),
               ),
               OutlinedButton(
                 onPressed: () async {
@@ -1102,32 +1118,32 @@ class _AccountDeleteConfirmationState extends ConsumerState<AccountDeleteConfirm
 
                   if (successDelete) {
                     Toastification().show(
-                      title: Text("Delete Account Success"),
-                      description: Text("Your account has been deleted successfully."),
+                      title: const Text("Delete Account Success"),
+                      description: const Text("Your account has been deleted successfully."),
                       type: ToastificationType.success,
                       style: ToastificationStyle.flat,
                       alignment: Alignment.topCenter,
-                      autoCloseDuration: Duration(seconds: 3),
-                      animationDuration: Duration(milliseconds: 500),
+                      autoCloseDuration: ToastAnimations.closeDuration,
+                      animationDuration: ToastAnimations.animationDuration,
                     );
                   } else {
                     Toastification().show(
-                      title: Text("Delete Account Failed"),
-                      description: Text("An error occurred while deleting your account."),
+                      title: const Text("Delete Account Failed"),
+                      description: const Text("An error occurred while deleting your account."),
                       type: ToastificationType.error,
                       style: ToastificationStyle.flat,
                       alignment: Alignment.topCenter,
-                      autoCloseDuration: Duration(seconds: 3),
-                      animationDuration: Duration(milliseconds: 500),
+                      autoCloseDuration: ToastAnimations.closeDuration,
+                      animationDuration: ToastAnimations.animationDuration,
                     );
                   }
                 },
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.redAccent,
-                  minimumSize: Size(120.0, 40.0),
-                  side: BorderSide(color: Colors.redAccent),
+                  foregroundColor: AppColors.dangerZone,
+                  minimumSize: const Size(120.0, 40.0),
+                  side: const BorderSide(color: AppColors.dangerZone),
                 ),
-                child: Text("Confirm", style: TextStyle(color: Colors.redAccent)),
+                child: const Text("Confirm", style: TextStyle(color: AppColors.dangerZone)),
               ),
             ],
           ),
