@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:toastification/toastification.dart';
 
+import '../../../core/app_constants.dart' hide AppRoutes;
 import '../../../shared/models/auth_user.dart';
 import '../../../shared/providers/auth_user_notifier.dart';
 
@@ -37,18 +38,18 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Edit Profile"),
+        title: const Text("Edit Profile"),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: Icon(Icons.arrow_back),
-          style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
+          icon: const Icon(Icons.arrow_back),
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
         ),
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0x990984E3), Color(0xFF0984E3)],
+              colors: [AppColors.primary.withValues(alpha: 0.6), AppColors.primary],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -56,10 +57,10 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 24.0),
+        padding: const EdgeInsets.all(AppSizes.p16),
         child: Column(
           children: <Widget>[
-            SizedBox(height: 40.0),
+            const SizedBox(height: 40.0),
             ClipOval(
               child: Image.network(
                 authUser?.avatar ?? "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
@@ -73,7 +74,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
 
                   return Center(
                     child: CircularProgressIndicator(
-                      backgroundColor: Color(0xFF00CEC9),
+                      backgroundColor: const Color(0xFF00CEC9),
                       value: loadingProgress.expectedTotalBytes != null
                           ? loadingProgress.cumulativeBytesLoaded /
                                 loadingProgress.expectedTotalBytes!
@@ -83,14 +84,14 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                 },
               ),
             ),
-            SizedBox(height: 40.0),
+            const SizedBox(height: 40.0),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
                   "DisplayName",
                   style: TextStyle(
-                    fontSize: 16.0,
+                    fontSize: AppSizes.mTextSize,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).textTheme.labelSmall?.color,
                   ),
@@ -102,11 +103,11 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                   ),
                   textInputAction: TextInputAction.next,
                 ),
-                SizedBox(height: 15.0),
+                const SizedBox(height: 15.0),
                 Text(
                   "Email Address",
                   style: TextStyle(
-                    fontSize: 16.0,
+                    fontSize: AppSizes.mTextSize,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).textTheme.labelSmall?.color,
                   ),
@@ -118,7 +119,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                   style: TextStyle(
                     color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
                   ),
-                  decoration: InputDecoration(hintText: "example@gmail.com"),
+                  decoration: const InputDecoration(hintText: "example@gmail.com"),
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -134,10 +135,9 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                     return null;
                   },
                 ),
-                SizedBox(height: 15.0),
               ],
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 30.0),
             ElevatedButton(
               onPressed: () {
                 if (emailFieldKey.currentState?.validate() ?? false) {
@@ -149,21 +149,22 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                         );
 
                     Toastification().show(
-                      title: Text("Profile updated successfully"),
+                      title: const Text("Profile updated successfully"),
                       type: ToastificationType.success,
                       style: ToastificationStyle.minimal,
                       alignment: Alignment.topCenter,
-                      autoCloseDuration: Duration(seconds: 2),
-                      animationDuration: Duration(milliseconds: 500),
+                      autoCloseDuration: ToastAnimations.closeDuration,
+                      animationDuration: ToastAnimations.animationDuration,
                     );
                   }
                   context.pop();
                 }
               },
-              style: ButtonStyle(minimumSize: WidgetStatePropertyAll(Size(double.infinity, 40.0))),
-              child: Text("Save", style: TextStyle(fontSize: 14.0, color: Colors.white)),
+              style: const ButtonStyle(
+                minimumSize: WidgetStatePropertyAll(Size(double.infinity, 40.0)),
+              ),
+              child: const Text("Save", style: TextStyle(fontSize: 14.0, color: Colors.white)),
             ),
-            SizedBox(height: 20.0),
           ],
         ),
       ),
