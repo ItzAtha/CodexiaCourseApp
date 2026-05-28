@@ -1,258 +1,166 @@
+import 'package:codexia_course_learning/shared/models/course.dart';
+import 'package:codexia_course_learning/shared/providers/course_list_notifier.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:toastification/toastification.dart';
 
+import '../../../core/app_constants.dart' show ToastAnimations;
 import '../../../core/utils/logger.dart';
 import '../../home/models/course_card.dart';
 
-class CoursePage extends StatefulWidget {
+enum FilterType { popular, rating, newest, clear }
+
+class CoursePage extends ConsumerStatefulWidget {
   const CoursePage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _CoursePageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _CoursePageState();
 }
 
-class _CoursePageState extends State<CoursePage> {
-  List<bool> isSelected = [false, false, false];
+class _CoursePageState extends ConsumerState<CoursePage> {
+  ({bool newest, bool popular, bool rating}) isSelected = (
+    popular: false,
+    rating: false,
+    newest: false,
+  );
+  Map<String, List<CourseCard>> courseList = {};
   Map<String, List<CourseCard>> filteredList = {};
   TextEditingController searchController = TextEditingController();
 
-  final courseCardList = {
-    "Programming Foundations": [
-      CourseCard(
-        type: CardType.course,
-        title: "Java Development",
-        description: "Learn Java programming and its applications in various domains.",
-        overview:
-            "In this course, you will learn the fundamentals of Java programming language, including syntax, object-oriented programming concepts, and how to build applications using Java. Whether you're a beginner or looking to enhance your Java skills, this course will provide you with the knowledge and practical experience needed to succeed in Java development.",
-        courseImage: "java.svg",
-        courseRoutePath: 'java-course',
-      ),
-      CourseCard(
-        type: CardType.course,
-        title: "Python Development",
-        description: "Learn Python programming and its applications in various domains.",
-        overview:
-            "In this course, you will learn the fundamentals of Python programming language, including syntax, data structures, and how to build applications using Python. Whether you're a beginner or looking to enhance your Python skills, this course will provide you with the knowledge and practical experience needed to succeed in Python development.",
-        courseImage: "python.svg",
-        courseRoutePath: 'python-course',
-      ),
-      CourseCard(
-        type: CardType.course,
-        title: "Web Development",
-        description:
-            "Learn how to build modern and responsive websites using HTML, CSS, and JavaScript.",
-        overview:
-            "In this course, you will learn the fundamentals of web development, including HTML for structuring web pages, CSS for styling, and JavaScript for adding interactivity. Whether you're a beginner or looking to enhance your web development skills, this course will provide you with the knowledge and practical experience needed to build modern and responsive websites.",
-        courseImage: "web.svg",
-        courseRoutePath: 'web-course',
-        isMaintainable: true,
-      ),
-      CourseCard(
-        type: CardType.course,
-        title: "PHP Development",
-        description: "Learn PHP programming and its applications in web development.",
-        overview:
-            "In this course, you will learn the fundamentals of PHP programming language, including syntax, data structures, and how to build web applications using PHP. Whether you're a beginner or looking to enhance your PHP skills, this course will provide you with the knowledge and practical experience needed to succeed in PHP development.",
-        courseImage: "php.svg",
-        courseRoutePath: 'php-course',
-        isMaintainable: true,
-      ),
-      CourseCard(
-        type: CardType.course,
-        title: "C/C++/C# Development",
-        description:
-            "Learn C, C++, and C# programming languages and their applications in various domains.",
-        overview:
-            "In this course, you will learn the fundamentals of C, C++, and C# programming languages, including syntax, data structures, and how to build applications using these languages. Whether you're a beginner or looking to enhance your skills in C, C++, or C#, this course will provide you with the knowledge and practical experience needed to succeed in development using these languages.",
-        courseImage: "c.svg",
-        courseRoutePath: 'c-course',
-        isMaintainable: true,
-      ),
-      CourseCard(
-        type: CardType.course,
-        title: "Dart Development",
-        description: "Learn Dart programming and its applications in Flutter development.",
-        overview:
-            "In this course, you will learn the fundamentals of Dart programming language, including syntax, data structures, and how to build applications using Dart. Whether you're a beginner or looking to enhance your Dart skills, this course will provide you with the knowledge and practical experience needed to succeed in Dart development, especially in the context of Flutter framework development.",
-        courseImage: "dart.svg",
-        courseRoutePath: 'dart-course',
-        isMaintainable: true,
-      ),
-      CourseCard(
-        type: CardType.course,
-        title: "Arduino Development",
-        description:
-            "Learn how to build interactive projects and prototypes using Arduino microcontroller platform.",
-        overview:
-            "In this course, you will learn the fundamentals of Arduino development, including programming the Arduino board, working with sensors and actuators, and building interactive projects. Whether you're a beginner or looking to enhance your skills in Arduino development, this course will provide you with the knowledge and practical experience needed to create innovative projects using the Arduino platform.",
-        courseImage: "arduino.svg",
-        courseRoutePath: 'arduino-course',
-        isMaintainable: true,
-      ),
-    ],
-    "Database Structures": [
-      CourseCard(
-        type: CardType.course,
-        title: "SQL Database",
-        description: "Learn how to design and manage relational databases using SQL.",
-        overview:
-            "In this course, you will learn the fundamentals of SQL databases, including database design, querying, and management using SQL. Whether you're a beginner or looking to enhance your SQL skills, this course will provide you with the knowledge and practical experience needed to succeed in SQL database development.",
-        courseImage: "sql.svg",
-        courseRoutePath: 'sql-course',
-        isMaintainable: true,
-      ),
-      CourseCard(
-        type: CardType.course,
-        title: "Prisma Database",
-        description: "Learn how to design and manage databases using Prisma ORM.",
-        overview:
-            "In this course, you will learn the fundamentals of Prisma database development, including database design, querying, and management using Prisma ORM. Whether you're a beginner or looking to enhance your Prisma skills, this course will provide you with the knowledge and practical experience needed to succeed in Prisma database development.",
-        courseImage: "prisma.svg",
-        courseRoutePath: 'prisma-course',
-        isMaintainable: true,
-      ),
-    ],
-    "Framework Development": [
-      CourseCard(
-        type: CardType.course,
-        title: "Spring Framework",
-        description:
-            "Learn how to build enterprise-level applications using the Spring Java framework.",
-        overview:
-            "In this course, you will learn the fundamentals of Spring framework development, including Java programming language, Spring architecture, dependency injection, and how to build enterprise-level applications using the Spring Java framework. Whether you're a beginner or looking to enhance your Spring skills, this course will provide you with the knowledge and practical experience needed to succeed in Spring framework development.",
-        courseImage: "spring.svg",
-        courseRoutePath: 'spring-course',
-        isMaintainable: true,
-      ),
-      CourseCard(
-        type: CardType.course,
-        title: "Django Framework",
-        description:
-            "Learn how to build secure and scalable web applications using the Django Python framework.",
-        overview:
-            "In this course, you will learn the fundamentals of Django framework development, including Python programming language, Django architecture, routing, database management, and how to build secure and scalable web applications using the Django Python framework. Whether you're a beginner or looking to enhance your Django skills, this course will provide you with the knowledge and practical experience needed to succeed in Django framework development.",
-        courseImage: "django.svg",
-        courseRoutePath: 'django-course',
-        isMaintainable: true,
-      ),
-      CourseCard(
-        type: CardType.course,
-        title: "Laravel Framework",
-        description:
-            "Learn how to build robust and scalable web applications using the Laravel PHP framework.",
-        overview:
-            "In this course, you will learn the fundamentals of Laravel framework development, including PHP programming language, Laravel architecture, routing, database management, and how to build robust and scalable web applications using the Laravel PHP framework. Whether you're a beginner or looking to enhance your Laravel skills, this course will provide you with the knowledge and practical experience needed to succeed in Laravel framework development.",
-        courseImage: "laravel.svg",
-        courseRoutePath: 'laravel-course',
-        isMaintainable: true,
-      ),
-      CourseCard(
-        type: CardType.course,
-        title: "React JS Library",
-        description:
-            "Learn how to build dynamic and interactive web applications using the React JS library.",
-        overview:
-            "In this course, you will learn the fundamentals of React JS development, including JSX syntax, component-based architecture, state management, and how to build dynamic and interactive web applications using the React JS library. Whether you're a beginner or looking to enhance your React JS skills, this course will provide you with the knowledge and practical experience needed to succeed in React JS development.",
-        courseImage: "reactjs.svg",
-        courseRoutePath: 'reactjs-course',
-        isMaintainable: true,
-      ),
-      CourseCard(
-        type: CardType.course,
-        title: "Next JS Framework",
-        description:
-            "Learn how to build server-rendered React applications using the Next JS framework.",
-        overview:
-            "In this course, you will learn the fundamentals of Next JS framework development, including JavaScript programming language, Next JS architecture, routing, server-side rendering, and how to build server-rendered React applications using the Next JS framework. Whether you're a beginner or looking to enhance your Next JS skills, this course will provide you with the knowledge and practical experience needed to succeed in Next JS framework development.",
-        courseImage: "nextjs.svg",
-        courseRoutePath: 'nextjs-course',
-        isMaintainable: true,
-      ),
-      CourseCard(
-        type: CardType.course,
-        title: "Express JS Framework",
-        description:
-            "Learn how to build fast and scalable web applications using the Express JS framework.",
-        overview:
-            "In this course, you will learn the fundamentals of Express JS development, including JavaScript programming language, Express architecture, routing, middleware, and how to build fast and scalable web applications using the Express JS framework. Whether you're a beginner or looking to enhance your Express JS skills, this course will provide you with the knowledge and practical experience needed to succeed in Express JS development.",
-        courseImage: "express.svg",
-        courseRoutePath: 'expressjs-course',
-        isMaintainable: true,
-      ),
-      CourseCard(
-        type: CardType.course,
-        title: "Flutter Framework",
-        description:
-            "Learn how to build beautiful and performant mobile apps using the Flutter framework.",
-        overview:
-            "In this course, you will learn the fundamentals of Flutter framework development, including Dart programming language, Flutter widgets, state management, and how to build cross-platform mobile applications using Flutter. Whether you're a beginner or looking to enhance your Flutter skills, this course will provide you with the knowledge and practical experience needed to succeed in Flutter framework development.",
-        courseImage: "flutter.svg",
-        courseRoutePath: 'flutter-course',
-        isMaintainable: true,
-      ),
-      CourseCard(
-        type: CardType.course,
-        title: "Arduino with PlatformIO",
-        description:
-            "Learn how to build interactive projects and prototypes using Arduino with PlatformIO IDE.",
-        overview:
-            "In this course, you will learn the fundamentals of Arduino development using PlatformIO IDE, including programming the Arduino board, working with sensors and actuators, and building interactive projects. Whether you're a beginner or looking to enhance your skills in Arduino development with PlatformIO, this course will provide you with the knowledge and practical experience needed to create innovative projects using the Arduino platform with PlatformIO IDE.",
-        courseImage: "platformio.svg",
-        courseRoutePath: 'platformio-course',
-        isMaintainable: true,
-      ),
-    ],
-  };
-
-  void filterList(String search) {
-    List<CourseCard> filteredCourseList = [];
-
-    courseCardList.forEach((key, value) {
-      for (var element in value) {
-        if (element.title!.toLowerCase().contains(search.toLowerCase())) {
-          filteredCourseList.add(element);
-          DebugLogger(message: element.title ?? "", level: LogLevel.debug).log();
-        }
-      }
-
-      setState(() {
-        filteredList.addAll({key: filteredCourseList});
-        filteredCourseList = [];
+  void searchFilterList(String search) {
+    setState(() {
+      filteredList = courseList.map((type, data) {
+        return MapEntry(
+          type,
+          data
+              .where((course) => course.title.toLowerCase().contains(search.toLowerCase()))
+              .toList(),
+        );
       });
-    });
-
-    filteredList.forEach((key, value) {
-      DebugLogger(message: key, level: LogLevel.debug).log();
-      String display = "Title: $key | Course: [";
-      for (var element in value) {
-        if (value.indexOf(element) == value.length - 1) {
-          display += element.title ?? "";
-        } else {
-          display += element.title ?? "";
-          display += ", ";
-        }
-      }
-      display += "]";
-      DebugLogger(message: display, level: LogLevel.info).log();
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    filteredList.addAll(courseCardList);
+  void filterList(FilterType type) {
+    switch (type) {
+      case FilterType.popular:
+        List<CourseCard> tempCourseList = [];
+
+        for (final course in courseList.keys) {
+          tempCourseList.addAll(courseList[course] ?? []);
+        }
+
+        tempCourseList.sort((a, b) => b.popular.compareTo(a.popular));
+        setState(() {
+          filteredList.clear();
+          filteredList["Popular Course"] = tempCourseList.take(10).toList();
+        });
+        break;
+      case FilterType.rating:
+        List<CourseCard> tempCourseList = [];
+
+        for (final course in courseList.keys) {
+          tempCourseList.addAll(courseList[course] ?? []);
+        }
+
+        tempCourseList.sort((a, b) => b.rating.compareTo(a.rating));
+        setState(() {
+          filteredList.clear();
+          filteredList["Top Rated Course"] = tempCourseList.take(10).toList();
+        });
+        break;
+      case FilterType.newest:
+        setState(() {
+          filteredList.clear();
+          filteredList = courseList.map((type, data) {
+            return MapEntry(
+              type,
+              data.where((course) {
+                Duration diff = DateTime.now().difference(course.createdAt);
+                if (diff.inDays < 2) {
+                  return true;
+                }
+                return false;
+              }).toList(),
+            );
+          });
+        });
+        break;
+      case FilterType.clear:
+        setState(() {
+          filteredList.clear();
+          filteredList.addAll(courseList);
+        });
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(courseListProvider, (previous, next) {
+      next.when(
+        data: (data) {
+          Map<String, List<Course>> coursesData = data.fold({}, (
+            Map<String, List<Course>> map,
+            course,
+          ) {
+            map.putIfAbsent(course.type.name, () => []).add(course);
+            return map;
+          });
+
+          for (final courses in coursesData.entries) {
+            List<CourseCard> cardList = [];
+            String courseType = courses.key;
+
+            for (final data in courses.value) {
+              CourseCard card = CourseCard(
+                data.name,
+                data.description,
+                data.rating,
+                data.popular,
+                data.levels,
+                data.createdAt,
+                data.isActive,
+              );
+              cardList.add(card);
+            }
+
+            cardList.sort((a, b) => a.title.compareTo(b.title));
+            courseList[courseType] = cardList;
+          }
+
+          setState(() {
+            filteredList.addAll(courseList);
+          });
+        },
+        error: (error, stackTrace) {
+          DebugLogger(
+            message: "Error loading course data: $error",
+            stackTrace: stackTrace,
+            level: LogLevel.error,
+          ).log();
+          Toastification().show(
+            context: context,
+            title: const Text("Couldn't load course"),
+            type: ToastificationType.error,
+            style: ToastificationStyle.flat,
+            alignment: Alignment.bottomCenter,
+            autoCloseDuration: ToastAnimations.closeDuration,
+            animationDuration: ToastAnimations.animationDuration,
+          );
+        },
+        loading: () {
+          DebugLogger(message: "Loading courses...", level: LogLevel.info).log();
+        },
+      );
+    });
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Center(
         child: Padding(
-          padding: EdgeInsets.all(20.0),
+          padding: const EdgeInsets.only(top: 15.0, left: 20.0, right: 20.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const SizedBox(height: 20.0),
               SizedBox(
                 height: 45.0,
                 child: Row(
@@ -270,17 +178,17 @@ class _CoursePageState extends State<CoursePage> {
                                   level: LogLevel.debug,
                                 ).log();
 
-                                filterList("");
+                                searchFilterList("");
                                 searchController.clear();
                               },
-                              icon: Icon(Icons.clear, size: 20.0),
+                              icon: const Icon(Icons.clear, size: 20.0),
                             ),
                         ],
-                        padding: WidgetStatePropertyAll(EdgeInsets.only(left: 10.0)),
+                        padding: const WidgetStatePropertyAll(EdgeInsets.only(left: 10.0)),
                         hintText: "Search for courses",
                         onChanged: (value) {
                           DebugLogger(message: "Search input: $value", level: LogLevel.debug).log();
-                          filterList(value);
+                          searchFilterList(value);
                         },
                       ),
                     ),
@@ -294,6 +202,8 @@ class _CoursePageState extends State<CoursePage> {
                         shape: Theme.of(context).iconButtonTheme.style?.shape?.resolve({}),
                         child: IconButton(
                           onPressed: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+
                             showModalBottomSheet(
                               context: context,
                               useRootNavigator: true,
@@ -301,10 +211,10 @@ class _CoursePageState extends State<CoursePage> {
                                 return StatefulBuilder(
                                   builder: (context, setState) {
                                     return Padding(
-                                      padding: EdgeInsets.only(
-                                        left: 20.0,
-                                        right: 20.0,
-                                        bottom: 10.0,
+                                      padding: const EdgeInsets.only(
+                                        left: 16.0,
+                                        right: 16.0,
+                                        bottom: 24.0,
                                       ),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
@@ -319,7 +229,7 @@ class _CoursePageState extends State<CoursePage> {
                                             ),
                                             textAlign: TextAlign.center,
                                           ),
-                                          SizedBox(height: 20.0),
+                                          const SizedBox(height: 15.0),
                                           Text(
                                             "Sort by",
                                             style: TextStyle(
@@ -333,101 +243,146 @@ class _CoursePageState extends State<CoursePage> {
                                             color: Colors.grey.shade300,
                                             height: 10.0,
                                           ),
-                                          SizedBox(height: 10.0),
+                                          const SizedBox(height: 10.0),
                                           Column(
                                             children: <Widget>[
                                               Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                 children: <Widget>[
                                                   FilterChip(
-                                                    label: Text(
+                                                    label: const Text(
                                                       "Popular",
                                                       style: TextStyle(fontSize: 14.0),
                                                     ),
                                                     onSelected: (selected) {
                                                       setState(() {
-                                                        isSelected[0] = selected;
-
-                                                        // Handle sort by popularity
-                                                        DebugLogger(
-                                                          message: "Sort by Popular",
-                                                          level: LogLevel.debug,
-                                                        ).log();
+                                                        isSelected = (
+                                                          popular: selected,
+                                                          rating: false,
+                                                          newest: false,
+                                                        );
                                                       });
                                                     },
-                                                    selected: isSelected[0],
+                                                    selected: isSelected.popular,
                                                   ),
                                                   FilterChip(
-                                                    label: Text(
+                                                    label: const Text(
                                                       "Rating",
                                                       style: TextStyle(fontSize: 14.0),
                                                     ),
                                                     onSelected: (selected) {
                                                       setState(() {
-                                                        isSelected[1] = selected;
-
-                                                        // Handle sort by popularity
-                                                        DebugLogger(
-                                                          message: "Sort by Rating",
-                                                          level: LogLevel.debug,
-                                                        ).log();
+                                                        isSelected = (
+                                                          popular: false,
+                                                          rating: selected,
+                                                          newest: false,
+                                                        );
                                                       });
                                                     },
-                                                    selected: isSelected[1],
+                                                    selected: isSelected.rating,
                                                   ),
                                                   FilterChip(
-                                                    label: Text(
+                                                    label: const Text(
                                                       "Newest",
                                                       style: TextStyle(fontSize: 14.0),
                                                     ),
                                                     onSelected: (selected) {
                                                       setState(() {
-                                                        isSelected[2] = selected;
-
-                                                        // Handle sort by popularity
-                                                        DebugLogger(
-                                                          message: "Sort by Newest",
-                                                          level: LogLevel.debug,
-                                                        ).log();
+                                                        isSelected = (
+                                                          popular: false,
+                                                          rating: false,
+                                                          newest: selected,
+                                                        );
                                                       });
                                                     },
-                                                    selected: isSelected[2],
+                                                    selected: isSelected.newest,
                                                   ),
                                                 ],
                                               ),
                                             ],
                                           ),
-                                          SizedBox(height: 30.0),
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              // Handle apply filters
-                                              DebugLogger(
-                                                message: "Apply filters",
-                                                level: LogLevel.debug,
-                                              ).log();
+                                          const SizedBox(height: 20.0),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: <Widget>[
+                                              OutlinedButton(
+                                                onPressed: () {
+                                                  isSelected = (
+                                                    popular: false,
+                                                    rating: false,
+                                                    newest: false,
+                                                  );
 
-                                              Navigator.pop(context);
-                                            },
-                                            style: ButtonStyle(
-                                              backgroundColor: WidgetStatePropertyAll(
-                                                Color(0xFF0984E3),
-                                              ),
-                                              padding: WidgetStatePropertyAll(
-                                                EdgeInsets.symmetric(vertical: 12.0),
-                                              ),
-                                              shape: WidgetStatePropertyAll(
-                                                RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(10.0),
+                                                  filterList(FilterType.clear);
+                                                  Navigator.pop(context);
+                                                },
+                                                style: OutlinedButton.styleFrom(
+                                                  foregroundColor: Colors.grey,
+                                                  padding: const EdgeInsets.symmetric(
+                                                    vertical: 12.0,
+                                                  ),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8.0),
+                                                  ),
+                                                  side: BorderSide(color: Colors.grey.shade600),
+                                                  minimumSize: const Size(180.0, 40.0),
+                                                ),
+                                                child: Text(
+                                                  "Clear",
+                                                  style: TextStyle(
+                                                    color: Colors.grey.shade600,
+                                                    fontSize: 16.0,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            child: Text(
-                                              "Apply",
-                                              style: TextStyle(
-                                                color: Color(0xFFF5F6FA),
-                                                fontSize: 16.0,
+                                              const SizedBox(width: 15.0),
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  if (isSelected.popular) {
+                                                    filterList(FilterType.popular);
+                                                  }
+
+                                                  if (isSelected.rating) {
+                                                    filterList(FilterType.rating);
+                                                  }
+
+                                                  if (isSelected.newest) {
+                                                    filterList(FilterType.newest);
+                                                  }
+
+                                                  if (!isSelected.popular &&
+                                                      !isSelected.rating &&
+                                                      !isSelected.newest) {
+                                                    filterList(FilterType.clear);
+                                                  }
+
+                                                  Navigator.pop(context);
+                                                },
+                                                style: ButtonStyle(
+                                                  backgroundColor: const WidgetStatePropertyAll(
+                                                    Color(0xFF0984E3),
+                                                  ),
+                                                  padding: const WidgetStatePropertyAll(
+                                                    EdgeInsets.symmetric(vertical: 12.0),
+                                                  ),
+                                                  shape: WidgetStatePropertyAll(
+                                                    RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(8.0),
+                                                    ),
+                                                  ),
+                                                  minimumSize: const WidgetStatePropertyAll(
+                                                    Size(180.0, 40.0),
+                                                  ),
+                                                ),
+                                                child: const Text(
+                                                  "Apply",
+                                                  style: TextStyle(
+                                                    color: Color(0xFFF5F6FA),
+                                                    fontSize: 16.0,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
+                                            ],
                                           ),
                                         ],
                                       ),
@@ -444,13 +399,35 @@ class _CoursePageState extends State<CoursePage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 10.0),
+              const SizedBox(height: 15.0),
               Expanded(
                 child: ListView(
                   children: <Widget>[
-                    Visibility(
-                      visible: filteredList["Programming Foundations"]?.isNotEmpty ?? false,
-                      child: Column(
+                    if ((filteredList["Popular Course"]?.isNotEmpty ?? false) ||
+                        (filteredList["Top Rated Course"]?.isNotEmpty ?? false))
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            filteredList["Popular Course"] != null
+                                ? "Popular Course"
+                                : "Top Rated Course",
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).textTheme.labelMedium?.color,
+                            ),
+                          ),
+                          for (var element
+                              in filteredList["Popular Course"] ??
+                                  filteredList["Top Rated Course"] ??
+                                  [])
+                            element.create(context),
+                          const SizedBox(height: 15.0),
+                        ],
+                      ),
+                    if (filteredList["Programming Foundation"]?.isNotEmpty ?? false)
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
@@ -461,16 +438,13 @@ class _CoursePageState extends State<CoursePage> {
                               color: Theme.of(context).textTheme.labelMedium?.color,
                             ),
                           ),
-                          SizedBox(height: 10.0),
-                          for (var element in filteredList["Programming Foundations"]!)
+                          for (var element in filteredList["Programming Foundation"] ?? [])
                             element.create(context),
-                          SizedBox(height: 30.0),
+                          const SizedBox(height: 15.0),
                         ],
                       ),
-                    ),
-                    Visibility(
-                      visible: filteredList["Database Structures"]?.isNotEmpty ?? false,
-                      child: Column(
+                    if (filteredList["Database Structures"]?.isNotEmpty ?? false)
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
@@ -481,16 +455,13 @@ class _CoursePageState extends State<CoursePage> {
                               color: Theme.of(context).textTheme.labelMedium?.color,
                             ),
                           ),
-                          SizedBox(height: 10.0),
-                          for (var element in filteredList["Database Structures"]!)
+                          for (var element in filteredList["Database Structures"] ?? [])
                             element.create(context),
-                          SizedBox(height: 30.0),
+                          const SizedBox(height: 15.0),
                         ],
                       ),
-                    ),
-                    Visibility(
-                      visible: filteredList["Framework Development"]?.isNotEmpty ?? false,
-                      child: Column(
+                    if (filteredList["Framework Development"]?.isNotEmpty ?? false)
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
@@ -501,13 +472,11 @@ class _CoursePageState extends State<CoursePage> {
                               color: Theme.of(context).textTheme.labelMedium?.color,
                             ),
                           ),
-                          SizedBox(height: 10.0),
-                          for (var element in filteredList["Framework Development"]!)
+                          for (var element in filteredList["Framework Development"] ?? [])
                             element.create(context),
-                          SizedBox(height: 10.0),
                         ],
                       ),
-                    ),
+                    const SizedBox(height: 30.0),
                   ],
                 ),
               ),
