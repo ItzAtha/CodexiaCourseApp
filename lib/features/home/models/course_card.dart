@@ -14,6 +14,8 @@ class CourseCard {
   final DateTime _createdAt;
   final bool _isActive;
 
+  final ValueNotifier<bool> _isCardOpened = ValueNotifier<bool>(false);
+
   CourseCard(
     String title,
     String description,
@@ -89,8 +91,8 @@ class CourseCard {
                       Text(
                         _rating.toStringAsFixed(_rating % 1 == 0 ? 0 : 1),
                         style: TextStyle(
-                          fontSize: 13.0,
-                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontSize: 16.0,
+                          color: Theme.of(context).textTheme.labelSmall?.color,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -108,8 +110,8 @@ class CourseCard {
                       Text(
                         _formatPopular(_popular),
                         style: TextStyle(
-                          fontSize: 13.0,
-                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontSize: 16.0,
+                          color: Theme.of(context).textTheme.labelSmall?.color,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -123,13 +125,30 @@ class CourseCard {
               backgroundColor: Colors.transparent,
               backgroundImage: Svg('assets/icons/${_title.split(' ')[0].toLowerCase()}.svg'),
             ),
+            trailing: ValueListenableBuilder<bool>(
+              valueListenable: _isCardOpened,
+              builder: (context, isOpened, child) {
+                return AnimatedRotation(
+                  turns: isOpened ? 0.25 : 0.0,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeInOut,
+                  child: Icon(
+                    Icons.arrow_forward_ios,
+                    size: 20.0,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                );
+              },
+            ),
             shape: const Border(),
             collapsedShape: const Border(),
             expansionAnimationStyle: const AnimationStyle(
               duration: Duration(milliseconds: 500),
-              curve: Curves.easeOut,
-              reverseCurve: Curves.easeIn,
+              curve: Curves.easeInOut,
             ),
+            onExpansionChanged: (value) {
+              _isCardOpened.value = value;
+            },
             children: <Widget>[
               const Divider(thickness: 1.5, height: 2.0),
               Padding(
@@ -166,9 +185,9 @@ class CourseCard {
                     ),
                     const SizedBox(height: 10.0),
                     Wrap(
-                      spacing: 8.0,
-                      runSpacing: 8.0,
-                      alignment: WrapAlignment.spaceAround,
+                      spacing: 12.0,
+                      runSpacing: 12.0,
+                      alignment: WrapAlignment.center,
                       children: <Widget>[for (var level in _levels) _getLevelBadge(level)],
                     ),
                     const SizedBox(height: 20.0),
