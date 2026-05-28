@@ -40,30 +40,30 @@ class _SpringCourseState extends State<SpringCourse> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the fundamentals of Spring framework: ",
-                courseImage: "spring-background.png",
-                courseRoutePath: 'spring-beginner',
-                courseLevel: CourseLevel.beginner,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description: "In this course, you will learn the advanced of Spring framework: ",
-                courseImage: "spring-background.png",
-                courseRoutePath: 'spring-intermediate',
-                courseLevel: CourseLevel.intermediate,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description: "In this course, you will learn the top-level Spring framework: ",
-                courseImage: "spring-background.png",
-                courseRoutePath: 'spring-expert',
-                courseLevel: CourseLevel.expert,
-              ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the fundamentals of Spring framework: ",
+              //   courseImage: "spring-background.png",
+              //   courseRoutePath: 'spring-beginner',
+              //   courseLevel: CourseLevel.beginner,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description: "In this course, you will learn the advanced of Spring framework: ",
+              //   courseImage: "spring-background.png",
+              //   courseRoutePath: 'spring-intermediate',
+              //   courseLevel: CourseLevel.intermediate,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description: "In this course, you will learn the top-level Spring framework: ",
+              //   courseImage: "spring-background.png",
+              //   courseRoutePath: 'spring-expert',
+              //   courseLevel: CourseLevel.expert,
+              // ).create(context),
               SizedBox(height: 80.0),
             ],
           ),

@@ -40,40 +40,40 @@ class _PythonCourseState extends State<PythonCourse> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the fundamentals of Python programming language: python syntax, data type, operator, conditional statements, looping, conditional looping, and functions.",
-                courseImage: "python-background.png",
-                courseRoutePath: 'python-beginner',
-                courseLevel: CourseLevel.beginner,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn advanced of the Python programming language: Collections, Processing data in files, Modules, Class, Inheritance, Polymorphism, Encapsulation, Abstraction, Enum, and Exception handling.",
-                courseImage: "python-background.png",
-                courseRoutePath: 'python-intermediate',
-                courseLevel: CourseLevel.intermediate,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the top-level Python programming language: GUI, HTTP, and Web Server.",
-                courseImage: "python-background.png",
-                courseRoutePath: 'python-expert',
-                courseLevel: CourseLevel.expert,
-              ).create(context),
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learning mastering of Python programming language.",
-                courseImage: "python-background.png",
-                courseRoutePath: 'python-master',
-                courseLevel: CourseLevel.master,
-              ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the fundamentals of Python programming language: python syntax, data type, operator, conditional statements, looping, conditional looping, and functions.",
+              //   courseImage: "python-background.png",
+              //   courseRoutePath: 'python-beginner',
+              //   courseLevel: CourseLevel.beginner,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn advanced of the Python programming language: Collections, Processing data in files, Modules, Class, Inheritance, Polymorphism, Encapsulation, Abstraction, Enum, and Exception handling.",
+              //   courseImage: "python-background.png",
+              //   courseRoutePath: 'python-intermediate',
+              //   courseLevel: CourseLevel.intermediate,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the top-level Python programming language: GUI, HTTP, and Web Server.",
+              //   courseImage: "python-background.png",
+              //   courseRoutePath: 'python-expert',
+              //   courseLevel: CourseLevel.expert,
+              // ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learning mastering of Python programming language.",
+              //   courseImage: "python-background.png",
+              //   courseRoutePath: 'python-master',
+              //   courseLevel: CourseLevel.master,
+              // ).create(context),
               SizedBox(height: 80.0),
             ],
           ),

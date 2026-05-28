@@ -40,37 +40,37 @@ class _ReactJSCourseState extends State<ReactJSCourse> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the fundamentals of ReactJS framework: ",
-                courseImage: "reactjs-background.png",
-                courseRoutePath: 'reactjs-beginner',
-                courseLevel: CourseLevel.beginner,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description: "In this course, you will learn the advanced of ReactJS framework: ",
-                courseImage: "reactjs-background.png",
-                courseRoutePath: 'reactjs-intermediate',
-                courseLevel: CourseLevel.intermediate,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description: "In this course, you will learn the top-level ReactJS framework: ",
-                courseImage: "reactjs-background.png",
-                courseRoutePath: 'reactjs-expert',
-                courseLevel: CourseLevel.expert,
-              ).create(context),
-              CourseCard(
-                type: CardType.courseDetail,
-                description: "In this course, you will learning mastering of ReactJS framework.",
-                courseImage: "reactjs-background.png",
-                courseRoutePath: 'reactjs-master',
-                courseLevel: CourseLevel.master,
-              ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the fundamentals of ReactJS framework: ",
+              //   courseImage: "reactjs-background.png",
+              //   courseRoutePath: 'reactjs-beginner',
+              //   courseLevel: CourseLevel.beginner,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description: "In this course, you will learn the advanced of ReactJS framework: ",
+              //   courseImage: "reactjs-background.png",
+              //   courseRoutePath: 'reactjs-intermediate',
+              //   courseLevel: CourseLevel.intermediate,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description: "In this course, you will learn the top-level ReactJS framework: ",
+              //   courseImage: "reactjs-background.png",
+              //   courseRoutePath: 'reactjs-expert',
+              //   courseLevel: CourseLevel.expert,
+              // ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description: "In this course, you will learning mastering of ReactJS framework.",
+              //   courseImage: "reactjs-background.png",
+              //   courseRoutePath: 'reactjs-master',
+              //   courseLevel: CourseLevel.master,
+              // ).create(context),
               SizedBox(height: 80.0),
             ],
           ),

@@ -40,32 +40,32 @@ class _WebCourseState extends State<WebCourse> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the fundamentals of Web programming language: html structure and css styling",
-                courseImage: "web-background.png",
-                courseRoutePath: 'web-beginner',
-                courseLevel: CourseLevel.beginner,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the advanced of Web programming language: javascript syntax, data type, operator, conditional statements, looping, conditional looping, and functions.",
-                courseImage: "web-background.png",
-                courseRoutePath: 'web-intermediate',
-                courseLevel: CourseLevel.intermediate,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the top-level Web programming language: GUI, HTTP, and Web Server.",
-                courseImage: "web-background.png",
-                courseRoutePath: 'web-expert',
-                courseLevel: CourseLevel.expert,
-              ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the fundamentals of Web programming language: html structure and css styling",
+              //   courseImage: "web-background.png",
+              //   courseRoutePath: 'web-beginner',
+              //   courseLevel: CourseLevel.beginner,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the advanced of Web programming language: javascript syntax, data type, operator, conditional statements, looping, conditional looping, and functions.",
+              //   courseImage: "web-background.png",
+              //   courseRoutePath: 'web-intermediate',
+              //   courseLevel: CourseLevel.intermediate,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the top-level Web programming language: GUI, HTTP, and Web Server.",
+              //   courseImage: "web-background.png",
+              //   courseRoutePath: 'web-expert',
+              //   courseLevel: CourseLevel.expert,
+              // ).create(context),
               SizedBox(height: 80.0),
             ],
           ),

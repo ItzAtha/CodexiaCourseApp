@@ -40,40 +40,40 @@ class _ArduinoCourseState extends State<ArduinoCourse> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the fundamentals of Arduino programming language: ",
-                courseImage: "arduino-background.png",
-                courseRoutePath: 'arduino-beginner',
-                courseLevel: CourseLevel.beginner,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the advanced of Arduino programming language: ",
-                courseImage: "arduino-background.png",
-                courseRoutePath: 'arduino-intermediate',
-                courseLevel: CourseLevel.intermediate,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the top-level Arduino programming language: ",
-                courseImage: "arduino-background.png",
-                courseRoutePath: 'arduino-expert',
-                courseLevel: CourseLevel.expert,
-              ).create(context),
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learning mastering of Arduino programming language.",
-                courseImage: "arduino-background.png",
-                courseRoutePath: 'arduino-master',
-                courseLevel: CourseLevel.master,
-              ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the fundamentals of Arduino programming language: ",
+              //   courseImage: "arduino-background.png",
+              //   courseRoutePath: 'arduino-beginner',
+              //   courseLevel: CourseLevel.beginner,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the advanced of Arduino programming language: ",
+              //   courseImage: "arduino-background.png",
+              //   courseRoutePath: 'arduino-intermediate',
+              //   courseLevel: CourseLevel.intermediate,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the top-level Arduino programming language: ",
+              //   courseImage: "arduino-background.png",
+              //   courseRoutePath: 'arduino-expert',
+              //   courseLevel: CourseLevel.expert,
+              // ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learning mastering of Arduino programming language.",
+              //   courseImage: "arduino-background.png",
+              //   courseRoutePath: 'arduino-master',
+              //   courseLevel: CourseLevel.master,
+              // ).create(context),
               SizedBox(height: 80.0),
             ],
           ),

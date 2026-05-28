@@ -40,38 +40,38 @@ class _PlatformIOCourseState extends State<PlatformIOCourse> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the fundamentals of PlatformIO framework: ",
-                courseImage: "platformio-background.png",
-                courseRoutePath: 'platformio-beginner',
-                courseLevel: CourseLevel.beginner,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the advanced of PlatformIO framework: ",
-                courseImage: "platformio-background.png",
-                courseRoutePath: 'platformio-intermediate',
-                courseLevel: CourseLevel.intermediate,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description: "In this course, you will learn the top-level PlatformIO framework: ",
-                courseImage: "platformio-background.png",
-                courseRoutePath: 'platformio-expert',
-                courseLevel: CourseLevel.expert,
-              ).create(context),
-              CourseCard(
-                type: CardType.courseDetail,
-                description: "In this course, you will learning mastering of PlatformIO framework.",
-                courseImage: "platformio-background.png",
-                courseRoutePath: 'platformio-master',
-                courseLevel: CourseLevel.master,
-              ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the fundamentals of PlatformIO framework: ",
+              //   courseImage: "platformio-background.png",
+              //   courseRoutePath: 'platformio-beginner',
+              //   courseLevel: CourseLevel.beginner,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the advanced of PlatformIO framework: ",
+              //   courseImage: "platformio-background.png",
+              //   courseRoutePath: 'platformio-intermediate',
+              //   courseLevel: CourseLevel.intermediate,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description: "In this course, you will learn the top-level PlatformIO framework: ",
+              //   courseImage: "platformio-background.png",
+              //   courseRoutePath: 'platformio-expert',
+              //   courseLevel: CourseLevel.expert,
+              // ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description: "In this course, you will learning mastering of PlatformIO framework.",
+              //   courseImage: "platformio-background.png",
+              //   courseRoutePath: 'platformio-master',
+              //   courseLevel: CourseLevel.master,
+              // ).create(context),
               SizedBox(height: 80.0),
             ],
           ),

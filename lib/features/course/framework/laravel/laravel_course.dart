@@ -40,30 +40,30 @@ class _LaravelCourseState extends State<LaravelCourse> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the fundamentals of Laravel framework: ",
-                courseImage: "laravel-background.png",
-                courseRoutePath: 'laravel-beginner',
-                courseLevel: CourseLevel.beginner,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description: "In this course, you will learn the advanced of Laravel framework: ",
-                courseImage: "laravel-background.png",
-                courseRoutePath: 'laravel-intermediate',
-                courseLevel: CourseLevel.intermediate,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description: "In this course, you will learn the top-level Laravel framework: ",
-                courseImage: "laravel-background.png",
-                courseRoutePath: 'laravel-expert',
-                courseLevel: CourseLevel.expert,
-              ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the fundamentals of Laravel framework: ",
+              //   courseImage: "laravel-background.png",
+              //   courseRoutePath: 'laravel-beginner',
+              //   courseLevel: CourseLevel.beginner,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description: "In this course, you will learn the advanced of Laravel framework: ",
+              //   courseImage: "laravel-background.png",
+              //   courseRoutePath: 'laravel-intermediate',
+              //   courseLevel: CourseLevel.intermediate,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description: "In this course, you will learn the top-level Laravel framework: ",
+              //   courseImage: "laravel-background.png",
+              //   courseRoutePath: 'laravel-expert',
+              //   courseLevel: CourseLevel.expert,
+              // ).create(context),
               SizedBox(height: 80.0),
             ],
           ),

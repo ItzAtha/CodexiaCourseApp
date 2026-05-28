@@ -40,37 +40,37 @@ class _NextJSCourseState extends State<NextJSCourse> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the fundamentals of NextJS framework: ",
-                courseImage: "nextjs-background.png",
-                courseRoutePath: 'nextjs-beginner',
-                courseLevel: CourseLevel.beginner,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description: "In this course, you will learn the advanced of NextJS framework: ",
-                courseImage: "nextjs-background.png",
-                courseRoutePath: 'nextjs-intermediate',
-                courseLevel: CourseLevel.intermediate,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description: "In this course, you will learn the top-level NextJS framework: ",
-                courseImage: "nextjs-background.png",
-                courseRoutePath: 'nextjs-expert',
-                courseLevel: CourseLevel.expert,
-              ).create(context),
-              CourseCard(
-                type: CardType.courseDetail,
-                description: "In this course, you will learning mastering of NextJS framework.",
-                courseImage: "nextjs-background.png",
-                courseRoutePath: 'nextjs-master',
-                courseLevel: CourseLevel.master,
-              ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the fundamentals of NextJS framework: ",
+              //   courseImage: "nextjs-background.png",
+              //   courseRoutePath: 'nextjs-beginner',
+              //   courseLevel: CourseLevel.beginner,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description: "In this course, you will learn the advanced of NextJS framework: ",
+              //   courseImage: "nextjs-background.png",
+              //   courseRoutePath: 'nextjs-intermediate',
+              //   courseLevel: CourseLevel.intermediate,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description: "In this course, you will learn the top-level NextJS framework: ",
+              //   courseImage: "nextjs-background.png",
+              //   courseRoutePath: 'nextjs-expert',
+              //   courseLevel: CourseLevel.expert,
+              // ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description: "In this course, you will learning mastering of NextJS framework.",
+              //   courseImage: "nextjs-background.png",
+              //   courseRoutePath: 'nextjs-master',
+              //   courseLevel: CourseLevel.master,
+              // ).create(context),
               SizedBox(height: 80.0),
             ],
           ),

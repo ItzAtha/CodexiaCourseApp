@@ -40,32 +40,32 @@ class _PHPCourseState extends State<PHPCourse> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the fundamentals of PHP programming language: ",
-                courseImage: "php-background.png",
-                courseRoutePath: 'php-beginner',
-                courseLevel: CourseLevel.beginner,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the advanced of PHP programming language: ",
-                courseImage: "php-background.png",
-                courseRoutePath: 'php-intermediate',
-                courseLevel: CourseLevel.intermediate,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the top-level PHP programming language: ",
-                courseImage: "php-background.png",
-                courseRoutePath: 'php-expert',
-                courseLevel: CourseLevel.expert,
-              ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the fundamentals of PHP programming language: ",
+              //   courseImage: "php-background.png",
+              //   courseRoutePath: 'php-beginner',
+              //   courseLevel: CourseLevel.beginner,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the advanced of PHP programming language: ",
+              //   courseImage: "php-background.png",
+              //   courseRoutePath: 'php-intermediate',
+              //   courseLevel: CourseLevel.intermediate,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the top-level PHP programming language: ",
+              //   courseImage: "php-background.png",
+              //   courseRoutePath: 'php-expert',
+              //   courseLevel: CourseLevel.expert,
+              // ).create(context),
               SizedBox(height: 80.0),
             ],
           ),

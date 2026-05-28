@@ -40,32 +40,32 @@ class _CPPCourseState extends State<CPPCourse> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the fundamentals of C programming language: ",
-                courseImage: "c-background.png",
-                courseRoutePath: 'c-beginner',
-                courseLevel: CourseLevel.beginner,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the advanced of C programming language: ",
-                courseImage: "c-background.png",
-                courseRoutePath: 'c-intermediate',
-                courseLevel: CourseLevel.intermediate,
-              ).create(context),
-              SizedBox(height: 10.0),
-              CourseCard(
-                type: CardType.courseDetail,
-                description:
-                    "In this course, you will learn the top-level C programming language: ",
-                courseImage: "c-background.png",
-                courseRoutePath: 'c-expert',
-                courseLevel: CourseLevel.expert,
-              ).create(context),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the fundamentals of C programming language: ",
+              //   courseImage: "c-background.png",
+              //   courseRoutePath: 'c-beginner',
+              //   courseLevel: CourseLevel.beginner,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the advanced of C programming language: ",
+              //   courseImage: "c-background.png",
+              //   courseRoutePath: 'c-intermediate',
+              //   courseLevel: CourseLevel.intermediate,
+              // ).create(context),
+              // SizedBox(height: 10.0),
+              // CourseCard(
+              //   type: CardType.courseDetail,
+              //   description:
+              //       "In this course, you will learn the top-level C programming language: ",
+              //   courseImage: "c-background.png",
+              //   courseRoutePath: 'c-expert',
+              //   courseLevel: CourseLevel.expert,
+              // ).create(context),
               SizedBox(height: 80.0),
             ],
           ),
