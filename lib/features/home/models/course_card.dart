@@ -5,206 +5,218 @@ import 'package:toastification/toastification.dart';
 
 import '../../../shared/enums/course_level.dart';
 
-enum CardType { course, courseDetail }
-
 class CourseCard {
-  final CardType _type;
-  final String? _title;
+  final String _title;
   final String _description;
-  final String? _overview;
-  final String _courseImage;
-  final String _courseRoutePath;
-  final CourseLevel? _courseLevel;
-  final List<CourseLevel> _availableLevels;
-  final bool? _isMaintainable;
+  final double _rating;
+  final double _popular;
+  final List<CourseLevel> _levels;
+  final DateTime _createdAt;
+  final bool _isActive;
 
-  String? get title => _title;
+  CourseCard(
+    String title,
+    String description,
+    double rating,
+    double popular,
+    List<CourseLevel> levels,
+    DateTime createdAt,
+    bool isActive,
+  ) : _title = title,
+      _description = description,
+      _rating = rating,
+      _popular = popular,
+      _levels = levels,
+      _createdAt = createdAt,
+      _isActive = isActive;
 
-  CourseCard({
-    required CardType type,
-    String? title,
-    required String description,
-    String? overview,
-    required String courseImage,
-    required String courseRoutePath,
-    CourseLevel? courseLevel,
-    List<CourseLevel> availableLevels = const [
-      CourseLevel.beginner,
-      CourseLevel.intermediate,
-      CourseLevel.expert,
-    ],
-    bool? isMaintainable,
-  }) : _availableLevels = availableLevels,
-       _isMaintainable = isMaintainable,
-       _courseLevel = courseLevel,
-       _courseRoutePath = courseRoutePath,
-       _courseImage = courseImage,
-       _overview = overview,
-       _description = description,
-       _title = title,
-       _type = type {
-    assert(
-      type == CardType.course || (type == CardType.courseDetail && courseLevel != null),
-      "Course level must be set for course detail card",
+  Widget create(BuildContext context) {
+    int fullStars = _rating.floor();
+    bool hasHalfStar = (_rating - fullStars) >= 0.5; // Simple rounding threshold
+    int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+    return Card(
+      elevation: 2.0,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+      margin: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+      child: Column(
+        children: <Widget>[
+          if (_isNewestCourse)
+            Container(
+              color: const Color(0x9900CEC9),
+              height: 30.0,
+              alignment: Alignment.centerLeft,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.0),
+                child: Text(
+                  "New Course!",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ExpansionTile(
+            title: Text(
+              _title,
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).textTheme.labelSmall?.color,
+              ),
+            ),
+            subtitle: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Tooltip(
+                  message: 'Rating',
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ...List.generate(
+                        fullStars,
+                        (index) => const Icon(Icons.star, color: Colors.amber, size: 16.0),
+                      ),
+                      if (hasHalfStar) const Icon(Icons.star_half, color: Colors.amber, size: 16.0),
+                      ...List.generate(
+                        emptyStars,
+                        (index) => const Icon(Icons.star_border, color: Colors.amber, size: 16.0),
+                      ),
+                      const SizedBox(width: 6.0),
+                      Text(
+                        _rating.toStringAsFixed(_rating % 1 == 0 ? 0 : 1),
+                        style: TextStyle(
+                          fontSize: 13.0,
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12.0),
+                Tooltip(
+                  message: 'Popularity',
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.local_fire_department, size: 16.0, color: Colors.redAccent),
+                      const SizedBox(width: 6.0),
+                      Text(
+                        _formatPopular(_popular),
+                        style: TextStyle(
+                          fontSize: 13.0,
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            leading: CircleAvatar(
+              radius: 20.0,
+              backgroundColor: Colors.transparent,
+              backgroundImage: Svg('assets/icons/${_title.split(' ')[0].toLowerCase()}.svg'),
+            ),
+            shape: const Border(),
+            collapsedShape: const Border(),
+            expansionAnimationStyle: const AnimationStyle(
+              duration: Duration(milliseconds: 500),
+              curve: Curves.easeOut,
+              reverseCurve: Curves.easeIn,
+            ),
+            children: <Widget>[
+              const Divider(thickness: 1.5, height: 2.0),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: <Widget>[
+                    Text(
+                      "Course Description",
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).textTheme.labelSmall?.color,
+                      ),
+                    ),
+                    const SizedBox(height: 10.0),
+                    Text(
+                      _description,
+                      textAlign: TextAlign.justify,
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        color: Theme.of(
+                          context,
+                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
+                      ),
+                    ),
+                    const SizedBox(height: 20.0),
+                    Text(
+                      "Available Levels",
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).textTheme.labelSmall?.color,
+                      ),
+                    ),
+                    const SizedBox(height: 10.0),
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      alignment: WrapAlignment.spaceAround,
+                      children: <Widget>[for (var level in _levels) _getLevelBadge(level)],
+                    ),
+                    const SizedBox(height: 20.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (!_isActive) {
+                          Toastification().show(
+                            title: const Text("Coming Soon"),
+                            description: const Text(
+                              "This course is under development. Stay tuned!",
+                            ),
+                            type: ToastificationType.info,
+                            style: ToastificationStyle.flat,
+                            alignment: Alignment.topCenter,
+                            autoCloseDuration: const Duration(seconds: 3),
+                            animationDuration: const Duration(milliseconds: 500),
+                          );
+                          return;
+                        }
+
+                        context.pushNamed('${_title.split(' ')[0].toLowerCase()}_details');
+                      },
+                      child: const Text(
+                        "See Details",
+                        style: TextStyle(fontSize: 14.0, color: Color(0xFFF5F6FA)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
-  Widget create(BuildContext context) {
-    return Card(
-      elevation: 4.0,
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
-      margin: EdgeInsets.symmetric(horizontal: 4.0, vertical: 10.0),
-      child: switch (_type) {
-        CardType.course => ExpansionTile(
-          title: Text(
-            _title!,
-            style: TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).textTheme.labelSmall?.color,
-            ),
-          ),
-          subtitle: Text(
-            _description,
-            style: TextStyle(fontSize: 14.0, color: Theme.of(context).textTheme.labelSmall?.color),
-          ),
-          leading: CircleAvatar(
-            radius: 20.0,
-            backgroundColor: Colors.transparent,
-            backgroundImage: Svg('assets/icons/$_courseImage'),
-          ),
-          shape: const Border(),
-          collapsedShape: const Border(),
-          expansionAnimationStyle: AnimationStyle(
-            duration: Duration(milliseconds: 500),
-            curve: Curves.easeOut,
-            reverseCurve: Curves.easeIn,
-          ),
-          children: <Widget>[
-            Divider(thickness: 1.5, height: 2.0),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    "Course Overview",
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).textTheme.labelSmall?.color,
-                    ),
-                  ),
-                  SizedBox(height: 10.0),
-                  Text(
-                    _overview!,
-                    textAlign: TextAlign.justify,
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
-                    ),
-                  ),
-                  SizedBox(height: 20.0),
-                  Text(
-                    "Available Levels",
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).textTheme.labelSmall?.color,
-                    ),
-                  ),
-                  SizedBox(height: 10.0),
-                  Wrap(
-                    spacing: 8.0,
-                    runSpacing: 8.0,
-                    alignment: WrapAlignment.spaceAround,
-                    children: <Widget>[for (var level in _availableLevels) _getLevelBadge(level)],
-                  ),
-                  SizedBox(height: 20.0),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_isMaintainable ?? false) {
-                        Toastification().show(
-                          title: Text("Coming Soon"),
-                          description: Text("This course is under development. Stay tuned!"),
-                          type: ToastificationType.info,
-                          style: ToastificationStyle.flat,
-                          alignment: Alignment.topCenter,
-                          autoCloseDuration: Duration(seconds: 3),
-                          animationDuration: Duration(milliseconds: 500),
-                        );
-                        return;
-                      }
-
-                      context.pushNamed(_courseRoutePath);
-                    },
-                    child: Text(
-                      "See Details",
-                      style: TextStyle(fontSize: 14.0, color: Color(0xFFF5F6FA)),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        CardType.courseDetail => Column(
-          children: <Widget>[
-            SizedBox(
-              height: 120.0,
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: -40.0,
-                    left: 0,
-                    right: 0,
-                    child: Image.asset("assets/images/$_courseImage"),
-                  ),
-
-                  Positioned(right: 10.0, top: 10.0, child: _getLevelBadge(_courseLevel!)),
-                ],
-              ),
-            ),
-
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Text(
-                    "What you'll learn",
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).textTheme.labelSmall?.color,
-                    ),
-                  ),
-                  SizedBox(height: 10.0),
-                  Text(
-                    _description,
-                    textAlign: TextAlign.justify,
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
-                    ),
-                  ),
-                  Divider(thickness: 1.0, height: 20.0),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.pushNamed(_courseRoutePath);
-                    },
-                    child: Text(
-                      "Get Started",
-                      style: TextStyle(fontSize: 14.0, color: Color(0xFFF5F6FA)),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      },
-    );
+  String _formatPopular(double p) {
+    if (p >= 1000000) {
+      return '${(p / 1000000).toStringAsFixed((p / 1000000) % 1 == 0 ? 0 : 1)}M';
+    }
+    if (p >= 1000) {
+      return '${(p / 1000).toStringAsFixed((p / 1000) % 1 == 0 ? 0 : 1)}k';
+    }
+    if (p % 1 == 0) {
+      return p.toInt().toString();
+    }
+    return p.toStringAsFixed(1);
   }
 
   Widget _getLevelBadge(CourseLevel level) {
@@ -242,5 +254,21 @@ class CourseCard {
       ),
       child: Text(text, style: TextStyle(fontSize: 12.0, color: color.shade900)),
     );
+  }
+
+  String get title => _title;
+
+  double get rating => _rating;
+
+  double get popular => _popular;
+
+  DateTime get createdAt => _createdAt;
+
+  bool get _isNewestCourse {
+    Duration diff = DateTime.now().difference(_createdAt);
+    if (diff.inDays < 2) {
+      return true;
+    }
+    return false;
   }
 }
