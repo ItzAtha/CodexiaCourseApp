@@ -208,10 +208,10 @@ class CourseCard {
                           return;
                         }
 
-                        context.pushNamed('${_title.split(' ')[0].toLowerCase()}_details');
+                        context.pushNamed('${_title.split(' ')[0].toLowerCase()}-course');
                       },
                       child: const Text(
-                        "See Details",
+                        "Start Course",
                         style: TextStyle(fontSize: 14.0, color: Color(0xFFF5F6FA)),
                       ),
                     ),
