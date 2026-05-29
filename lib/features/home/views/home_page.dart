@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:codexia_course_learning/features/home/models/app_bar.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +8,8 @@ import 'package:skeletonizer/skeletonizer.dart';
 import '../../../shared/models/auth_user.dart';
 import '../../../shared/models/user_course.dart';
 import '../../../shared/providers/auth_user_notifier.dart';
-import '../models/progress_card.dart';
+import '../widgets/app_bar.dart';
+import '../widgets/progress_card.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -24,11 +24,11 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   Widget loadCourseData() {
     return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16.0),
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Container(
-          constraints: BoxConstraints(maxHeight: 150.0),
+          constraints: const BoxConstraints(maxHeight: 150.0),
           child: Skeletonizer(
             key: skeletonizerKey,
             enabled: true,
@@ -45,7 +45,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         key: skeletonizerKey,
                         child: Row(
                           children: <Widget>[
-                            Bone.icon(size: 16.0),
+                            const Bone.icon(size: 16.0),
                             const SizedBox(width: 5.0),
                             Bone.text(
                               width: 60.0,
@@ -61,7 +61,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   const SizedBox(height: 40.0),
                   Row(
                     children: <Widget>[
-                      Bone.icon(size: 50.0),
+                      const Bone.icon(size: 50.0),
                       const SizedBox(width: 15.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,12 +89,12 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   Widget noCourseData() {
     return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16.0),
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Container(
           width: double.infinity,
-          constraints: BoxConstraints(maxHeight: 150.0),
+          constraints: const BoxConstraints(maxHeight: 150.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -158,7 +158,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     List<UserCourse>? courseList = userCourseList?.courseList;
 
     return Scaffold(
-      appBar: HomeAppBar(),
+      appBar: const HomeAppBar(),
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         child: Column(
