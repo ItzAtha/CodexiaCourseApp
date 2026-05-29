@@ -6,7 +6,7 @@ import 'package:toastification/toastification.dart';
 
 import '../../../core/app_constants.dart' show ToastAnimations;
 import '../../../core/utils/logger.dart';
-import '../../home/models/course_card.dart';
+import '../widgets/course_card.dart';
 
 enum FilterType { popular, rating, newest, clear }
 
@@ -205,10 +205,7 @@ class _CoursePageState extends ConsumerState<CoursePage> {
         ),
         Text(
           "Try to search another course.",
-          style: TextStyle(
-            fontSize: 16.0,
-            color: Theme.of(context).textTheme.labelSmall?.color,
-          ),
+          style: TextStyle(fontSize: 16.0, color: Theme.of(context).textTheme.labelSmall?.color),
         ),
       ],
     );
@@ -218,17 +215,12 @@ class _CoursePageState extends ConsumerState<CoursePage> {
     return Column(
       children: <Widget>[
         const CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(
-            Color(0xCC00CEC9),
-          ),
+          valueColor: AlwaysStoppedAnimation<Color>(Color(0xCC00CEC9)),
         ),
         const SizedBox(height: 15.0),
         Text(
           "Loading courses...",
-          style: TextStyle(
-            fontSize: 16.0,
-            color: Theme.of(context).textTheme.labelSmall?.color,
-          ),
+          style: TextStyle(fontSize: 16.0, color: Theme.of(context).textTheme.labelSmall?.color),
         ),
       ],
     );
@@ -367,14 +359,12 @@ class _CoursePageState extends ConsumerState<CoursePage> {
               ),
               const SizedBox(height: 15.0),
               Expanded(
-                child: filteredList.values.any((courses) => courses.isNotEmpty) == true ? ListView(
-                  children: <Widget>[...getCourseList(), const SizedBox(height: 30.0)],
-                ) : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    courseState.isLoading ? loadingCourses() : noCourses(),
-                  ],
-                ),
+                child: filteredList.values.any((courses) => courses.isNotEmpty) == true
+                    ? ListView(children: <Widget>[...getCourseList(), const SizedBox(height: 30.0)])
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[courseState.isLoading ? loadingCourses() : noCourses()],
+                      ),
               ),
             ],
           ),
