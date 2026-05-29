@@ -1,4 +1,5 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:codexia_course_learning/features/home/widgets/bottom_navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +10,6 @@ import 'package:toastification/toastification.dart';
 import '../../../core/app_constants.dart' hide AppSizes;
 import '../../core/utils/logger.dart';
 import '../../shared/providers/auth_user_notifier.dart';
-import './models/bottom_navbar.dart';
 
 class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key, required StatefulNavigationShell navigationShell})
