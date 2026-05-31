@@ -12,6 +12,7 @@ class AppSizes {
   static const double sTextSize = 12.0;
   static const double smTextSize = 14.0;
   static const double mTextSize = 16.0;
+  static const double mlTextSize = 18.0;
   static const double lTextSize = 20.0;
   static const double xlTextSize = 24.0;
   static const double xxlTextSize = 28.0;
