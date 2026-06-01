@@ -30,19 +30,22 @@ class AuthUserNotifier extends _$AuthUserNotifier {
           : 'anonymous';
 
       final String docId = '${userId}_$provider';
-      final (usersData, coursesData) = await (
+      final (usersData, courseProgressData) = await (
         usersCollection.doc(docId).get(),
-        usersCollection.doc(docId).collection('Courses').get(),
+        usersCollection.doc(docId).collection('CourseProgress').get(),
       ).wait;
 
       if (usersData.exists) {
+        List<UserCourseProgress> coursesProgress = [];
         final Map<String, dynamic> userData = usersData.data() as Map<String, dynamic>;
 
-        if (coursesData.docs.isNotEmpty) {
-          userData.addAll({
-            'courses': UserCourseList.fromJson(coursesData.docs.map((doc) => doc.data()).toList()),
-          });
+        if (courseProgressData.docs.isNotEmpty) {
+          for (final courseProgress in courseProgressData.docs) {
+            Map<String, dynamic> progressData = courseProgress.data();
+            coursesProgress.add(UserCourseProgress.fromJson(progressData));
+          }
         }
+        userData['courseProgress'] = coursesProgress;
 
         try {
           authUser = AuthUser.fromJson(userData);
@@ -103,7 +106,7 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     }
   }
 
-  Future<void> updateCourses(UserCourseList courses) async {
+  Future<void> updateCourses(List<UserCourseProgress> coursesProgress) async {
     FirebaseManager manager = FirebaseManager();
     User? currentUser = FirebaseAuth.instance.currentUser;
 
@@ -114,21 +117,22 @@ class AuthUserNotifier extends _$AuthUserNotifier {
           : 'anonymous';
 
       final String docId = '${userId}_$provider';
-      state = AsyncData(state.value!.copyWith(courses: courses));
+      state = AsyncData(state.value!.copyWith(coursesProgress: coursesProgress));
 
-      for (var course in courses.courseList) {
-        await manager.updateData(
-          'Users',
-          docId,
-          subCollectionQuery: [
-            SubCollectionQuery(
-              collection: 'Courses',
-              docId: course.courseId,
-              data: courses.toJson(),
-            ),
-          ],
-        );
-      }
+      // TODO: Refactor this code to support saving course progress in Firestore
+      // for (var course in courses.courseList) {
+      //   await manager.updateData(
+      //     'Users',
+      //     docId,
+      //     subCollectionQuery: [
+      //       SubCollectionQuery(
+      //         collection: 'Courses',
+      //         docId: course.courseId,
+      //         data: courses.toJson(),
+      //       ),
+      //     ],
+      //   );
+      // }
     }
   }
 }
