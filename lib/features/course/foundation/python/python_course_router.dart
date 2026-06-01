@@ -8,19 +8,21 @@ class PythonCourseRouter {
 
   static GoRoute initialize() {
     GoRoute pythonCourseRouter = GoRoute(
-      path: 'python',
+      path: 'python/:courseId',
       name: 'python-course',
       pageBuilder: (context, state) {
+        final courseId = state.pathParameters['courseId'] ?? "";
+
         return CustomTransitionPage(
           key: state.pageKey,
-          child: PythonCourse(),
-          transitionDuration: Duration(milliseconds: 800),
-          reverseTransitionDuration: Duration(milliseconds: 800),
+          child: PythonCourse(courseId: courseId),
+          transitionDuration: const Duration(milliseconds: 800),
+          reverseTransitionDuration: const Duration(milliseconds: 800),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return SharedAxisTransition(
               animation: animation,
               secondaryAnimation: secondaryAnimation,
-              transitionType: SharedAxisTransitionType.scaled,
+              transitionType: SharedAxisTransitionType.horizontal,
               child: child,
             );
           },
