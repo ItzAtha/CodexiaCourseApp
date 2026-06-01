@@ -5,21 +5,21 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 class ProgressCard {
   final String _title;
-  final String _startDate;
+  final String _lastAccessedDate;
   final CourseLevel _level;
   final double _progress;
   final String _courseImage;
 
   ProgressCard({
     required String title,
-    required String startDate,
+    required String lastAccessedDate,
     required CourseLevel level,
     required double progress,
     required String courseImage,
   }) : _courseImage = courseImage,
        _progress = progress,
        _level = level,
-       _startDate = startDate,
+       _lastAccessedDate = lastAccessedDate,
        _title = title;
 
   Widget create(BuildContext context) {
@@ -38,7 +38,7 @@ class ProgressCard {
                       const Icon(Icons.calendar_today, size: 16.0, color: Color(0xFF0984E3)),
                       const SizedBox(width: 5.0),
                       Text(
-                        _startDate,
+                        _lastAccessedDate,
                         style: TextStyle(
                           fontSize: 14.0,
                           color: Theme.of(context).textTheme.labelSmall?.color,
