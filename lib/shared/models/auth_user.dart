@@ -5,17 +5,17 @@ class AuthUser {
   String? displayName;
   String email;
   String? avatar;
-  UserCourseList? courses;
+  List<UserCourseProgress> coursesProgress;
 
   AuthUser({
     required this.username,
     this.displayName,
     required this.email,
     this.avatar,
-    required this.courses,
+    required this.coursesProgress,
   });
 
-  AuthUser.defaultUser() : username = 'Guest', email = '', courses = UserCourseList(courseList: []);
+  AuthUser.defaultUser() : username = 'Guest', email = '', coursesProgress = [];
 
   factory AuthUser.fromJson(Map<String, dynamic> json) {
     return AuthUser(
@@ -23,7 +23,7 @@ class AuthUser {
       displayName: json['displayName'],
       email: json['email'],
       avatar: json['avatar'],
-      courses: json['courses'],
+      coursesProgress: json['courseProgress'],
     );
   }
 
@@ -33,7 +33,7 @@ class AuthUser {
       'displayName': displayName,
       'email': email,
       'avatar': avatar,
-      'courses': courses?.toJson() ?? UserCourseList(courseList: []).toJson(),
+      'courseProgress': coursesProgress.map((progress) => progress.toJson()).toList(),
     };
   }
 
@@ -42,14 +42,14 @@ class AuthUser {
     String? Function()? displayName,
     String? email,
     String? Function()? avatar,
-    UserCourseList? courses,
+    List<UserCourseProgress>? coursesProgress,
   }) {
     return AuthUser(
       username: username ?? this.username,
       displayName: displayName != null ? displayName() : this.displayName,
       email: email ?? this.email,
       avatar: avatar != null ? avatar() : this.avatar,
-      courses: courses ?? this.courses,
+      coursesProgress: coursesProgress ?? this.coursesProgress,
     );
   }
 }
