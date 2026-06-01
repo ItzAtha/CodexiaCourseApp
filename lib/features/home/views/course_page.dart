@@ -226,44 +226,53 @@ class _CoursePageState extends ConsumerState<CoursePage> {
     );
   }
 
+  void _initializeCourseLists(List<Course> data) {
+    courseList.clear();
+
+    Map<String, List<Course>> coursesData = data.fold({}, (Map<String, List<Course>> map, course) {
+      map.putIfAbsent(course.type.name, () => []).add(course);
+      return map;
+    });
+
+    for (final courses in coursesData.entries) {
+      List<CourseCard> cardList = [];
+      String courseType = courses.key;
+
+      for (final courseData in courses.value) {
+        CourseCard card = CourseCard(
+          courseData.courseId,
+          courseData.name,
+          courseData.description,
+          courseData.rating,
+          courseData.popular,
+          courseData.levels,
+          courseData.createdAt,
+          courseData.isActive,
+        );
+        cardList.add(card);
+      }
+
+      cardList.sort((a, b) => a.title.compareTo(b.title));
+      courseList[courseType] = cardList;
+    }
+
+    filteredList.clear();
+    filteredList.addAll(courseList);
+  }
+
   @override
   Widget build(BuildContext context) {
     final courseState = ref.watch(courseListProvider);
 
+    if (courseList.isEmpty && courseState.hasValue) {
+      _initializeCourseLists(courseState.requireValue);
+    }
+
     ref.listen(courseListProvider, (previous, next) {
       next.when(
         data: (data) {
-          Map<String, List<Course>> coursesData = data.fold({}, (
-            Map<String, List<Course>> map,
-            course,
-          ) {
-            map.putIfAbsent(course.type.name, () => []).add(course);
-            return map;
-          });
-
-          for (final courses in coursesData.entries) {
-            List<CourseCard> cardList = [];
-            String courseType = courses.key;
-
-            for (final data in courses.value) {
-              CourseCard card = CourseCard(
-                data.name,
-                data.description,
-                data.rating,
-                data.popular,
-                data.levels,
-                data.createdAt,
-                data.isActive,
-              );
-              cardList.add(card);
-            }
-
-            cardList.sort((a, b) => a.title.compareTo(b.title));
-            courseList[courseType] = cardList;
-          }
-
           setState(() {
-            filteredList.addAll(courseList);
+            _initializeCourseLists(data);
           });
         },
         error: (error, stackTrace) {
