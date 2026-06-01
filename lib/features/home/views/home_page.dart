@@ -1,5 +1,8 @@
 import 'dart:math';
 
+import 'package:codexia_course_learning/shared/enums/course_level.dart';
+import 'package:codexia_course_learning/shared/models/course.dart';
+import 'package:codexia_course_learning/shared/providers/course_list_notifier.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -114,17 +117,27 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget hasCourseData({required List<UserCourse> courseList}) {
+  Widget hasCourseData({
+    required List<Course> courseListData,
+    required List<UserCourseProgress> courseProgressList,
+  }) {
     return ExpandablePageView.builder(
       controller: carouselController,
       clipBehavior: Clip.none,
-      itemCount: courseList.length,
+      itemCount: courseProgressList.length,
       itemBuilder: (BuildContext context, int index) {
-        UserCourse course = courseList[index];
+        UserCourseProgress courseProgress = courseProgressList[index];
+        Course? course = courseListData.firstWhere((c) => c.courseId == courseProgress.courseId);
+
+        UserLevelProgress levelProgress = courseProgress.levelProgress.firstWhere(
+          (levelProgress) => levelProgress.levelName == courseProgress.lastAccessedLevel,
+        );
+        double progress = levelProgress.completedModules.length / levelProgress.totalModules;
 
         if (!carouselController.position.haveDimensions) {
           return const SizedBox();
         }
+
         return AnimatedBuilder(
           animation: carouselController,
           builder: (context, child) {
@@ -136,11 +149,14 @@ class _HomePageState extends ConsumerState<HomePage> {
             return Transform.scale(
               scale: scale,
               child: ProgressCard(
-                title: course.courseName,
-                startDate: course.startDate.toDate().toIso8601String().split('T')[0],
-                level: course.courseLevel,
-                progress: course.progress,
-                courseImage: '${course.courseName.toLowerCase().split(' ')[0]}.svg',
+                title: course.name,
+                lastAccessedDate: courseProgress.lastAccessedAt.toIso8601String().split('T')[0],
+                level: CourseLevel.values.firstWhere(
+                  (e) => e.toString().split('.').last == courseProgress.lastAccessedLevel,
+                  orElse: () => CourseLevel.beginner,
+                ),
+                progress: progress,
+                courseImage: '${course.name.split(' ')[0].toLowerCase()}.svg',
               ).create(context),
             );
           },
@@ -152,10 +168,10 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final authUserState = ref.watch(authUserProvider);
-    AuthUser? authUser = authUserState.value;
+    final courseListData = ref.watch(courseListProvider);
 
-    UserCourseList? userCourseList = authUser?.courses;
-    List<UserCourse>? courseList = userCourseList?.courseList;
+    AuthUser? authUser = authUserState.value;
+    List<UserCourseProgress>? userCourseProgress = authUser?.coursesProgress;
 
     return Scaffold(
       appBar: const HomeAppBar(),
@@ -164,10 +180,13 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: Column(
           children: <Widget>[
             const SizedBox(height: 25.0),
-            authUserState.isLoading
+            authUserState.isLoading || courseListData.isLoading
                 ? loadCourseData()
-                : courseList != null
-                ? hasCourseData(courseList: courseList)
+                : userCourseProgress != null
+                ? hasCourseData(
+                    courseListData: courseListData.requireValue,
+                    courseProgressList: userCourseProgress,
+                  )
                 : noCourseData(),
           ],
         ),
