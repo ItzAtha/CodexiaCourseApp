@@ -6,6 +6,7 @@ import 'package:toastification/toastification.dart';
 import '../../../shared/enums/course_level.dart';
 
 class CourseCard {
+  final String _id;
   final String _title;
   final String _description;
   final double _rating;
@@ -17,6 +18,7 @@ class CourseCard {
   final ValueNotifier<bool> _isCardOpened = ValueNotifier<bool>(false);
 
   CourseCard(
+    String id,
     String title,
     String description,
     double rating,
@@ -24,7 +26,8 @@ class CourseCard {
     List<CourseLevel> levels,
     DateTime createdAt,
     bool isActive,
-  ) : _title = title,
+  ) : _id = id,
+      _title = title,
       _description = description,
       _rating = rating,
       _popular = popular,
@@ -208,7 +211,10 @@ class CourseCard {
                           return;
                         }
 
-                        context.pushNamed('${_title.split(' ')[0].toLowerCase()}-course');
+                        context.pushNamed(
+                          '${_title.split(' ')[0].toLowerCase()}-course',
+                          pathParameters: {'courseId': _id},
+                        );
                       },
                       child: const Text(
                         "Start Course",
