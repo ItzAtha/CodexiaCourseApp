@@ -11,6 +11,16 @@ enum CourseType {
 }
 
 enum LessonFeature { hasInteractive, hasSandbox }
+enum ContentType {
+  explain("Explain"),
+  hint("Hint"),
+  important("Important"),
+  conclusion("Conclusion");
+
+  final String name;
+
+  const ContentType(this.name);
+}
 
 class Course {
   String courseId;
@@ -22,7 +32,7 @@ class Course {
   List<CourseLevel> levels;
   DateTime createdAt;
   bool isActive;
-  List<CourseModule>? modules;
+  Map<CourseLevel, List<CourseModule>>? modules;
 
   Course(
     this.courseId,
@@ -38,6 +48,23 @@ class Course {
   );
 
   factory Course.fromJson(Map<String, dynamic> json) {
+    Map<CourseLevel, List<CourseModule>>? parsedModules;
+
+    if (json['modules'] != null) {
+      if (json['modules'] is Map) {
+        parsedModules = {};
+        (json['modules'] as Map<String, dynamic>).forEach((levelKey, modulesList) {
+          CourseLevel level = CourseLevel.values.firstWhere(
+            (e) => e.name == levelKey,
+            orElse: () => CourseLevel.beginner,
+          );
+          parsedModules![level] = (modulesList as List)
+              .map((module) => CourseModule.fromJson(module))
+              .toList();
+        });
+      }
+    }
+
     return Course(
       json['id'],
       json['title'],
@@ -50,7 +77,7 @@ class Course {
           .toList(),
       DateTime.parse(json['createdAt']),
       json['isActive'],
-      json['modules'],
+      parsedModules ?? {},
     );
   }
 
@@ -65,7 +92,12 @@ class Course {
       'level': levels.map((level) => level.name).toList(),
       'createdAt': createdAt.toIso8601String(),
       'isActive': isActive,
-      'modules': modules?.map((course) => course.toJson()).toList(),
+      'modules': modules != null
+          ? modules!.map((level, moduleList) => MapEntry(
+                level.name.toLowerCase(),
+                moduleList.map((module) => module.toJson()).toList(),
+              ))
+          : {},
     };
   }
 
@@ -79,7 +111,7 @@ class Course {
     List<CourseLevel> Function()? levels,
     DateTime Function()? createdAt,
     bool Function()? isActive,
-    List<CourseModule>? Function()? modules,
+    Map<CourseLevel, List<CourseModule>>? Function()? modules,
   }) {
     return Course(
       courseId != null ? courseId() : this.courseId,
@@ -97,27 +129,22 @@ class Course {
 }
 
 class CourseModule {
+  String moduleId;
   int order;
   String title;
   String description;
   int expAmount;
-  double progress;
   Duration duration;
-  int totalLessons;
-  bool isLocked;
-
-  // List<CourseLesson> lessons;
+  List<CourseLesson> lessons;
 
   CourseModule(
+      this.moduleId,
     this.order,
     this.title,
     this.description,
     this.expAmount,
-    this.progress,
     this.duration,
-    this.totalLessons,
-    this.isLocked,
-    /*this.lessons*/
+    this.lessons,
   );
 
   factory CourseModule.fromJson(Map<String, dynamic> json) {
@@ -127,51 +154,54 @@ class CourseModule {
     Duration duration = Duration(hours: hours, minutes: minutes);
 
     return CourseModule(
+      json['id'],
       json['order'],
       json['title'],
       json['description'],
       json['exp'],
-      json['progress'],
       duration,
-      json['totalLessons'],
-      json['isLocked'],
-      // (json['lessons'] as List)
-      //     .map((lesson) => CourseLesson.fromJson(lesson))
-      //     .toList(),
+      json['lessons'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'moduleId': moduleId,
       'order': order,
+      'title': title,
       'description': description,
       'exp': expAmount,
       'duration': duration.toString().split('.').first.padLeft(8, '0'),
-      // 'lessons': lessons.map((lesson) => lesson.toJson()).toList(),
+      'lessons': lessons.map((lesson) => lesson.toJson()).toList(),
     };
   }
 }
 
-// TODO: Implement this code to save Course Modules Lessons
-// class CourseLesson {
-//   String content;
-//   List<LessonFeature> features;
-//
-//   CourseLesson(this.content, this.features);
-//
-//   factory CourseLesson.fromJson(Map<String, dynamic> json) {
-//     return CourseLesson(
-//       json['content'],
-//       (json['features'] as List)
-//           .map((feature) => LessonFeature.values.firstWhere((e) => e.name == feature))
-//           .toList(),
-//     );
-//   }
-//
-//   Map<String, dynamic> toJson() {
-//     return {
-//       'content': content,
-//       'features': features.map((feature) => feature.name).toList(),
-//     };
-//   }
-// }
+class CourseLesson {
+  String id;
+  String title;
+  Map<ContentType, String> content;
+  List<LessonFeature> features;
+
+  CourseLesson(this.id, this.title, this.content, this.features);
+
+  factory CourseLesson.fromJson(Map<String, dynamic> json) {
+    return CourseLesson(
+      json['id'],
+      json['title'],
+      (json['content'] as Map<String, dynamic>).map((key, value) => MapEntry(ContentType.values.firstWhere((e) => e.name == key), value)),
+      (json['features'] as List)
+          .map((feature) => LessonFeature.values.firstWhere((e) => e.name == feature))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'content': content.map((key, value) => MapEntry(key.name, value)),
+      'features': features.map((feature) => feature.name).toList(),
+    };
+  }
+}
