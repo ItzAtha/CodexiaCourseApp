@@ -371,9 +371,11 @@ class _CoursePageState extends ConsumerState<CoursePage> {
                 child: filteredList.values.any((courses) => courses.isNotEmpty) == true
                     ? ListView(children: <Widget>[...getCourseList(), const SizedBox(height: 30.0)])
                     : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[courseState.isLoading ? loadingCourses() : noCourses()],
-                      ),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    courseState.isLoading ? loadingCourses() : noCourses(),
+                  ],
+                ),
               ),
             ],
           ),
