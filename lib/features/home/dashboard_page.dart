@@ -85,6 +85,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     ref.listen(authUserProvider, (previous, next) {
       next.when(
         data: (data) {
+          if (previous?.value?.email == data.email) return;
+
           DebugLogger(
             message: "Successfully loaded profile: ${data.username}",
             level: LogLevel.info,
