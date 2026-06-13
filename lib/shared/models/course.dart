@@ -50,10 +50,16 @@ abstract class Course with _$Course {
     required DateTime createdAt,
     required bool isActive,
 
-    @Default({}) Map<CourseLevel, List<CourseModule>>? modules,
+    @Default({}) Map<CourseLevel, List<CourseModule>> modules,
   }) = _Course;
 
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);
+
+  Map<String, dynamic> toDatabaseMap() {
+    final Map<String, dynamic> data = toJson();
+    data.remove('modules');
+    return data;
+  }
 
   List<CourseLevel> get validLevels {
     return levels.where((level) => level != CourseLevel.unknown).toList();
