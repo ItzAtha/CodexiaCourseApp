@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../shared/models/user_course.dart';
+import '../../shared/models/user_course_progress.dart';
 
 class BaseCourse extends ConsumerStatefulWidget {
   final String _courseId;
@@ -59,7 +59,9 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
     final courseListState = ref.watch(courseListProvider);
 
     authUserState.whenData((data) {
-      progress = data.coursesProgress.where((progress) => progress.courseId == widget._courseId).firstOrNull;
+      progress = data.coursesProgress
+          .where((progress) => progress.courseId == widget._courseId)
+          .firstOrNull;
     });
 
     courseListState.whenData((data) {
@@ -79,7 +81,7 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
         backgroundColor: Colors.transparent,
         leading: IconButton(
           onPressed: () {
-            progress?.moduleProgress.add(UserModuleProgress(moduleId: widget._moduleId, completedLessons: [for (var lesson in widget._lessons) lesson.id], isComplete: false));
+            // progress?.moduleProgress.add(UserModuleProgress(lessonId: widget._moduleId, completedLessons: [for (var lesson in widget._lessons) lesson.id], isComplete: false));
             context.pop();
           },
           icon: const Icon(Icons.arrow_back),
@@ -98,21 +100,50 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
       body: Column(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.only(top: AppSizes.p16, bottom: AppSizes.p8, left: AppSizes.p24, right: AppSizes.p24),
+            padding: const EdgeInsets.only(
+              top: AppSizes.p16,
+              bottom: AppSizes.p8,
+              left: AppSizes.p24,
+              right: AppSizes.p24,
+            ),
             child: Column(
               crossAxisAlignment: .start,
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text("Lesson Progress", style: TextStyle(fontSize: AppSizes.sTextSize, color: Colors.grey.shade600)),
+                    Text(
+                      "Lesson Progress",
+                      style: TextStyle(fontSize: AppSizes.sTextSize, color: Colors.grey.shade600),
+                    ),
                     Row(
                       children: <Widget>[
-                        Text("Page ${currentPage + 1} of ${widget._lessons.length}", style: TextStyle(fontSize: AppSizes.sTextSize, fontWeight: FontWeight.bold, color: Colors.grey.shade600)),
+                        Text(
+                          "Page ${currentPage + 1} of ${widget._lessons.length}",
+                          style: TextStyle(
+                            fontSize: AppSizes.sTextSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
                         const SizedBox(width: 2.5),
-                        Text("•", style: TextStyle(fontSize: AppSizes.sTextSize, fontWeight: FontWeight.bold, color: Colors.grey.shade600)),
+                        Text(
+                          "•",
+                          style: TextStyle(
+                            fontSize: AppSizes.sTextSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
                         const SizedBox(width: 2.5),
-                        Text(NumberFormat.percentPattern().format(completedProgress), style: TextStyle(fontSize: AppSizes.sTextSize, fontWeight: FontWeight.bold, color: Colors.grey.shade600)),
+                        Text(
+                          NumberFormat.percentPattern().format(completedProgress),
+                          style: TextStyle(
+                            fontSize: AppSizes.sTextSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -131,22 +162,19 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
                       borderRadius: const BorderRadius.all(Radius.circular(8.0)),
                       valueColor: AlwaysStoppedAnimation<Color>(
                         Color.lerp(
-                          AppColors.primary.withValues(alpha: 0.6),
-                          AppColors.secondary,
-                          value,
-                        ) ??
+                              AppColors.primary.withValues(alpha: 0.6),
+                              AppColors.secondary,
+                              value,
+                            ) ??
                             AppColors.primary.withValues(alpha: 0.6),
                       ),
                     );
                   },
                 ),
                 const SizedBox(height: 12.0),
-                PageViewIndicator(
-                  currentIndex: currentPage,
-                  pageCount: widget._lessons.length,
-                ),
+                PageViewIndicator(currentIndex: currentPage, pageCount: widget._lessons.length),
               ],
-            )
+            ),
           ),
           Expanded(
             child: Padding(
@@ -214,13 +242,15 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
                   ),
                   iconAlignment: IconAlignment.end,
                   icon: const Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.white),
-                  label: currentPage != widget._lessons.length - 1 ? const Text(
-                    "Continue",
-                    style: TextStyle(fontSize: AppSizes.mTextSize, color: Colors.white),
-                  ) : const Text(
-                    "Finish",
-                    style: TextStyle(fontSize: AppSizes.mTextSize, color: Colors.white),
-                  ),
+                  label: currentPage != widget._lessons.length - 1
+                      ? const Text(
+                          "Continue",
+                          style: TextStyle(fontSize: AppSizes.mTextSize, color: Colors.white),
+                        )
+                      : const Text(
+                          "Finish",
+                          style: TextStyle(fontSize: AppSizes.mTextSize, color: Colors.white),
+                        ),
                 ),
               ],
             ),
@@ -243,15 +273,17 @@ class PageViewIndicator extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
         pageCount,
-            (index) => AnimatedContainer(
-              width: currentIndex == index ? 42.0 : 24.0,
-              height: 8.0,
+        (index) => AnimatedContainer(
+          width: currentIndex == index ? 42.0 : 24.0,
+          height: 8.0,
           duration: const Duration(milliseconds: 300),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(4.0)),
-                color: currentIndex == index ? AppColors.secondary : AppColors.secondary.withValues(alpha: 0.5),
-              ),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+            color: currentIndex == index
+                ? AppColors.secondary
+                : AppColors.secondary.withValues(alpha: 0.5),
+          ),
         ),
       ),
     );
