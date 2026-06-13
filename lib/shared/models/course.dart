@@ -1,6 +1,7 @@
-import 'package:codexia_course_learning/services/string_duration_converter.dart';
 import 'package:codexia_course_learning/shared/enums/course_level.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
+import 'course/course_module.dart';
 
 part 'course.freezed.dart';
 
@@ -57,32 +58,4 @@ abstract class Course with _$Course {
   List<CourseLevel> get validLevels {
     return levels.where((level) => level != CourseLevel.unknown).toList();
   }
-}
-
-@freezed
-abstract class CourseModule with _$CourseModule {
-  const factory CourseModule({
-    required String moduleId,
-    required int order,
-    required String title,
-    required String description,
-    required int expAmount,
-
-    @StringDurationConverter() required Duration duration,
-    @Default([]) List<CourseLesson> lessons,
-  }) = _CourseModule;
-
-  factory CourseModule.fromJson(Map<String, dynamic> json) => _$CourseModuleFromJson(json);
-}
-
-@freezed
-abstract class CourseLesson with _$CourseLesson {
-  const factory CourseLesson({
-    required String lessonId,
-    required String title,
-
-    @Default({}) Map<ContentType, String> content,
-  }) = _CourseLesson;
-
-  factory CourseLesson.fromJson(Map<String, dynamic> json) => _$CourseLessonFromJson(json);
 }
