@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 import '../../shared/models/course.dart';
+import '../../shared/models/course/course_lesson.dart';
 
 class CourseContent extends StatefulWidget {
   final List<CourseLesson> _lessons;

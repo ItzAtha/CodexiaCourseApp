@@ -6,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/app_constants.dart' show AppSizes, AppColors;
-import '../../../shared/models/course.dart';
+import '../../../shared/models/course/course_module.dart';
 
 class CourseModuleCard extends StatelessWidget {
   final String _courseId;

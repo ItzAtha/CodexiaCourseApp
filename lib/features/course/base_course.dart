@@ -1,7 +1,6 @@
 import 'package:codexia_course_learning/core/app_constants.dart';
 import 'package:codexia_course_learning/features/course/course_content.dart';
 import 'package:codexia_course_learning/shared/enums/course_level.dart';
-import 'package:codexia_course_learning/shared/models/course.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
 import 'package:codexia_course_learning/shared/providers/course_list_notifier.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -9,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../shared/models/course/course_lesson.dart';
 import '../../shared/models/user_course_progress.dart';
 
 class BaseCourse extends ConsumerStatefulWidget {

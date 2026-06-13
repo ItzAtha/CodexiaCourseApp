@@ -4,7 +4,7 @@ import 'package:codexia_course_learning/features/course/foundation/python/python
 import 'package:codexia_course_learning/shared/enums/course_level.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../shared/models/course.dart';
+import '../../../../shared/models/course/course_lesson.dart';
 
 class PythonCourseRouter {
   PythonCourseRouter._();
