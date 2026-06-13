@@ -9,16 +9,26 @@ part 'course_module.g.dart';
 
 @freezed
 abstract class CourseModule with _$CourseModule {
+  const CourseModule._();
+
   const factory CourseModule({
-    required String moduleId,
+    @JsonKey(name: 'id') required String moduleId,
+
     required int order,
     required String title,
     required String description,
-    required int expAmount,
+
+    @JsonKey(name: 'exp') required int expAmount,
 
     @StringDurationConverter() required Duration duration,
     @Default([]) List<CourseLesson> lessons,
   }) = _CourseModule;
 
   factory CourseModule.fromJson(Map<String, dynamic> json) => _$CourseModuleFromJson(json);
+
+  Map<String, dynamic> toDatabaseMap() {
+    final Map<String, dynamic> data = toJson();
+    data.remove('lessons');
+    return data;
+  }
 }
