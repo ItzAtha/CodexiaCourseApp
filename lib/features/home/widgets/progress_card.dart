@@ -131,6 +131,10 @@ class ProgressCard {
         text = "Master Level";
         color = Colors.purple;
         break;
+      case CourseLevel.unknown:
+        text = "Unknown Level";
+        color = Colors.grey;
+        break;
     }
 
     return Container(
