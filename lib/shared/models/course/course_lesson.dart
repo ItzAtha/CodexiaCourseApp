@@ -6,14 +6,25 @@ part 'course_lesson.freezed.dart';
 
 part 'course_lesson.g.dart';
 
-@freezed
-abstract class CourseLesson with _$CourseLesson {
-  const factory CourseLesson({
-    required String lessonId,
+@Freezed(unionKey: 'type')
+sealed class CourseLesson with _$CourseLesson {
+  const CourseLesson._();
+
+  const factory CourseLesson.material({
+    @JsonKey(name: 'id') required String lessonId,
+
     required String title,
 
     @Default({}) Map<ContentType, String> content,
-  }) = _CourseLesson;
+  }) = MaterialLesson;
+
+  const factory CourseLesson.quiz({
+    @JsonKey(name: 'id') required String lessonId,
+
+    required String title,
+
+    @Default({}) Map<ContentType, String> content,
+  }) = QuizLesson;
 
   factory CourseLesson.fromJson(Map<String, dynamic> json) => _$CourseLessonFromJson(json);
 }
