@@ -20,6 +20,7 @@ firebase_options.dart
 
 # Generated files related
 *.g.dart
+*.freezed.dart
 
 # IntelliJ related
 *.iml
