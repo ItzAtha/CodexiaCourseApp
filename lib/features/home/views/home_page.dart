@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../shared/models/auth_user.dart';
-import '../../../shared/models/user_course.dart';
+import '../../../shared/models/user_course_progress.dart';
 import '../../../shared/providers/auth_user_notifier.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/progress_card.dart';
@@ -149,14 +149,14 @@ class _HomePageState extends ConsumerState<HomePage> {
             return Transform.scale(
               scale: scale,
               child: ProgressCard(
-                title: course.name,
+                title: course.title,
                 lastAccessedDate: courseProgress.lastAccessedAt.toIso8601String().split('T')[0],
                 level: CourseLevel.values.firstWhere(
                   (e) => e.toString().split('.').last == courseProgress.lastAccessedLevel,
                   orElse: () => CourseLevel.beginner,
                 ),
                 progress: progress,
-                courseImage: '${course.name.split(' ')[0].toLowerCase()}.svg',
+                courseImage: '${course.title.split(' ')[0].toLowerCase()}.svg',
               ).create(context),
             );
           },
@@ -182,7 +182,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             const SizedBox(height: 25.0),
             authUserState.isLoading || courseListData.isLoading
                 ? loadCourseData()
-                : userCourseProgress != null
+                : userCourseProgress != null && userCourseProgress.isNotEmpty
                 ? hasCourseData(
                     courseListData: courseListData.requireValue,
                     courseProgressList: userCourseProgress,
