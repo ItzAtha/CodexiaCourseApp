@@ -5,23 +5,27 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/utils/logger.dart';
 import '../../manager/firebase_manager.dart';
-import '../models/user_course.dart';
+import '../models/user_course_progress.dart';
 
 part 'auth_user_notifier.g.dart';
 
 @riverpod
 class AuthUserNotifier extends _$AuthUserNotifier {
+  final CollectionReference usersCollection = FirebaseFirestore.instance.collection('Users');
+
   @override
   Future<AuthUser> build() async {
     return _loadUserData();
   }
 
   Future<AuthUser> _loadUserData() async {
-    AuthUser authUser = AuthUser.defaultUser();
+    AuthUser authUser = AuthUser(
+      username: "Guest",
+      email: "guest@example.com",
+      createdAt: DateTime.now(),
+      lastSignIn: DateTime.now(),
+    );
     final User? currentUser = FirebaseAuth.instance.currentUser;
-
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final CollectionReference usersCollection = firestore.collection('Users');
 
     if (currentUser != null) {
       final String userId = currentUser.uid;
@@ -36,16 +40,16 @@ class AuthUserNotifier extends _$AuthUserNotifier {
       ).wait;
 
       if (usersData.exists) {
-        List<UserCourseProgress> coursesProgress = [];
+        List<Map<String, dynamic>> coursesProgressRaw = [];
         final Map<String, dynamic> userData = usersData.data() as Map<String, dynamic>;
 
         if (courseProgressData.docs.isNotEmpty) {
           for (final courseProgress in courseProgressData.docs) {
             Map<String, dynamic> progressData = courseProgress.data();
-            coursesProgress.add(UserCourseProgress.fromJson(progressData));
+            coursesProgressRaw.add(progressData);
           }
         }
-        userData['courseProgress'] = coursesProgress;
+        userData['coursesProgress'] = coursesProgressRaw;
 
         try {
           authUser = AuthUser.fromJson(userData);
@@ -72,6 +76,33 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     return authUser;
   }
 
+  Future<void> refetchProgress() async {
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      final String userId = currentUser.uid;
+      String provider = currentUser.providerData.isNotEmpty
+          ? currentUser.providerData[0].providerId
+          : 'anonymous';
+
+      final String docId = '${userId}_$provider';
+      final courseProgressData = await usersCollection
+          .doc(docId)
+          .collection('CourseProgress')
+          .get();
+
+      List<UserCourseProgress> coursesProgress = [];
+      if (courseProgressData.docs.isNotEmpty) {
+        for (final courseProgress in courseProgressData.docs) {
+          Map<String, dynamic> progressData = courseProgress.data();
+          coursesProgress.add(UserCourseProgress.fromJson(progressData));
+        }
+      }
+
+      state = AsyncData(state.value!.copyWith(coursesProgress: coursesProgress));
+    }
+  }
+
   Future<void> updateDisplayName(String? displayName) async {
     FirebaseManager manager = FirebaseManager();
     User? currentUser = FirebaseAuth.instance.currentUser;
@@ -83,7 +114,7 @@ class AuthUserNotifier extends _$AuthUserNotifier {
           : 'anonymous';
 
       final String docId = '${userId}_$provider';
-      state = AsyncData(state.value!.copyWith(displayName: () => displayName));
+      state = AsyncData(state.value!.copyWith(displayName: displayName));
 
       await manager.updateData('Users', docId, newData: {'displayName': state.value!.displayName});
     }
@@ -100,13 +131,13 @@ class AuthUserNotifier extends _$AuthUserNotifier {
           : 'anonymous';
 
       final String docId = '${userId}_$provider';
-      state = AsyncData(state.value!.copyWith(avatar: () => avatar));
+      state = AsyncData(state.value!.copyWith(avatar: avatar));
 
       await manager.updateData('Users', docId, newData: {'avatar': avatar});
     }
   }
 
-  Future<void> updateCourses(List<UserCourseProgress> coursesProgress) async {
+  Future<void> updateCourses(UserCourseProgress coursesProgress) async {
     FirebaseManager manager = FirebaseManager();
     User? currentUser = FirebaseAuth.instance.currentUser;
 
@@ -117,7 +148,13 @@ class AuthUserNotifier extends _$AuthUserNotifier {
           : 'anonymous';
 
       final String docId = '${userId}_$provider';
-      state = AsyncData(state.value!.copyWith(coursesProgress: coursesProgress));
+      int index = state.value!.coursesProgress.indexWhere(
+        (item) => item.courseId == coursesProgress.courseId,
+      );
+      if (index != -1) {
+        // fruits[index] = 'Mango';
+      }
+      // state = AsyncData(state.value!.copyWith(coursesProgress: coursesProgress));
 
       // TODO: Refactor this code to support saving course progress in Firestore
       // for (var course in courses.courseList) {
