@@ -5,7 +5,6 @@ import 'package:codexia_course_learning/shared/enums/course_level.dart';
 import 'package:codexia_course_learning/shared/models/course.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../models/course/course_lesson.dart';
 import '../models/course/course_module.dart';
 
 part 'course_list_notifier.g.dart';
@@ -37,6 +36,10 @@ class CourseListNotifier extends _$CourseListNotifier {
     final levelsSnapshot = await levelsCollection.get();
 
     for (var level in levelsSnapshot.docs) {
+      List<CourseModule> modules = [];
+      List<Map<String, dynamic>> lessons = [];
+      final moduleLevel = CourseLevel.values.firstWhere((l) => l.name.toLowerCase() == level.id);
+
       final modulesCollection = levelsCollection.doc(level.id).collection('Modules');
       final lessonCollection = levelsCollection.doc(level.id).collection('Lessons');
 
@@ -47,27 +50,20 @@ class CourseListNotifier extends _$CourseListNotifier {
 
       for (var module in modulesSnapshot.docs) {
         final moduleData = module.data();
-        List<String> moduleLessons = List<String>.from(moduleData['lessons']);
 
-        List<CourseLesson> lessonsList = lessonSnapshot.docs
-            .where((lesson) => moduleLessons.contains(lesson.id))
-            .map((lesson) {
-              final lessonData = lesson.data();
-              print(lessonData);
-              return CourseLesson.fromJson(lessonData);
-            })
-            .toList();
+        for (var lesson in lessonSnapshot.docs) {
+          final lessonData = lesson.data();
 
-        moduleData['lessons'] = lessonsList;
+          if (lessonData['id'].startsWith(moduleData['id'])) {
+            lessons.add(lessonData);
+          }
+        }
 
-        modulesList.putIfAbsent(
-          CourseLevel.values.firstWhere((l) => l.name.toLowerCase() == level.id),
-          () => [],
-        );
-        modulesList[CourseLevel.values.firstWhere((l) => l.name.toLowerCase() == level.id)]!.add(
-          CourseModule.fromJson(moduleData),
-        );
+        moduleData['lessons'] = lessons;
+        modules.add(CourseModule.fromJson(moduleData));
       }
+
+      modulesList[moduleLevel] = modules;
     }
 
     final courses = state.value != null ? List<Course>.from(state.value!) : await _loadCourseData();
