@@ -23,8 +23,8 @@ class _CoursePageState extends ConsumerState<CoursePage> {
     rating: false,
     newest: false,
   );
-  Map<String, List<CourseCard>> courseList = {};
-  Map<String, List<CourseCard>> filteredList = {};
+  Map<CourseType, List<CourseCard>> courseList = {};
+  Map<CourseType, List<CourseCard>> filteredList = {};
   TextEditingController searchController = TextEditingController();
 
   void updateFilterData(({bool newest, bool popular, bool rating}) data) {
@@ -58,7 +58,7 @@ class _CoursePageState extends ConsumerState<CoursePage> {
         tempCourseList.sort((a, b) => b.popular.compareTo(a.popular));
         setState(() {
           filteredList.clear();
-          filteredList["Popular Course"] = tempCourseList.take(10).toList();
+          filteredList[CourseType.popularCourse] = tempCourseList.take(10).toList();
         });
         break;
       case FilterType.rating:
@@ -71,7 +71,7 @@ class _CoursePageState extends ConsumerState<CoursePage> {
         tempCourseList.sort((a, b) => b.rating.compareTo(a.rating));
         setState(() {
           filteredList.clear();
-          filteredList["Top Rated Course"] = tempCourseList.take(10).toList();
+          filteredList[CourseType.topRateCourse] = tempCourseList.take(10).toList();
         });
         break;
       case FilterType.newest:
@@ -105,91 +105,29 @@ class _CoursePageState extends ConsumerState<CoursePage> {
   List<Widget> getCourseList() {
     List<Widget> courseList = [];
 
-    if ((filteredList["Popular Course"]?.isNotEmpty ?? false) ||
-        (filteredList["Top Rated Course"]?.isNotEmpty ?? false)) {
+    for (final type in filteredList.keys) {
+      if (filteredList[type]?.isEmpty ?? true) continue;
+
       courseList.add(
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              filteredList["Popular Course"] != null ? "Popular Course" : "Top Rated Course",
+              type.name,
               style: TextStyle(
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).textTheme.labelMedium?.color,
               ),
             ),
-            for (var element
-                in filteredList["Popular Course"] ?? filteredList["Top Rated Course"] ?? [])
-              element.create(context),
+            for (CourseCard element in filteredList[type] ?? []) element.create(context),
             const SizedBox(height: 15.0),
           ],
         ),
       );
     }
 
-    if (filteredList["Programming Foundation"]?.isNotEmpty ?? false) {
-      courseList.add(
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              "Programming Foundations",
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.labelMedium?.color,
-              ),
-            ),
-            for (var element in filteredList["Programming Foundation"] ?? [])
-              element.create(context),
-            const SizedBox(height: 15.0),
-          ],
-        ),
-      );
-    }
-
-    if (filteredList["Database Structures"]?.isNotEmpty ?? false) {
-      courseList.add(
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              "Database Structures",
-              style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.labelMedium?.color,
-              ),
-            ),
-            for (var element in filteredList["Database Structures"] ?? []) element.create(context),
-            const SizedBox(height: 15.0),
-          ],
-        ),
-      );
-    }
-
-    if (filteredList["Framework Development"]?.isNotEmpty ?? false) {
-      courseList.add(
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              "Framework Development",
-              style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.labelMedium?.color,
-              ),
-            ),
-            for (var element in filteredList["Framework Development"] ?? [])
-              element.create(context),
-          ],
-        ),
-      );
-    }
-
-    return courseList;
+    return courseList.reversed.toList();
   }
 
   Widget noCourses() {
@@ -229,23 +167,31 @@ class _CoursePageState extends ConsumerState<CoursePage> {
   void _initializeCourseLists(List<Course> data) {
     courseList.clear();
 
-    Map<String, List<Course>> coursesData = data.fold({}, (Map<String, List<Course>> map, course) {
-      map.putIfAbsent(course.type.name, () => []).add(course);
+    for (var course in data) {
+      DebugLogger(message: course.toJson(), level: LogLevel.trace).log();
+    }
+
+    Map<CourseType, List<Course>> coursesData = data.fold({}, (
+      Map<CourseType, List<Course>> map,
+      course,
+    ) {
+      CourseType type = CourseType.values.firstWhere((level) => level == course.type);
+      map.putIfAbsent(type, () => []).add(course);
       return map;
     });
 
     for (final courses in coursesData.entries) {
       List<CourseCard> cardList = [];
-      String courseType = courses.key;
+      CourseType courseType = courses.key;
 
       for (final courseData in courses.value) {
         CourseCard card = CourseCard(
           courseData.courseId,
-          courseData.name,
+          courseData.title,
           courseData.description,
           courseData.rating,
           courseData.popular,
-          courseData.levels,
+          courseData.validLevels,
           courseData.createdAt,
           courseData.isActive,
         );
@@ -371,11 +317,9 @@ class _CoursePageState extends ConsumerState<CoursePage> {
                 child: filteredList.values.any((courses) => courses.isNotEmpty) == true
                     ? ListView(children: <Widget>[...getCourseList(), const SizedBox(height: 30.0)])
                     : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    courseState.isLoading ? loadingCourses() : noCourses(),
-                  ],
-                ),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[courseState.isLoading ? loadingCourses() : noCourses()],
+                      ),
               ),
             ],
           ),
