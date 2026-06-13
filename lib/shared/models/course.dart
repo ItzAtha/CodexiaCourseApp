@@ -20,18 +20,6 @@ enum CourseType {
   const CourseType(this.name);
 }
 
-@JsonEnum(fieldRename: FieldRename.screamingSnake)
-enum ContentType {
-  explain("Explain"),
-  hint("Hint"),
-  important("Important"),
-  conclusion("Conclusion");
-
-  final String name;
-
-  const ContentType(this.name);
-}
-
 @freezed
 abstract class Course with _$Course {
   const Course._();
