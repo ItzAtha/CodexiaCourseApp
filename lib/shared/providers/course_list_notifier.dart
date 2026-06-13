@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:codexia_course_learning/shared/enums/course_level.dart';
 import 'package:codexia_course_learning/shared/models/course.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'course_list_notifier.g.dart';
@@ -28,65 +28,63 @@ class CourseListNotifier extends _$CourseListNotifier {
   }
 
   Future<void> fetchModules(String courseId) async {
-    List<CourseModule> modulesList = [];
+    Map<CourseLevel, List<CourseModule>> modulesList = {};
 
-    final User? currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
-      final String userId = currentUser.uid;
-      String provider = currentUser.providerData.isNotEmpty
-          ? currentUser.providerData[0].providerId
-          : 'anonymous';
+    final levelsCollection = coursesCollection.doc(courseId).collection('Levels');
+    final levelsSnapshot = await levelsCollection.get();
 
-      final String userDocId = '${userId}_$provider';
+    for (var level in levelsSnapshot.docs) {
+      final modulesCollection = levelsCollection.doc(level.id).collection('Modules');
+      final lessonCollection = levelsCollection.doc(level.id).collection('Lessons');
 
-      final levelsCollection = coursesCollection.doc(courseId).collection('Levels');
-      final levelsSnapshot = await levelsCollection.get();
+      final (modulesSnapshot, lessonSnapshot) = await (
+        modulesCollection.get(),
+        lessonCollection.get(),
+      ).wait;
 
-      for (var level in levelsSnapshot.docs) {
-        final modulesCollection = levelsCollection.doc(level.id).collection('Modules');
-        final modulesSnapshot = await modulesCollection.get();
+      for (var module in modulesSnapshot.docs) {
+        final moduleData = module.data();
+        List<String> moduleLessons = List<String>.from(moduleData['lessons']);
 
-        for (var module in modulesSnapshot.docs) {
-          final moduleData = module.data();
+        List<CourseLesson> lessonsList = lessonSnapshot.docs
+            .where((lesson) => moduleLessons.contains(lesson.id))
+            .map((lesson) {
+              final lessonData = lesson.data();
+              print(lessonData);
+              return CourseLesson.fromJson(lessonData);
+            })
+            .toList();
 
-          moduleData['totalLessons'] = (moduleData['lessons'] as List).length;
+        moduleData['lessons'] = lessonsList;
 
-          final moduleProgressCollection = await FirebaseFirestore.instance
-              .collection('Users')
-              .doc(userDocId)
-              .collection('CourseProgress')
-              .doc(courseId)
-              .collection('Modules')
-              .doc(module.id)
-              .get();
-
-          if (moduleProgressCollection.exists) {
-            final moduleProgressData = moduleProgressCollection.data();
-            int totalLessonCompleted = (moduleProgressData?['completedLessons'] ?? []).length;
-            int totalLessons = (moduleData['lessons'] as List).length;
-            double calcProgress = totalLessonCompleted / totalLessons;
-            moduleData['progress'] = calcProgress;
-            moduleData['isLocked'] = false;
-          } else {
-            moduleData['progress'] = 0.0;
-            moduleData['isLocked'] = true;
-          }
-
-          modulesList.add(CourseModule.fromJson(moduleData));
-          print("Modules: ID ${module.id}, Data: $moduleData");
-        }
+        modulesList.putIfAbsent(
+          CourseLevel.values.firstWhere((l) => l.name.toLowerCase() == level.id),
+          () => [],
+        );
+        modulesList[CourseLevel.values.firstWhere((l) => l.name.toLowerCase() == level.id)]!.add(
+          CourseModule.fromJson(moduleData),
+        );
       }
+    }
 
-      final courses = state.value != null
-          ? List<Course>.from(state.value!)
-          : await _loadCourseData();
-      final idx = courses.indexWhere((course) => course.courseId == courseId);
-      if (idx != -1) {
-        courses[idx] = courses[idx].copyWith(modules: () => modulesList);
-        state = AsyncData(courses);
-      } else {
-        print('Course with id $courseId not found when updating modules.');
-      }
+    final courses = state.value != null ? List<Course>.from(state.value!) : await _loadCourseData();
+    final idx = courses.indexWhere((course) => course.courseId == courseId);
+    if (idx != -1) {
+      courses[idx] = courses[idx].copyWith(modules: modulesList);
+      state = AsyncData(courses);
+    } else {
+      print('Course with id $courseId not found when fetching modules.');
+    }
+  }
+
+  Future<void> unloadModules(String courseId) async {
+    final courses = state.value != null ? List<Course>.from(state.value!) : await _loadCourseData();
+    final idx = state.value?.indexWhere((course) => course.courseId == courseId) ?? -1;
+    if (idx != -1) {
+      courses[idx] = courses[idx].copyWith(modules: {});
+      state = AsyncData(courses);
+    } else {
+      print('Course with id $courseId not found when unload modules.');
     }
   }
 }
