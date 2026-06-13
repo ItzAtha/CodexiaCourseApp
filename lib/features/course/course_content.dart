@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
-import '../../shared/models/course.dart';
 import '../../shared/models/course/course_lesson.dart';
 
 class CourseContent extends StatefulWidget {
@@ -13,13 +12,47 @@ class CourseContent extends StatefulWidget {
     super.key,
     required List<CourseLesson> lessons,
     required PageController controller,
-  }): _lessons = lessons, _pageController = controller;
+  }) : _lessons = lessons,
+       _pageController = controller;
 
   @override
   State<StatefulWidget> createState() => CourseContentState();
 }
 
 class CourseContentState extends State<CourseContent> {
+  Widget buildLesson(CourseLesson lesson) {
+    return switch (lesson) {
+      MaterialLesson() => Column(
+        children: <Widget>[
+          Text(
+            lesson.title,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontSize: AppSizes.xxlTextSize,
+              color: AppColors.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          Text(
+            lesson.content[MaterialContentType.explain] ?? "",
+            textAlign: TextAlign.justify,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).textTheme.bodyMedium?.color,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+      // TODO: Handle this case.
+      MultipleChoiceQuiz() => throw UnimplementedError(),
+      // TODO: Handle this case.
+      DragAndDropQuiz() => throw UnimplementedError(),
+      // TODO: Handle this case.
+      CodeSandboxQuiz() => throw UnimplementedError(),
+      // TODO: Handle this case.
+      CoordinateHotspotQuiz() => throw UnimplementedError(),
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,29 +66,7 @@ class CourseContentState extends State<CourseContent> {
         return Scrollbar(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: AppSizes.p16, vertical: AppSizes.p8),
-            child: Center(
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    lesson.title,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontSize: AppSizes.xxlTextSize,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16.0),
-                  Text(
-                    lesson.content[ContentType.explain] ?? "",
-                    textAlign: TextAlign.justify,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).textTheme.bodyMedium?.color,
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            child: Center(child: buildLesson(lesson)),
           ),
         );
       },
