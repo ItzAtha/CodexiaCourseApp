@@ -1,55 +1,26 @@
-import 'package:codexia_course_learning/shared/models/user_course.dart';
+import 'package:codexia_course_learning/shared/models/user_course_progress.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class AuthUser {
-  String username;
-  String? displayName;
-  String email;
-  String? avatar;
-  List<UserCourseProgress> coursesProgress;
+part 'auth_user.freezed.dart';
 
-  AuthUser({
-    required this.username,
-    this.displayName,
-    required this.email,
-    this.avatar,
-    required this.coursesProgress,
-  });
+part 'auth_user.g.dart';
 
-  AuthUser.defaultUser() : username = 'Guest', email = '', coursesProgress = [];
+@freezed
+abstract class AuthUser with _$AuthUser {
+  const AuthUser._();
 
-  factory AuthUser.fromJson(Map<String, dynamic> json) {
-    return AuthUser(
-      username: json['username'],
-      displayName: json['displayName'],
-      email: json['email'],
-      avatar: json['avatar'],
-      coursesProgress: json['courseProgress'],
-    );
-  }
+  const factory AuthUser({
+    required String username,
+    required String email,
 
-  Map<String, dynamic> toJson() {
-    return {
-      'username': username,
-      'displayName': displayName,
-      'email': email,
-      'avatar': avatar,
-      'courseProgress': coursesProgress.map((progress) => progress.toJson()).toList(),
-    };
-  }
+    @Default('') String? displayName,
+    @Default('') String? avatar,
 
-  AuthUser copyWith({
-    String? username,
-    String? Function()? displayName,
-    String? email,
-    String? Function()? avatar,
-    List<UserCourseProgress>? coursesProgress,
-  }) {
-    return AuthUser(
-      username: username ?? this.username,
-      displayName: displayName != null ? displayName() : this.displayName,
-      email: email ?? this.email,
-      avatar: avatar != null ? avatar() : this.avatar,
-      coursesProgress: coursesProgress ?? this.coursesProgress,
-    );
-  }
+    required DateTime createdAt,
+    required DateTime lastSignIn,
+
+    @Default([]) List<UserCourseProgress> coursesProgress,
+  }) = _AuthUser;
+
+  factory AuthUser.fromJson(Map<String, dynamic> json) => _$AuthUserFromJson(json);
 }
