@@ -5,6 +5,9 @@ import 'package:codexia_course_learning/shared/enums/course_level.dart';
 import 'package:codexia_course_learning/shared/models/course.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../models/course/course_lesson.dart';
+import '../models/course/course_module.dart';
+
 part 'course_list_notifier.g.dart';
 
 @riverpod
