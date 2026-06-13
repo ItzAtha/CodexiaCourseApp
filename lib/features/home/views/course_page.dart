@@ -167,10 +167,6 @@ class _CoursePageState extends ConsumerState<CoursePage> {
   void _initializeCourseLists(List<Course> data) {
     courseList.clear();
 
-    for (var course in data) {
-      DebugLogger(message: course.toJson(), level: LogLevel.trace).log();
-    }
-
     Map<CourseType, List<Course>> coursesData = data.fold({}, (
       Map<CourseType, List<Course>> map,
       course,
