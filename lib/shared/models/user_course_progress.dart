@@ -1,97 +1,65 @@
-class UserCourseProgress {
-  final String courseId;
-  final String lastAccessedLevel;
-  final String lastAccessedModule;
-  final String lastAccessedLesson;
-  final DateTime lastAccessedAt;
-  final List<UserLevelProgress> levelProgress;
-  final List<UserModuleProgress> moduleProgress;
+import 'package:codexia_course_learning/services/level_progress_list_converter.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  UserCourseProgress({
-    required this.courseId,
-    required this.lastAccessedLevel,
-    required this.lastAccessedModule,
-    required this.lastAccessedLesson,
-    required this.lastAccessedAt,
-    required this.levelProgress,
-    required this.moduleProgress,
-  });
+part 'user_course_progress.freezed.dart';
 
-  factory UserCourseProgress.fromJson(Map<String, dynamic> json) {
-    return UserCourseProgress(
-      courseId: json['courseId'],
-      lastAccessedLevel: json['lastAccessedLevel'],
-      lastAccessedModule: json['lastAccessedModule'],
-      lastAccessedLesson: json['lastAccessedLesson'],
-      lastAccessedAt: DateTime.parse(json['lastAccessedAt']),
-      levelProgress: (json['levelProgress'] as Map<String, dynamic>).entries
-          .map((level) => UserLevelProgress.fromEntry(level))
-          .toList(),
-      moduleProgress: [],
-    );
-  }
+part 'user_course_progress.g.dart';
 
-  Map<String, dynamic> toJson() {
-    return {
-      'courseId': courseId,
-      'lastAccessedLevel': lastAccessedLevel,
-      'lastAccessedModule': lastAccessedModule,
-      'lastAccessedLesson': lastAccessedLesson,
-      'lastAccessedAt': lastAccessedAt.toIso8601String(),
-      'levelProgress': Map.fromEntries(
-        levelProgress.map((level) => MapEntry(level.levelName, level.toMap())),
-      ),
-      'moduleProgress': Map.fromEntries(
-        moduleProgress.map((module) => MapEntry(module.moduleId, module.toMap())),
-      ),
-    };
-  }
+@freezed
+abstract class UserCourseProgress with _$UserCourseProgress {
+  const UserCourseProgress._();
+
+  const factory UserCourseProgress({
+    required String courseId,
+    required String lastAccessedLevel,
+    required String lastAccessedModule,
+    required String lastAccessedLesson,
+    required DateTime lastAccessedAt,
+
+    @LevelProgressListConverter() @Default([]) List<UserLevelProgress> levelProgress,
+  }) = _UserCourseProgress;
+
+  factory UserCourseProgress.fromJson(Map<String, dynamic> json) =>
+      _$UserCourseProgressFromJson(json);
 }
 
-class UserLevelProgress {
-  final String levelName;
-  final List<String> completedModules;
-  final int totalModules;
+@freezed
+abstract class UserLevelProgress with _$UserLevelProgress {
+  const UserLevelProgress._();
 
-  UserLevelProgress({
-    required this.levelName,
-    required this.completedModules,
-    required this.totalModules,
-  });
+  const factory UserLevelProgress({
+    required String levelName,
+    required List<String> completedModules,
+    required int totalModules,
+  }) = _UserLevelProgress;
+
+  factory UserLevelProgress.fromJson(Map<String, dynamic> json) =>
+      _$UserLevelProgressFromJson(json);
 
   factory UserLevelProgress.fromEntry(MapEntry<String, dynamic> entry) {
-    return UserLevelProgress(
-      levelName: entry.key,
-      completedModules: List<String>.from(entry.value['completedModules']),
-      totalModules: entry.value['totalModules'],
-    );
+    final Map<String, dynamic> data = Map<String, dynamic>.from(entry.value as Map);
+    data['levelProgress'] = entry.key;
+    return UserLevelProgress.fromJson(data);
   }
 
-  Map<String, dynamic> toMap() {
-    return {'completedModules': completedModules, 'totalModules': totalModules};
+  MapEntry<String, dynamic> toMap() {
+    final Map<String, dynamic> data = toJson();
+
+    data.remove('levelProgress');
+    return MapEntry(levelName, data);
   }
 }
 
-class UserModuleProgress {
-  final String moduleId;
-  final List<String> completedLessons;
-  final bool isComplete;
+@freezed
+abstract class UserModuleProgress with _$UserModuleProgress {
+  const UserModuleProgress._();
 
-  UserModuleProgress({
-    required this.moduleId,
-    required this.completedLessons,
-    required this.isComplete,
-  });
+  const factory UserModuleProgress({
+    required String lessonId,
+    required List<String> completedLessons,
+    required int totalLessons,
+  }) = _UserModuleProgress;
 
-  factory UserModuleProgress.fromEntry(MapEntry<String, dynamic> entry) {
-    return UserModuleProgress(
-      moduleId: entry.key,
-      completedLessons: List<String>.from(entry.value['completedModules']),
-      isComplete: false,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {'completedModules': completedLessons, 'totalModules': isComplete};
-  }
+  factory UserModuleProgress.fromJson(Map<String, dynamic> json) =>
+      _$UserModuleProgressFromJson(json);
 }
