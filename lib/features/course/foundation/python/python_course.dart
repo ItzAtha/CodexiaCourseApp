@@ -1,6 +1,6 @@
 import 'package:codexia_course_learning/features/home/widgets/course_module_card.dart';
 import 'package:codexia_course_learning/shared/enums/course_level.dart';
-import 'package:codexia_course_learning/shared/models/user_course.dart';
+import 'package:codexia_course_learning/shared/models/user_course_progress.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -12,6 +12,7 @@ import 'package:toastification/toastification.dart';
 import '../../../../core/app_constants.dart' show AppSizes, AppColors, ToastAnimations;
 import '../../../../core/utils/logger.dart';
 import '../../../../shared/models/course.dart';
+import '../../../../shared/models/course/course_module.dart';
 import '../../../../shared/providers/course_list_notifier.dart';
 
 class PythonCourse extends ConsumerStatefulWidget {
@@ -37,23 +38,74 @@ class _PythonCourseState extends ConsumerState<PythonCourse> {
   Future<void> loadCourseStats() async {
     final authUser = await ref.read(authUserProvider.future);
 
-    Map<CourseLevel, List<CourseModule>>? modulesData = course?.modules;
+    Map<CourseLevel, List<CourseModule>> modulesData = course?.modules ?? {};
     UserCourseProgress? courseProgress = authUser.coursesProgress
         .where((course) => course.courseId == widget.courseId)
         .firstOrNull;
 
-    if (modulesData != null && courseProgress != null) {
-      UserLevelProgress? levelProgress = courseProgress.levelProgress
-          .where((level) => level.levelName == currentCourseLevel.name.toLowerCase())
+    if (modulesData.isNotEmpty && courseProgress != null) {
+      List<CourseModule>? modulesList = modulesData[currentCourseLevel];
+      int totalMods = modulesList?.length ?? 0;
+
+      UserLevelProgress? levelProgress = courseProgress.levels
+          .where((level) => level.levelId == currentCourseLevel.name.toLowerCase())
           .firstOrNull;
 
-      if (levelProgress != null) {
-        setState(() {
-          completedModules = levelProgress.completedModules.length;
-          totalModules = levelProgress.totalModules;
-          overallProgress = completedModules / totalModules;
-        });
+      int completedMods = 0;
+      double overall = 0.0;
+
+      if (levelProgress != null && totalMods > 0 && modulesList != null) {
+        double sumProgress = 0.0;
+
+        for (final module in modulesList) {
+          int totalLessons = module.lessons.length;
+
+          final lessonIds = module.lessons
+              .map((l) {
+                try {
+                  return (l as dynamic).lessonId as String;
+                } catch (_) {
+                  try {
+                    return (l as dynamic).id as String;
+                  } catch (_) {
+                    if (l is String) return l;
+                    return null;
+                  }
+                }
+              })
+              .whereType<String>()
+              .toSet();
+
+          final List<dynamic> rawCompletedIds =
+              (levelProgress.completedLesson[module.moduleId] as List<dynamic>?) ?? <dynamic>[];
+
+          final int completedLessons = rawCompletedIds
+              .where((id) => id is String && lessonIds.contains(id))
+              .length;
+
+          if (totalLessons > 0) {
+            double prog = completedLessons / totalLessons;
+            sumProgress += prog;
+            if (completedLessons >= totalLessons) completedMods++;
+          } else {
+            sumProgress += 0.0;
+          }
+        }
+
+        overall = sumProgress / totalMods;
       }
+
+      setState(() {
+        completedModules = completedMods;
+        totalModules = totalMods;
+        overallProgress = overall;
+      });
+    } else {
+      setState(() {
+        completedModules = 0;
+        totalModules = course?.modules[currentCourseLevel]?.length ?? 0;
+        overallProgress = 0.0;
+      });
     }
   }
 
@@ -74,32 +126,83 @@ class _PythonCourseState extends ConsumerState<PythonCourse> {
 
         for (var i = 0; i < courseModulesList.length; i++) {
           CourseModule module = modules.value[i];
-          UserModuleProgress? moduleProgress = courseProgress.moduleProgress
-              .where((m) => m.moduleId == module.moduleId)
+
+          UserLevelProgress? levelProgress = courseProgress.levels
+              .where((lp) => lp.levelId == level.name.toLowerCase())
               .firstOrNull;
 
           int totalLesson = module.lessons.length;
-          int totalCompleted = moduleProgress?.completedLessons.length ?? 0;
-          double progress = totalCompleted / totalLesson;
+          final lessonIds = module.lessons
+              .map((l) {
+                try {
+                  return (l as dynamic).lessonId as String;
+                } catch (_) {
+                  try {
+                    return (l as dynamic).id as String;
+                  } catch (_) {
+                    if (l is String) return l;
+                    return null;
+                  }
+                }
+              })
+              .whereType<String>()
+              .toSet();
+
+          int totalCompleted = 0;
+          if (levelProgress != null) {
+            final List<dynamic> rawCompleted =
+                (levelProgress.completedLesson[module.moduleId] as List<dynamic>?) ?? <dynamic>[];
+            totalCompleted = rawCompleted
+                .where((id) => id is String && lessonIds.contains(id))
+                .length;
+          }
+
+          double progress = totalLesson > 0 ? totalCompleted / totalLesson : 0.0;
 
           bool isLocked = false;
-          if (i >= 1) {
-            CourseModule moduleTemp = modules.value[i - 1];
-            UserLevelProgress? levelProgress = courseProgress.levelProgress
-                .where((level) => level.levelName == currentCourseLevel.name.toLowerCase())
-                .firstOrNull;
+          if (i > 0 && levelProgress != null) {
+            CourseModule previousModule = modules.value[i - 1];
+            try {
+              int previousTotalLessons = previousModule.lessons.length;
 
-            if (levelProgress != null) {
-              try {
-                isLocked = levelProgress.completedModules[i - 1] != moduleTemp.moduleId;
-              } catch (e) {
-                isLocked = true;
-              }
+              final prevLessonIds = previousModule.lessons
+                  .map((l) {
+                    try {
+                      return (l as dynamic).lessonId as String;
+                    } catch (_) {
+                      try {
+                        return (l as dynamic).id as String;
+                      } catch (_) {
+                        if (l is String) return l;
+                        return null;
+                      }
+                    }
+                  })
+                  .whereType<String>()
+                  .toSet();
+
+              final List<dynamic> prevRawCompleted =
+                  (levelProgress.completedLesson[previousModule.moduleId] as List<dynamic>?) ??
+                  <dynamic>[];
+
+              int previousCompletedLessons = prevRawCompleted
+                  .where((id) => id is String && prevLessonIds.contains(id))
+                  .length;
+
+              isLocked = previousCompletedLessons < previousTotalLessons;
+            } catch (e) {
+              isLocked = true;
             }
           }
 
           Widget moduleWidget =
-              CourseModuleCard(course!.courseId, level, module, progress, isLocked: isLocked)
+              CourseModuleCard(
+                    course!.courseId,
+                    level,
+                    module,
+                    progress.isNaN ? 0.0 : progress,
+                    isLocked: isLocked,
+                  )
                   .animate(delay: Duration(milliseconds: 250 * i))
                   .moveY(
                     duration: const Duration(milliseconds: 500),
