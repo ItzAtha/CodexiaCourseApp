@@ -1,15 +1,16 @@
+import 'package:codexia_course_learning/shared/models/user_course_progress.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../shared/models/user_course_progress.dart';
-
-class LevelProgressListConverter implements JsonConverter<List<UserLevelProgress>, Map<String, dynamic>> {
-  const LevelProgressListConverter();
+class UserLevelProgressConverter
+    implements JsonConverter<List<UserLevelProgress>, Map<String, dynamic>> {
+  const UserLevelProgressConverter();
 
   @override
   List<UserLevelProgress> fromJson(Map<String, dynamic> json) {
     return json.entries.map((entry) {
       final Map<String, dynamic> data = Map<String, dynamic>.from(entry.value as Map);
-      data['levelName'] = entry.key;
+      data['levelId'] = entry.key;
+
       return UserLevelProgress.fromJson(data);
     }).toList();
   }
@@ -19,8 +20,8 @@ class LevelProgressListConverter implements JsonConverter<List<UserLevelProgress
     final Map<String, dynamic> map = {};
     for (var item in list) {
       final data = item.toJson();
-      data.remove('levelName');
-      map[item.levelName] = data;
+      data.remove('levelId');
+      map[item.levelId] = data;
     }
     return map;
   }
