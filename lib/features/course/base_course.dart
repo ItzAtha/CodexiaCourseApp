@@ -34,6 +34,8 @@ class BaseCourse extends ConsumerStatefulWidget {
 
 class BaseCourseState extends ConsumerState<BaseCourse> {
   String? title;
+  List<int> indexLesson = [];
+
   int currentPage = 0;
   int lastPage = 0;
   double completedProgress = 0.0;
@@ -41,9 +43,21 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
   UserCourseProgress? progress;
   late PageController pageController;
 
+  void onQuizChange(int quizIndex) {
+    setState(() => indexLesson.insert(quizIndex, quizIndex));
+  }
+
   @override
   void initState() {
     super.initState();
+
+    indexLesson.addAll(
+      widget._lessons
+          .asMap()
+          .entries
+          .where((entry) => entry.value is MaterialLesson)
+          .map((entry) => entry.key),
+    );
     pageController = PageController(initialPage: 0);
   }
 
@@ -68,7 +82,7 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
       title = data
           .where((course) => course.courseId == widget._courseId)
           .first
-          .modules?[widget._level]
+          .modules[widget._level]
           ?.where((module) => module.moduleId == widget._moduleId)
           .first
           .title;
@@ -99,22 +113,38 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
       ),
       body: Column(
         children: <Widget>[
-          Padding(
+          Container(
             padding: const EdgeInsets.only(
               top: AppSizes.p16,
-              bottom: AppSizes.p8,
+              bottom: AppSizes.p16,
               left: AppSizes.p24,
               right: AppSizes.p24,
             ),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  spreadRadius: 1,
+                  blurRadius: 4,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
             child: Column(
-              crossAxisAlignment: .start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
                       "Lesson Progress",
-                      style: TextStyle(fontSize: AppSizes.sTextSize, color: Colors.grey.shade600),
+                      style: TextStyle(
+                        fontSize: AppSizes.sTextSize,
+                        color: Theme.of(
+                          context,
+                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
+                      ),
                     ),
                     Row(
                       children: <Widget>[
@@ -123,7 +153,9 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
                           style: TextStyle(
                             fontSize: AppSizes.sTextSize,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade600,
+                            color: Theme.of(
+                              context,
+                            ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
                           ),
                         ),
                         const SizedBox(width: 2.5),
@@ -132,7 +164,9 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
                           style: TextStyle(
                             fontSize: AppSizes.sTextSize,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade600,
+                            color: Theme.of(
+                              context,
+                            ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
                           ),
                         ),
                         const SizedBox(width: 2.5),
@@ -141,7 +175,9 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
                           style: TextStyle(
                             fontSize: AppSizes.sTextSize,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade600,
+                            color: Theme.of(
+                              context,
+                            ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
@@ -178,13 +214,31 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(AppSizes.p8),
-              child: CourseContent(lessons: widget._lessons, controller: pageController),
+              padding: const EdgeInsets.symmetric(horizontal: AppSizes.p8),
+              child: CourseContent(
+                lessons: widget._lessons,
+                controller: pageController,
+                onQuizChange: (isChange) => onQuizChange(isChange),
+              ),
             ),
           ),
-          const SizedBox(height: 10.0),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSizes.p16),
+          Container(
+            padding: const EdgeInsets.all(AppSizes.p16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.only(
+                topRight: Radius.circular(24.0),
+                topLeft: Radius.circular(24.0),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  spreadRadius: 1.5,
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -204,39 +258,46 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
                           overlayColor: Colors.grey.shade400,
                           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                         ),
-                        icon: Icon(Icons.arrow_back_ios, size: 16.0, color: Colors.grey.shade700),
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          size: 16.0,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                         label: Text(
                           "Previous",
                           style: TextStyle(
                             fontSize: AppSizes.mTextSize,
-                            color: Colors.grey.shade700,
+                            color: Theme.of(context).textTheme.labelSmall?.color,
                           ),
                         ),
                       )
                     : const SizedBox.shrink(),
                 ElevatedButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      if (currentPage == widget._lessons.length - 1) {
-                        context.pop();
-                        return;
-                      } else {
-                        currentPage++;
-                      }
+                  onPressed: !indexLesson.contains(currentPage)
+                      ? null
+                      : () {
+                          setState(() {
+                            if (currentPage == widget._lessons.length - 1) {
+                              context.pop();
+                              return;
+                            } else {
+                              currentPage++;
+                            }
 
-                      if (lastPage < currentPage) {
-                        completedProgress = currentPage / (widget._lessons.length - 1);
-                        lastPage = currentPage;
-                      }
-                    });
-                    pageController.animateToPage(
-                      currentPage,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  },
+                            if (lastPage < currentPage) {
+                              completedProgress = currentPage / (widget._lessons.length - 1);
+                              lastPage = currentPage;
+                            }
+                          });
+                          pageController.animateToPage(
+                            currentPage,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
+                    disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
                     minimumSize: const Size(120.0, 30.0),
                     padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                   ),
