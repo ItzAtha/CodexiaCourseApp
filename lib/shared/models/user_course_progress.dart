@@ -33,8 +33,6 @@ abstract class UserLevelProgress with _$UserLevelProgress {
 
   const factory UserLevelProgress({
     required String levelId,
-    required List<String> completedModules,
-
     @JsonKey(name: 'modules') required Map<String, List<String>> completedLesson,
   }) = _UserLevelProgress;
 
