@@ -92,29 +92,40 @@ class AuthUserNotifier extends _$AuthUserNotifier {
 
   Future<void> refetchProgress() async {
     final User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null || state.value == null) return;
 
-    if (currentUser != null) {
-      final String userId = currentUser.uid;
-      String provider = currentUser.providerData.isNotEmpty
-          ? currentUser.providerData[0].providerId
-          : 'anonymous';
+    final String userId = currentUser.uid;
+    String provider = currentUser.providerData.isNotEmpty
+        ? currentUser.providerData[0].providerId
+        : 'anonymous';
+    final String docId = '${userId}_$provider';
 
-      final String docId = '${userId}_$provider';
-      final courseProgressData = await usersCollection
-          .doc(docId)
-          .collection('CourseProgress')
-          .get();
+    final courseProgressData = await usersCollection.doc(docId).collection('CourseProgress').get();
 
-      List<UserCourseProgress> coursesProgress = [];
-      if (courseProgressData.docs.isNotEmpty) {
-        for (final courseProgress in courseProgressData.docs) {
-          Map<String, dynamic> progressData = courseProgress.data();
-          coursesProgress.add(UserCourseProgress.fromJson(progressData));
+    List<UserCourseProgress> compiledProgressList = [];
+
+    if (courseProgressData.docs.isNotEmpty) {
+      for (final courseProgress in courseProgressData.docs) {
+        Map<String, dynamic> progressData = courseProgress.data();
+        final Map<String, dynamic> levelsGroupMap = {};
+
+        final levelProgressData = await usersCollection
+            .doc(docId)
+            .collection('CourseProgress')
+            .doc(courseProgress.id)
+            .collection('Levels')
+            .get();
+
+        for (final levelProgress in levelProgressData.docs) {
+          levelsGroupMap[levelProgress.id] = levelProgress.data();
         }
-      }
 
-      state = AsyncData(state.value!.copyWith(coursesProgress: coursesProgress));
+        progressData['levels'] = levelsGroupMap;
+        compiledProgressList.add(UserCourseProgress.fromJson(progressData));
+      }
     }
+
+    state = AsyncData(state.value!.copyWith(coursesProgress: compiledProgressList));
   }
 
   Future<void> updateDisplayName(String? displayName) async {
@@ -151,41 +162,56 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     }
   }
 
-  Future<void> updateCourses(UserCourseProgress coursesProgress) async {
-    FirebaseManager manager = FirebaseManager();
+  Future<void> updateCourses(UserCourseProgress updatedProgress) async {
     User? currentUser = FirebaseAuth.instance.currentUser;
+    if (state.value == null || currentUser == null) return;
 
-    if (state.value != null && currentUser != null) {
-      final String userId = currentUser.uid;
-      String provider = currentUser.providerData.isNotEmpty
-          ? currentUser.providerData[0].providerId
-          : 'anonymous';
+    final String userId = currentUser.uid;
+    String provider = currentUser.providerData.isNotEmpty
+        ? currentUser.providerData[0].providerId
+        : 'anonymous';
+    final String docId = '${userId}_$provider';
 
-      final String docId = '${userId}_$provider';
-      int index = state.value!.coursesProgress.indexWhere(
-        (item) => item.courseId == coursesProgress.courseId,
-      );
+    final List<UserCourseProgress> currentProgressList = List<UserCourseProgress>.from(
+      state.value!.coursesProgress,
+    );
 
-      // TODO: Fix update user course progress to save it in Users.CourseProgress()
-      if (index != -1) {
-        // fruits[index] = 'Mango';
+    int index = currentProgressList.indexWhere((item) => item.courseId == updatedProgress.courseId);
+
+    if (index != -1) {
+      currentProgressList[index] = updatedProgress;
+    } else {
+      currentProgressList.add(updatedProgress);
+    }
+
+    state = AsyncData(state.value!.copyWith(coursesProgress: currentProgressList));
+
+    final courseDocRef = usersCollection
+        .doc(docId)
+        .collection('CourseProgress')
+        .doc(updatedProgress.courseId);
+
+    final Map<String, dynamic> rootPayload = updatedProgress.toJson();
+    rootPayload.remove('levels');
+
+    try {
+      await courseDocRef.set(rootPayload, SetOptions(merge: true));
+
+      for (final level in updatedProgress.levels) {
+        final Map<String, dynamic> levelPayload = level.toJson();
+        levelPayload.remove('levelId');
+
+        await courseDocRef
+            .collection('Levels')
+            .doc(level.levelId)
+            .set(levelPayload, SetOptions(merge: true));
       }
-      // state = AsyncData(state.value!.copyWith(coursesProgress: coursesProgress));
-
-      // TODO: Refactor this code to support saving course progress in Firestore
-      // for (var course in courses.courseList) {
-      //   await manager.updateData(
-      //     'Users',
-      //     docId,
-      //     subCollectionQuery: [
-      //       SubCollectionQuery(
-      //         collection: 'Courses',
-      //         docId: course.courseId,
-      //         data: courses.toJson(),
-      //       ),
-      //     ],
-      //   );
-      // }
+    } catch (error, stackTrace) {
+      DebugLogger(
+        message: 'Failed to sync course progress to Firestore: $error',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
     }
   }
 }
