@@ -46,6 +46,20 @@ class AuthUserNotifier extends _$AuthUserNotifier {
         if (courseProgressData.docs.isNotEmpty) {
           for (final courseProgress in courseProgressData.docs) {
             Map<String, dynamic> progressData = courseProgress.data();
+            final Map<String, dynamic> levelsGroupMap = {};
+
+            final levelProgressData = await usersCollection
+                .doc(docId)
+                .collection('CourseProgress')
+                .doc(courseProgress.id)
+                .collection('Levels')
+                .get();
+
+            for (final levelProgress in levelProgressData.docs) {
+              levelsGroupMap[levelProgress.id] = levelProgress.data();
+            }
+
+            progressData['levels'] = levelsGroupMap;
             coursesProgressRaw.add(progressData);
           }
         }
@@ -151,6 +165,8 @@ class AuthUserNotifier extends _$AuthUserNotifier {
       int index = state.value!.coursesProgress.indexWhere(
         (item) => item.courseId == coursesProgress.courseId,
       );
+
+      // TODO: Fix update user course progress to save it in Users.CourseProgress()
       if (index != -1) {
         // fruits[index] = 'Mango';
       }
