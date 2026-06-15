@@ -37,7 +37,6 @@ class CourseListNotifier extends _$CourseListNotifier {
 
     for (var level in levelsSnapshot.docs) {
       List<CourseModule> modules = [];
-      List<Map<String, dynamic>> lessons = [];
       final moduleLevel = CourseLevel.values.firstWhere((l) => l.name.toLowerCase() == level.id);
 
       final modulesCollection = levelsCollection.doc(level.id).collection('Modules');
@@ -49,6 +48,7 @@ class CourseListNotifier extends _$CourseListNotifier {
       ).wait;
 
       for (var module in modulesSnapshot.docs) {
+        List<Map<String, dynamic>> lessons = [];
         final moduleData = module.data();
 
         for (var lesson in lessonSnapshot.docs) {
