@@ -1,12 +1,14 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'course_lesson.freezed.dart';
+
 part 'course_lesson.g.dart';
 
 @JsonEnum(fieldRename: FieldRename.screamingSnake)
 enum MaterialContentType {
   explain("Explain"),
   hint("Hint"),
+  warning("Warning"),
   important("Important"),
   conclusion("Conclusion"),
   codeSandbox("Code Sandbox");
