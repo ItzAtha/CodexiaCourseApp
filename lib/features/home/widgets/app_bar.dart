@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -36,13 +37,22 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
               enableSwitchAnimation: true,
               child: Row(
                 children: <Widget>[
-                  CircleAvatar(
-                    radius: 20.0,
-                    backgroundImage: NetworkImage(
-                      authUser?.avatar ?? "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
+                  SizedBox(
+                    width: 45.0,
+                    height: 45.0,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20.0),
+                      child: CachedNetworkImage(
+                        imageUrl:
+                            authUser?.avatar ??
+                            "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(color: Colors.grey[300]),
+                        errorWidget: (context, url, error) => Container(color: Colors.grey[300]),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 15.0),
+                  const SizedBox(width: 12.0),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,

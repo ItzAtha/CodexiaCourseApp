@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -62,26 +63,16 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
           children: <Widget>[
             const SizedBox(height: 40.0),
             ClipOval(
-              child: Image.network(
-                authUser?.avatar ?? "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
-                width: 110.0,
-                height: 110.0,
+              child: CachedNetworkImage(
+                imageUrl:
+                    authUser?.avatar ?? "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
                 fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child;
-                  }
-
-                  return Center(
-                    child: CircularProgressIndicator(
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    CircularProgressIndicator(
+                      value: downloadProgress.progress,
                       backgroundColor: const Color(0xFF00CEC9),
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                          : null,
                     ),
-                  );
-                },
+                errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.red),
               ),
             ),
             const SizedBox(height: 40.0),

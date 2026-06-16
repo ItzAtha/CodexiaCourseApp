@@ -1,4 +1,5 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:codexia_course_learning/core/utils/logger.dart';
 import 'package:codexia_course_learning/services/firebase_services.dart';
 import 'package:codexia_course_learning/shared/models/auth_user.dart';
@@ -78,16 +79,24 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         child: Stack(
                           alignment: AlignmentGeometry.center,
                           children: <Widget>[
-                            CircleAvatar(
-                              radius: 55.0,
-                              backgroundImage: NetworkImage(
-                                authUser?.avatar ??
+                            ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl:
+                                    authUser?.avatar ??
                                     "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
+                                fit: BoxFit.cover,
+                                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                    CircularProgressIndicator(
+                                      value: downloadProgress.progress,
+                                      backgroundColor: const Color(0xFF00CEC9),
+                                    ),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.error, color: Colors.red),
                               ),
                             ),
                             Positioned(
-                              bottom: 12.0,
-                              right: 12.0,
+                              bottom: 8.0,
+                              right: 8.0,
                               child: Skeleton.ignore(
                                 child: FloatingActionButton.small(
                                   onPressed: () {
