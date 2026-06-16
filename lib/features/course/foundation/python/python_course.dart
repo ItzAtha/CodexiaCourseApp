@@ -370,7 +370,7 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
                                   tween: Tween<double>(begin: 0.0, end: overallProgress),
                                   builder: (context, value, child) {
                                     return Text(
-                                      "${NumberFormat.percentPattern().format(value)}%",
+                                      NumberFormat.percentPattern().format(value),
                                       style: const TextStyle(
                                         fontSize: 36,
                                         fontWeight: FontWeight.bold,
