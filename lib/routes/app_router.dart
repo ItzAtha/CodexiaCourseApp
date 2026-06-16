@@ -18,8 +18,11 @@ import '../features/chat/aibot/views/ai_chat_bot_page.dart';
 import '../features/profile/view/user_profile.dart';
 
 class AppRouter {
+  static final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+
   static final GoRouter router = GoRouter(
     initialLocation: AppRoutes.authRoute.path,
+    observers: [routeObserver],
     debugLogDiagnostics: true,
     refreshListenable: GoRouterRefreshStream(FirebaseAuth.instance.authStateChanges()),
     redirect: (context, state) {
