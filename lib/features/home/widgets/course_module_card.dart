@@ -76,12 +76,6 @@ class _CourseModuleCardState extends State<CourseModuleCard> {
   }
 
   @override
-  void dispose() {
-    animationController?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
