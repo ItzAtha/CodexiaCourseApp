@@ -1,4 +1,5 @@
 import 'package:codexia_course_learning/features/home/widgets/course_module_card.dart';
+import 'package:codexia_course_learning/routes/app_router.dart';
 import 'package:codexia_course_learning/shared/enums/course_level.dart';
 import 'package:codexia_course_learning/shared/models/user_course_progress.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
@@ -24,7 +25,7 @@ class PythonCourse extends ConsumerStatefulWidget {
   ConsumerState<PythonCourse> createState() => _PythonCourseState();
 }
 
-class _PythonCourseState extends ConsumerState<PythonCourse> {
+class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
   double overallProgress = 0.0;
   int completedModules = 0;
   int totalModules = 0;
@@ -111,6 +112,7 @@ class _PythonCourseState extends ConsumerState<PythonCourse> {
 
   Future<void> loadCourseModules() async {
     final authUser = await ref.read(authUserProvider.future);
+    modulesCarouselPage.clear();
 
     Map<CourseLevel, List<CourseModule>>? modulesData = course?.modules;
     UserCourseProgress? courseProgress = authUser.coursesProgress
@@ -159,39 +161,45 @@ class _PythonCourseState extends ConsumerState<PythonCourse> {
 
           double progress = totalLesson > 0 ? totalCompleted / totalLesson : 0.0;
 
-          bool isLocked = false;
-          if (i > 0 && levelProgress != null) {
-            CourseModule previousModule = modules.value[i - 1];
-            try {
-              int previousTotalLessons = previousModule.lessons.length;
-
-              final prevLessonIds = previousModule.lessons
-                  .map((l) {
-                    try {
-                      return (l as dynamic).lessonId as String;
-                    } catch (_) {
-                      try {
-                        return (l as dynamic).id as String;
-                      } catch (_) {
-                        if (l is String) return l;
-                        return null;
-                      }
-                    }
-                  })
-                  .whereType<String>()
-                  .toSet();
-
-              final List<dynamic> prevRawCompleted =
-                  (levelProgress.completedLesson[previousModule.moduleId] as List<dynamic>?) ??
-                  <dynamic>[];
-
-              int previousCompletedLessons = prevRawCompleted
-                  .where((id) => id is String && prevLessonIds.contains(id))
-                  .length;
-
-              isLocked = previousCompletedLessons < previousTotalLessons;
-            } catch (e) {
+          bool isLocked;
+          if (i == 0) {
+            isLocked = false;
+          } else {
+            if (levelProgress == null) {
               isLocked = true;
+            } else {
+              CourseModule previousModule = courseModulesList[i - 1];
+              try {
+                int previousTotalLessons = previousModule.lessons.length;
+
+                final prevLessonIds = previousModule.lessons
+                    .map((l) {
+                      try {
+                        return (l as dynamic).lessonId as String;
+                      } catch (_) {
+                        try {
+                          return (l as dynamic).id as String;
+                        } catch (_) {
+                          if (l is String) return l;
+                          return null;
+                        }
+                      }
+                    })
+                    .whereType<String>()
+                    .toSet();
+
+                final List<dynamic> prevRawCompleted =
+                    (levelProgress.completedLesson[previousModule.moduleId] as List<dynamic>?) ??
+                    <dynamic>[];
+
+                int previousCompletedLessons = prevRawCompleted
+                    .where((id) => id is String && prevLessonIds.contains(id))
+                    .length;
+
+                isLocked = previousCompletedLessons < previousTotalLessons;
+              } catch (e) {
+                isLocked = true;
+              }
             }
           }
 
@@ -232,9 +240,30 @@ class _PythonCourseState extends ConsumerState<PythonCourse> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    AppRouter.routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
   void dispose() {
     pageController?.dispose();
+    AppRouter.routeObserver.unsubscribe(this);
     super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    () async {
+      try {
+        await ref.read(authUserProvider.notifier).refetchProgress();
+        loadCourseStats();
+        loadCourseModules();
+        debugPrint('Successfully refetch progress!');
+      } catch (e) {
+        debugPrint('Failed to refetch progress: $e');
+      }
+    }();
   }
 
   @override
@@ -247,7 +276,7 @@ class _PythonCourseState extends ConsumerState<PythonCourse> {
           if (course != null) {
             loadCourseStats();
             loadCourseModules();
-            print("Course Models Data:");
+            debugPrint("Course Models Data:");
             DebugLogger(message: course!.toJson(), level: LogLevel.trace).log();
           } else {
             DebugLogger(message: "Failed to get course data", level: LogLevel.info).log();
