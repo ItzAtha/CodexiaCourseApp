@@ -3,6 +3,7 @@ import 'package:codexia_course_learning/routes/app_router.dart';
 import 'package:codexia_course_learning/shared/enums/course_level.dart';
 import 'package:codexia_course_learning/shared/models/user_course_progress.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -363,13 +364,20 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
                                   "Overall Progress",
                                   style: TextStyle(color: Colors.white),
                                 ),
-                                Text(
-                                  "${(overallProgress * 100).toInt()}%",
-                                  style: const TextStyle(
-                                    fontSize: 36,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
+                                TweenAnimationBuilder<double>(
+                                  duration: const Duration(seconds: 1),
+                                  curve: Curves.easeInOut,
+                                  tween: Tween<double>(begin: 0.0, end: overallProgress),
+                                  builder: (context, value, child) {
+                                    return Text(
+                                      "${NumberFormat.percentPattern().format(value)}%",
+                                      style: const TextStyle(
+                                        fontSize: 36,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    );
+                                  },
                                 ),
                                 Text(
                                   "$completedModules/$totalModules modules completed",
@@ -382,12 +390,19 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
                                 const SizedBox(height: 12.0),
                                 SizedBox(
                                   width: 180.0,
-                                  child: LinearProgressIndicator(
-                                    value: overallProgress,
-                                    backgroundColor: Colors.white24,
-                                    color: Colors.white,
-                                    minHeight: 8,
-                                    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                                  child: TweenAnimationBuilder<double>(
+                                    duration: const Duration(seconds: 1),
+                                    curve: Curves.easeInOut,
+                                    tween: Tween<double>(begin: 0.0, end: overallProgress),
+                                    builder: (context, value, child) {
+                                      return LinearProgressIndicator(
+                                        value: value,
+                                        backgroundColor: Colors.white24,
+                                        color: Colors.white,
+                                        minHeight: 8.0,
+                                        borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                                      );
+                                    },
                                   ),
                                 ),
                               ],
