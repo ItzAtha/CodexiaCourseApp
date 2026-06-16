@@ -14,7 +14,7 @@ abstract class AuthUser with _$AuthUser {
     required String email,
 
     @Default('') String? displayName,
-    @Default('') String? avatar,
+    @Default('https://cdn-icons-png.flaticon.com/128/3135/3135715.png') String? avatar,
 
     required DateTime createdAt,
     required DateTime lastSignIn,
