@@ -8,15 +8,13 @@ import 'package:go_router/go_router.dart';
 import '../../../core/app_constants.dart' show AppSizes, AppColors;
 import '../../../shared/models/course/course_module.dart';
 
-class CourseModuleCard extends StatelessWidget {
+class CourseModuleCard extends StatefulWidget {
   final String _courseId;
   final CourseLevel _levelId;
   final CourseModule _module;
 
   final double _progress;
   final bool? _isLocked;
-
-  AnimationController? _animationController;
 
   CourseModuleCard(
     this._courseId,
@@ -29,38 +27,45 @@ class CourseModuleCard extends StatelessWidget {
     assert(_progress >= 0.0 && _progress <= 1.0, "Progress range must be in 0.0 until 1.0!");
   }
 
-  bool get _isModuleLocked {
-    return _isLocked ?? false;
+  @override
+  State<CourseModuleCard> createState() => _CourseModuleCardState();
+}
+
+class _CourseModuleCardState extends State<CourseModuleCard> {
+  AnimationController? animationController;
+
+  bool get isModuleLocked {
+    return widget._isLocked ?? false;
   }
 
-  bool get _isModuleCompleted {
-    return _progress == 1.0;
+  bool get isModuleCompleted {
+    return widget._progress == 1.0;
   }
 
-  Color _getColorState() {
-    if (_isLocked ?? false) {
+  Color getColorState() {
+    if (widget._isLocked ?? false) {
       return Colors.grey;
-    } else if (_isModuleCompleted) {
+    } else if (isModuleCompleted) {
       return AppColors.secondary;
     } else {
       return AppColors.primary;
     }
   }
 
-  String _formatDuration(Duration d) {
+  String formatDuration(Duration d) {
     int hours = d.inHours;
     int minutes = d.inMinutes.remainder(60);
     return '${hours}h ${minutes}m';
   }
 
-  Widget _getIconState() {
-    if (_isModuleLocked) {
+  Widget getIconState() {
+    if (isModuleLocked) {
       return const FaIcon(FontAwesomeIcons.lock, color: Colors.grey);
-    } else if (_isModuleCompleted) {
+    } else if (isModuleCompleted) {
       return const FaIcon(FontAwesomeIcons.circleCheck, color: AppColors.secondary);
     } else {
       return Text(
-        "${_module.order}",
+        "${widget._module.order}",
         style: const TextStyle(
           fontSize: AppSizes.xlTextSize,
           fontWeight: FontWeight.bold,
@@ -71,26 +76,35 @@ class CourseModuleCard extends StatelessWidget {
   }
 
   @override
+  void dispose() {
+    animationController?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () {
-        if (_isLocked ?? false) {
-          _animationController?.forward(from: 0.0);
+        if (widget._isLocked ?? false) {
+          if (animationController?.isAnimating ?? false) return;
+          animationController?.forward(from: 0.0);
         } else {
           context.pushNamed(
             'course-module',
             pathParameters: {
-              'courseId': _courseId,
-              'levelId': _levelId.name.toLowerCase(),
-              'moduleId': _module.moduleId,
+              'courseId': widget._courseId,
+              'levelId': widget._levelId.name.toLowerCase(),
+              'moduleId': widget._module.moduleId,
             },
-            extra: _module.lessons,
+            extra: widget._module.lessons,
           );
         }
 
-        print("Path To: course/$_courseId/${_levelId.name.toLowerCase()}/${_module.moduleId}");
+        debugPrint(
+          "Path To: course/${widget._courseId}/${widget._levelId.name.toLowerCase()}/${widget._module.moduleId}",
+        );
       },
       child:
           Card(
@@ -107,7 +121,7 @@ class CourseModuleCard extends StatelessWidget {
                             Container(
                               width: 8.0,
                               decoration: BoxDecoration(
-                                color: _getColorState(),
+                                color: getColorState(),
                                 borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(15.0),
                                   bottomLeft: Radius.circular(15.0),
@@ -121,10 +135,10 @@ class CourseModuleCard extends StatelessWidget {
                               padding: const EdgeInsets.all(AppSizes.p12),
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: _getColorState().withValues(alpha: 0.25),
+                                color: getColorState().withValues(alpha: 0.25),
                                 borderRadius: const BorderRadius.all(Radius.circular(15.0)),
                               ),
-                              child: _getIconState(),
+                              child: getIconState(),
                             ),
                             const SizedBox(width: 12.0),
                             Expanded(
@@ -139,7 +153,7 @@ class CourseModuleCard extends StatelessWidget {
                                       children: <Widget>[
                                         Expanded(
                                           child: Text(
-                                            _module.title,
+                                            widget._module.title,
                                             style: TextStyle(
                                               fontSize: AppSizes.mlTextSize,
                                               fontWeight: FontWeight.bold,
@@ -147,7 +161,7 @@ class CourseModuleCard extends StatelessWidget {
                                             ),
                                           ),
                                         ),
-                                        if (!_isModuleLocked)
+                                        if (!isModuleLocked)
                                           Container(
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: AppSizes.p8,
@@ -160,7 +174,7 @@ class CourseModuleCard extends StatelessWidget {
                                               ),
                                             ),
                                             child: Text(
-                                              "+${_module.expAmount} XP",
+                                              "+${widget._module.expAmount} XP",
                                               style: const TextStyle(
                                                 fontSize: AppSizes.smTextSize,
                                                 color: AppColors.secondary,
@@ -170,7 +184,7 @@ class CourseModuleCard extends StatelessWidget {
                                       ],
                                     ),
                                     Text(
-                                      _module.description,
+                                      widget._module.description,
                                       style: TextStyle(
                                         fontSize: AppSizes.smTextSize,
                                         color: theme.textTheme.labelSmall?.color?.withValues(
@@ -178,18 +192,27 @@ class CourseModuleCard extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                                    if (!_isModuleLocked) const SizedBox(height: 8.0),
-                                    if (!_isModuleLocked)
-                                      LinearProgressIndicator(
-                                        value: _progress,
-                                        backgroundColor: _isModuleCompleted
-                                            ? AppColors.secondary.withValues(alpha: 0.3)
-                                            : AppColors.primary.withValues(alpha: 0.3),
-                                        color: _isModuleCompleted
-                                            ? AppColors.secondary
-                                            : AppColors.primary,
-                                        minHeight: 6.0,
-                                        borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                                    if (!isModuleLocked) const SizedBox(height: 8.0),
+                                    if (!isModuleLocked)
+                                      TweenAnimationBuilder<double>(
+                                        duration: const Duration(seconds: 1),
+                                        curve: Curves.easeInOut,
+                                        tween: Tween<double>(begin: 0.0, end: widget._progress),
+                                        builder: (context, value, child) {
+                                          return LinearProgressIndicator(
+                                            value: value,
+                                            backgroundColor: isModuleCompleted
+                                                ? AppColors.secondary.withValues(alpha: 0.3)
+                                                : AppColors.primary.withValues(alpha: 0.3),
+                                            color: isModuleCompleted
+                                                ? AppColors.secondary
+                                                : AppColors.primary,
+                                            minHeight: 6.0,
+                                            borderRadius: const BorderRadius.all(
+                                              Radius.circular(8.0),
+                                            ),
+                                          );
+                                        },
                                       ),
                                     const SizedBox(height: 6.0),
                                     Row(
@@ -197,7 +220,7 @@ class CourseModuleCard extends StatelessWidget {
                                         const FaIcon(FontAwesomeIcons.bookOpen, size: 12.0),
                                         const SizedBox(width: 4.0),
                                         Text(
-                                          "${_module.lessons.length} Lessons",
+                                          "${widget._module.lessons.length} Lessons",
                                           style: TextStyle(
                                             fontSize: AppSizes.sTextSize,
                                             color: theme.textTheme.labelSmall?.color?.withValues(
@@ -209,7 +232,7 @@ class CourseModuleCard extends StatelessWidget {
                                         const FaIcon(FontAwesomeIcons.clock, size: 12.0),
                                         const SizedBox(width: 4.0),
                                         Text(
-                                          _formatDuration(_module.duration),
+                                          formatDuration(widget._module.duration),
                                           style: TextStyle(
                                             fontSize: AppSizes.sTextSize,
                                             color: theme.textTheme.labelSmall?.color?.withValues(
@@ -218,8 +241,8 @@ class CourseModuleCard extends StatelessWidget {
                                           ),
                                         ),
                                         const SizedBox(width: 8.0),
-                                        if (!_isModuleLocked)
-                                          _isModuleCompleted
+                                        if (!isModuleLocked)
+                                          isModuleCompleted
                                               ? const Text(
                                                   "Completed",
                                                   style: TextStyle(
@@ -228,13 +251,23 @@ class CourseModuleCard extends StatelessWidget {
                                                     color: AppColors.secondary,
                                                   ),
                                                 )
-                                              : Text(
-                                                  "${NumberFormat.percentPattern().format(_progress)} Done",
-                                                  style: const TextStyle(
-                                                    fontSize: AppSizes.sTextSize,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: AppColors.primary,
+                                              : TweenAnimationBuilder<double>(
+                                                  duration: const Duration(seconds: 1),
+                                                  curve: Curves.easeInOut,
+                                                  tween: Tween<double>(
+                                                    begin: 0.0,
+                                                    end: widget._progress,
                                                   ),
+                                                  builder: (context, value, child) {
+                                                    return Text(
+                                                      "${NumberFormat.percentPattern().format(value)} Done",
+                                                      style: const TextStyle(
+                                                        fontSize: AppSizes.sTextSize,
+                                                        fontWeight: FontWeight.w600,
+                                                        color: AppColors.primary,
+                                                      ),
+                                                    );
+                                                  },
                                                 ),
                                       ],
                                     ),
@@ -264,7 +297,7 @@ class CourseModuleCard extends StatelessWidget {
                   ),
                 ),
               )
-              .animate(autoPlay: false, onInit: (controller) => _animationController = controller)
+              .animate(autoPlay: false, onInit: (controller) => animationController = controller)
               .shakeX(hz: 4, duration: 500.ms),
     );
   }
