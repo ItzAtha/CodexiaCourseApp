@@ -4,6 +4,7 @@ import 'package:codexia_course_learning/shared/enums/course_level.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
 import 'package:codexia_course_learning/shared/providers/course_list_notifier.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -40,11 +41,119 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
   int lastPage = 0;
   double completedProgress = 0.0;
 
-  UserCourseProgress? progress;
+  UserCourseProgress? courseProgress;
+  UserLevelProgress? levelProgress;
   late PageController pageController;
 
   void onQuizChange(int quizIndex) {
     setState(() => indexLesson.insert(quizIndex, quizIndex));
+  }
+
+  void loadProgressData() async {
+    final (authUserState, courseListState) = await (
+      ref.read(authUserProvider.future),
+      ref.read(courseListProvider.future),
+    ).wait;
+
+    courseProgress = authUserState.coursesProgress
+        .where((progress) => progress.courseId == widget._courseId)
+        .firstOrNull;
+
+    levelProgress = courseProgress?.levels
+        .where((progress) => progress.levelId == widget._level.name.toLowerCase())
+        .firstOrNull;
+
+    levelProgress ??= UserLevelProgress(
+      levelId: widget._level.name.toLowerCase(),
+      completedLesson: {},
+    );
+
+    setState(() {
+      if (listEquals(
+        levelProgress?.completedLesson[widget._moduleId],
+        widget._lessons.map((lesson) => lesson.lessonId).toSet().toList(),
+      )) {
+        completedProgress = 1.0;
+        return;
+      }
+
+      int previousIndexPage = levelProgress?.completedLesson[widget._moduleId]?.length ?? 0;
+      currentPage = lastPage = previousIndexPage;
+      completedProgress = currentPage / (widget._lessons.length - 1);
+
+      pageController.animateToPage(
+        previousIndexPage,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    });
+
+    title = courseListState
+        .where((course) => course.courseId == widget._courseId)
+        .first
+        .modules[widget._level]
+        ?.where((module) => module.moduleId == widget._moduleId)
+        .first
+        .title;
+  }
+
+  Future<void> updateProgress() async {
+    if (listEquals(
+      levelProgress?.completedLesson[widget._moduleId],
+      widget._lessons.take(lastPage).map((lesson) => lesson.lessonId).toSet().toList(),
+    )) {
+      debugPrint("No user progress change! Skipping...");
+      return;
+    }
+
+    if (levelProgress?.completedLesson[widget._moduleId]?.length == widget._lessons.length) {
+      return;
+    }
+
+    Map<String, List<String>> completedLesson = {...?levelProgress?.completedLesson};
+    List<String> completedLessonList = widget._lessons
+        .take(lastPage)
+        .map((lesson) => lesson.lessonId)
+        .toSet()
+        .toList();
+
+    completedLesson.update(
+      widget._moduleId,
+      (value) => completedLessonList,
+      ifAbsent: () => completedLessonList,
+    );
+
+    UserCourseProgress updatedProgress = courseProgress != null
+        ? courseProgress!.copyWith(
+            lastAccessedLevel: widget._level.name.toLowerCase(),
+            lastAccessedModule: widget._moduleId,
+            lastAccessedLesson: widget._lessons[currentPage].lessonId,
+            lastAccessedAt: DateTime.now(),
+            levels: [
+              ...courseProgress!.levels.where(
+                (level) => level.levelId != widget._level.name.toLowerCase(),
+              ),
+              UserLevelProgress(
+                levelId: widget._level.name.toLowerCase(),
+                completedLesson: completedLesson,
+              ),
+            ],
+          )
+        : UserCourseProgress(
+            courseId: widget._courseId,
+            lastAccessedLevel: widget._level.name.toLowerCase(),
+            lastAccessedModule: widget._moduleId,
+            lastAccessedLesson: widget._lessons[currentPage].lessonId,
+            lastAccessedAt: DateTime.now(),
+            levels: [
+              UserLevelProgress(
+                levelId: widget._level.name.toLowerCase(),
+                completedLesson: completedLesson,
+              ),
+            ],
+          );
+
+    await ref.read(authUserProvider.notifier).updateCourses(updatedProgress);
   }
 
   @override
@@ -58,7 +167,9 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
           .where((entry) => entry.value is MaterialLesson)
           .map((entry) => entry.key),
     );
+
     pageController = PageController(initialPage: 0);
+    loadProgressData();
   }
 
   @override
@@ -69,34 +180,18 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
 
   @override
   Widget build(BuildContext context) {
-    final authUserState = ref.watch(authUserProvider);
-    final courseListState = ref.watch(courseListProvider);
-
-    authUserState.whenData((data) {
-      progress = data.coursesProgress
-          .where((progress) => progress.courseId == widget._courseId)
-          .firstOrNull;
-    });
-
-    courseListState.whenData((data) {
-      title = data
-          .where((course) => course.courseId == widget._courseId)
-          .first
-          .modules[widget._level]
-          ?.where((module) => module.moduleId == widget._moduleId)
-          .first
-          .title;
-    });
-
     return Scaffold(
       appBar: AppBar(
         title: Text(title ?? ""),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          onPressed: () {
-            // progress?.moduleProgress.add(UserModuleProgress(lessonId: widget._moduleId, completedLessons: [for (var lesson in widget._lessons) lesson.id], isComplete: false));
-            context.pop();
+          onPressed: () async {
+            await updateProgress();
+
+            if (context.mounted) {
+              context.pop();
+            }
           },
           icon: const Icon(Icons.arrow_back),
           style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
@@ -275,25 +370,44 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
                 ElevatedButton.icon(
                   onPressed: !indexLesson.contains(currentPage)
                       ? null
-                      : () {
-                          setState(() {
-                            if (currentPage == widget._lessons.length - 1) {
-                              context.pop();
-                              return;
-                            } else {
-                              currentPage++;
+                      : () async {
+                          if (currentPage == widget._lessons.length - 1) {
+                            if (!listEquals(
+                              levelProgress?.completedLesson[widget._moduleId],
+                              widget._lessons.map((lesson) => lesson.lessonId).toSet().toList(),
+                            )) {
+                              lastPage += 1;
+                              await updateProgress();
                             }
 
+                            if (context.mounted) {
+                              context.pop();
+                              return;
+                            }
+                          }
+
+                          setState(() {
+                            currentPage++;
+
                             if (lastPage < currentPage) {
-                              completedProgress = currentPage / (widget._lessons.length - 1);
+                              if (listEquals(
+                                levelProgress?.completedLesson[widget._moduleId],
+                                widget._lessons.map((lesson) => lesson.lessonId).toSet().toList(),
+                              )) {
+                                completedProgress = 1.0;
+                              } else {
+                                completedProgress = currentPage / (widget._lessons.length - 1);
+                              }
+
                               lastPage = currentPage;
                             }
+
+                            pageController.animateToPage(
+                              currentPage,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
                           });
-                          pageController.animateToPage(
-                            currentPage,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
