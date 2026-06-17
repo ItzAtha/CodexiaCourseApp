@@ -4,7 +4,6 @@ import 'package:codexia_course_learning/shared/enums/course_level.dart';
 import 'package:codexia_course_learning/shared/models/course.dart';
 import 'package:codexia_course_learning/shared/models/course/course_module.dart';
 import 'package:codexia_course_learning/shared/providers/course_list_notifier.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,6 +33,7 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
+  bool isLoadedComplete = false;
   bool isProgressTrackerLoad = false;
   List<ProgressCard> progressCard = [];
   late Future<List<dynamic>> progressData;
@@ -180,21 +180,25 @@ class _HomePageState extends ConsumerState<HomePage> {
           }
 
           levelProgress = levelProgress / totalModules;
-          progressCard.add(
-            ProgressCard(
-              title: course.title,
-              lastAccessedDate: courseProgress.lastAccessedAt.toIso8601String().split('T')[0],
-              level: CourseLevel.values.firstWhere(
-                (level) => level.name.toLowerCase() == courseProgress.lastAccessedLevel,
-                orElse: () => CourseLevel.beginner,
+          if (levelProgress < 1.0) {
+            progressCard.add(
+              ProgressCard(
+                title: course.title,
+                lastAccessedDate: courseProgress.lastAccessedAt.toIso8601String().split('T')[0],
+                level: CourseLevel.values.firstWhere(
+                  (level) => level.name.toLowerCase() == courseProgress.lastAccessedLevel,
+                  orElse: () => CourseLevel.beginner,
+                ),
+                progress: levelProgress,
+                courseImage: '${course.title.split(' ')[0].toLowerCase()}.svg',
               ),
-              progress: levelProgress,
-              courseImage: '${course.title.split(' ')[0].toLowerCase()}.svg',
-            ),
-          );
+            );
+          }
         }
       }
     }
+
+    setState(() => isLoadedComplete = true);
   }
 
   @override
@@ -224,6 +228,10 @@ class _HomePageState extends ConsumerState<HomePage> {
 
             progressData.when(
               data: (data) {
+                if (!isLoadedComplete) {
+                  return loadCourseData();
+                }
+
                 if (progressCard.isNotEmpty) {
                   return ExpandablePageView.builder(
                     controller: carouselController,
@@ -251,7 +259,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     },
                   );
                 }
-                return loadCourseData();
+                return noCourseData();
               },
               error: (error, stack) {
                 return noCourseData();
