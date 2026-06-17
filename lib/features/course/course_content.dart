@@ -5,7 +5,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../../core/constants/app_sizes.dart';
 import '../../shared/models/course/course_lesson.dart';
 
 class CourseContent extends StatefulWidget {
@@ -424,7 +423,8 @@ class CourseContentState extends State<CourseContent> {
             fit: BoxFit.cover,
             progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(
               value: downloadProgress.progress,
-              backgroundColor: const Color(0xFF00CEC9),
+              color: AppColors.secondary,
+              backgroundColor: AppColors.secondary.withValues(alpha: 0.4),
             ),
             errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.red),
           ),

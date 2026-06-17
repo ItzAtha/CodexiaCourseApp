@@ -73,7 +73,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                   progressIndicatorBuilder: (context, url, downloadProgress) =>
                       CircularProgressIndicator(
                         value: downloadProgress.progress,
-                        backgroundColor: const Color(0xFF00CEC9),
+                        color: AppColors.secondary,
+                        backgroundColor: AppColors.secondary.withValues(alpha: 0.4),
                       ),
                   errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.red),
                 ),
