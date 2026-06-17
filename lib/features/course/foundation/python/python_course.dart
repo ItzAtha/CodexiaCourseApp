@@ -120,7 +120,7 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
         .where((course) => course.courseId == widget.courseId)
         .firstOrNull;
 
-    if (modulesData != null && courseProgress != null) {
+    if (modulesData != null) {
       for (final modules in modulesData.entries) {
         List<Widget> modulesWidget = [];
 
@@ -130,7 +130,7 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
         for (var i = 0; i < courseModulesList.length; i++) {
           CourseModule module = modules.value[i];
 
-          UserLevelProgress? levelProgress = courseProgress.levels
+          UserLevelProgress? levelProgress = courseProgress?.levels
               .where((lp) => lp.levelId == level.name.toLowerCase())
               .firstOrNull;
 
