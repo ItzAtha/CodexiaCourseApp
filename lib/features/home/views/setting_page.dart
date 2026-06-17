@@ -79,19 +79,23 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         child: Stack(
                           alignment: AlignmentGeometry.center,
                           children: <Widget>[
-                            ClipOval(
-                              child: CachedNetworkImage(
-                                imageUrl:
-                                    authUser?.avatar ??
-                                    "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
-                                fit: BoxFit.cover,
-                                progressIndicatorBuilder: (context, url, downloadProgress) =>
-                                    CircularProgressIndicator(
-                                      value: downloadProgress.progress,
-                                      backgroundColor: const Color(0xFF00CEC9),
-                                    ),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(Icons.error, color: Colors.red),
+                            SizedBox(
+                              height: 120.0,
+                              width: 120.0,
+                              child: ClipOval(
+                                child: CachedNetworkImage(
+                                  imageUrl:
+                                      authUser?.avatar ??
+                                      "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
+                                  fit: BoxFit.cover,
+                                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                      CircularProgressIndicator(
+                                        value: downloadProgress.progress,
+                                        backgroundColor: const Color(0xFF00CEC9),
+                                      ),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error, color: Colors.red),
+                                ),
                               ),
                             ),
                             Positioned(
