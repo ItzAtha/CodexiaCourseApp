@@ -1,7 +1,10 @@
 import 'package:codexia_course_learning/shared/enums/course_level.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+
+import '../../../core/app_constants.dart' show AppSizes, AppColors;
 
 class ProgressCard {
   final String _title;
@@ -89,20 +92,39 @@ class ProgressCard {
                       ),
                       borderRadius: BorderRadius.circular(12.0),
                     ),
-                    child: Text(
-                      "${(_progress * 100).toInt()}% Completed",
-                      style: const TextStyle(fontSize: 12.0, color: Colors.blue),
+                    child: TweenAnimationBuilder<double>(
+                      duration: const Duration(seconds: 1),
+                      curve: Curves.easeInOut,
+                      tween: Tween<double>(begin: 0.0, end: _progress),
+                      builder: (context, value, child) {
+                        return Text(
+                          "${NumberFormat.percentPattern().format(value)} Done",
+                          style: const TextStyle(
+                            fontSize: AppSizes.sTextSize,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 10.0),
-            LinearProgressIndicator(
-              value: _progress,
-              backgroundColor: Color(0x6600CEC9),
-              color: Color(0xFF00CEC9),
-              borderRadius: BorderRadius.circular(8.0),
+            TweenAnimationBuilder<double>(
+              duration: const Duration(seconds: 1),
+              curve: Curves.easeInOut,
+              tween: Tween<double>(begin: 0.0, end: _progress),
+              builder: (context, value, child) {
+                return LinearProgressIndicator(
+                  value: value,
+                  backgroundColor: const Color(0x6600CEC9),
+                  color: const Color(0xFF00CEC9),
+                  minHeight: 6.0,
+                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                );
+              },
             ),
           ],
         ),
