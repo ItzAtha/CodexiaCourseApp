@@ -27,9 +27,10 @@ class PythonCourse extends ConsumerStatefulWidget {
 }
 
 class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
-  double overallProgress = 0.0;
-  int completedModules = 0;
   int totalModules = 0;
+  int completedModules = 0;
+  double overallProgress = 0.0;
+  bool isModulesLoaded = false;
 
   Course? course;
   List<List<Widget>> modulesCarouselPage = [];
@@ -231,6 +232,8 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
         level: LogLevel.info,
       ).log();
     }
+
+    setState(() => isModulesLoaded = true);
   }
 
   @override
@@ -521,25 +524,44 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
                 ),
                 const SizedBox(height: 8.0),
                 Expanded(
-                  child: PageView.builder(
-                    controller: pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: modulesCarouselPage.length,
-                    itemBuilder: (context, index) {
-                      List<Widget> modulesWidget = modulesCarouselPage[index];
+                  child: isModulesLoaded
+                      ? PageView.builder(
+                          controller: pageController,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: modulesCarouselPage.length,
+                          itemBuilder: (context, index) {
+                            List<Widget> modulesWidget = modulesCarouselPage[index];
 
-                      return ListView.separated(
-                        padding: const EdgeInsets.only(bottom: AppSizes.p16),
-                        itemCount: modulesWidget.length,
-                        itemBuilder: (context, index) {
-                          return modulesWidget[index];
-                        },
-                        separatorBuilder: (BuildContext context, int index) {
-                          return const SizedBox(height: 12.0);
-                        },
-                      );
-                    },
-                  ),
+                            return ListView.separated(
+                              padding: const EdgeInsets.only(bottom: AppSizes.p16),
+                              itemCount: modulesWidget.length,
+                              itemBuilder: (context, index) {
+                                return modulesWidget[index];
+                              },
+                              separatorBuilder: (BuildContext context, int index) {
+                                return const SizedBox(height: 12.0);
+                              },
+                            );
+                          },
+                        )
+                      : Column(
+                          mainAxisAlignment: .center,
+                          children: <Widget>[
+                            CircularProgressIndicator(
+                              color: AppColors.secondary,
+                              backgroundColor: AppColors.secondary.withValues(alpha: 0.4),
+                            ),
+                            const SizedBox(height: 16.0),
+                            Text(
+                              "Loading Modules...",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: AppSizes.smTextSize,
+                                color: Theme.of(context).textTheme.labelSmall?.color,
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
               ],
             ),
