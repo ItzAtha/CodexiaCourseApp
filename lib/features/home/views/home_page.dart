@@ -2,17 +2,29 @@ import 'dart:math';
 
 import 'package:codexia_course_learning/shared/enums/course_level.dart';
 import 'package:codexia_course_learning/shared/models/course.dart';
+import 'package:codexia_course_learning/shared/models/course/course_module.dart';
 import 'package:codexia_course_learning/shared/providers/course_list_notifier.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../shared/models/auth_user.dart';
+import '../../../shared/models/course/course_lesson.dart';
 import '../../../shared/models/user_course_progress.dart';
 import '../../../shared/providers/auth_user_notifier.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/progress_card.dart';
+
+final progressDataProvider = FutureProvider.autoDispose<List<dynamic>>((ref) async {
+  final results = await Future.wait([
+    ref.watch(authUserProvider.future),
+    ref.watch(courseListProvider.future),
+  ]);
+
+  return [results[0], results[1]];
+});
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -22,7 +34,11 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  final carouselController = PageController(viewportFraction: 0.85);
+  bool isProgressTrackerLoad = false;
+  List<ProgressCard> progressCard = [];
+  late Future<List<dynamic>> progressData;
+
+  final carouselController = PageController(viewportFraction: 0.9);
   final UniqueKey skeletonizerKey = UniqueKey();
 
   Widget loadCourseData() {
@@ -117,61 +133,86 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget hasCourseData({
+  Future<void> loadProgressData({
     required List<Course> courseListData,
     required List<UserCourseProgress> courseProgressList,
-  }) {
-    return ExpandablePageView.builder(
-      controller: carouselController,
-      clipBehavior: Clip.none,
-      itemCount: courseProgressList.length,
-      itemBuilder: (BuildContext context, int index) {
-        UserCourseProgress courseProgress = courseProgressList[index];
-        Course? course = courseListData.firstWhere((c) => c.courseId == courseProgress.courseId);
+  }) async {
+    for (var index = 0; index < courseProgressList.length; index++) {
+      UserCourseProgress courseProgress = courseProgressList[index];
 
-        UserLevelProgress levelProgress = courseProgress.levelProgress.firstWhere(
-          (levelProgress) => levelProgress.levelName == courseProgress.lastAccessedLevel,
-        );
-        double progress = levelProgress.completedModules.length / levelProgress.totalModules;
+      String courseId = courseProgress.courseId;
+      List<UserLevelProgress> levelProgress = courseProgress.levels;
 
-        if (!carouselController.position.haveDimensions) {
-          return const SizedBox();
-        }
+      await ref.read(courseListProvider.notifier).fetchModules(courseId);
+      List<Course> courseList = ref.read(courseListProvider).requireValue;
+      await ref.read(courseListProvider.notifier).unloadModules(courseId);
 
-        return AnimatedBuilder(
-          animation: carouselController,
-          builder: (context, child) {
-            double scale = 1.0;
-            if (carouselController.position.haveDimensions) {
-              scale = max(0.8, 1 - (carouselController.page! - index).abs() * 0.2);
+      Course? course = courseList.where((b) => b.courseId == courseId).firstOrNull;
+      if (course != null) {
+        for (final progress in levelProgress) {
+          String levelId = progress.levelId;
+          Map<String, List<String>> lessons = progress.completedLesson;
+
+          int totalModules = 0;
+          double levelProgress = 0;
+
+          for (final lesson in Map.fromEntries(
+            lessons.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
+          ).entries) {
+            String moduleId = lesson.key;
+            List<String> completedLesson = lesson.value;
+
+            List<CourseModule>? modules = course.modules.entries
+                .where((value) => value.key.name.toLowerCase() == levelId)
+                .map((module) => module.value)
+                .firstOrNull;
+            if (modules != null) {
+              CourseModule? module = modules
+                  .where((module) => module.moduleId == moduleId)
+                  .firstOrNull;
+
+              if (module != null) {
+                List<CourseLesson> lessons = module.lessons;
+                levelProgress += completedLesson.length / lessons.length;
+                totalModules++;
+              }
             }
+          }
 
-            return Transform.scale(
-              scale: scale,
-              child: ProgressCard(
-                title: course.title,
-                lastAccessedDate: courseProgress.lastAccessedAt.toIso8601String().split('T')[0],
-                level: CourseLevel.values.firstWhere(
-                  (e) => e.toString().split('.').last == courseProgress.lastAccessedLevel,
-                  orElse: () => CourseLevel.beginner,
-                ),
-                progress: progress,
-                courseImage: '${course.title.split(' ')[0].toLowerCase()}.svg',
-              ).create(context),
-            );
-          },
-        );
-      },
-    );
+          levelProgress = levelProgress / totalModules;
+          progressCard.add(
+            ProgressCard(
+              title: course.title,
+              lastAccessedDate: courseProgress.lastAccessedAt.toIso8601String().split('T')[0],
+              level: CourseLevel.values.firstWhere(
+                (level) => level.name.toLowerCase() == courseProgress.lastAccessedLevel,
+                orElse: () => CourseLevel.beginner,
+              ),
+              progress: levelProgress,
+              courseImage: '${course.title.split(' ')[0].toLowerCase()}.svg',
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final authUserState = ref.watch(authUserProvider);
-    final courseListData = ref.watch(courseListProvider);
+    final progressData = ref.watch(progressDataProvider);
 
-    AuthUser? authUser = authUserState.value;
-    List<UserCourseProgress>? userCourseProgress = authUser?.coursesProgress;
+    ref.listen(progressDataProvider, (prev, next) {
+      next.whenData((data) {
+        AuthUser authUser = data[0];
+        List<Course> courseListData = data[1];
+        List<UserCourseProgress> userCourseProgress = authUser.coursesProgress;
+
+        if (!isProgressTrackerLoad) {
+          loadProgressData(courseListData: courseListData, courseProgressList: userCourseProgress);
+          isProgressTrackerLoad = true;
+        }
+      });
+    });
 
     return Scaffold(
       appBar: const HomeAppBar(),
@@ -180,14 +221,45 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: Column(
           children: <Widget>[
             const SizedBox(height: 25.0),
-            authUserState.isLoading || courseListData.isLoading
-                ? loadCourseData()
-                : userCourseProgress != null && userCourseProgress.isNotEmpty
-                ? hasCourseData(
-                    courseListData: courseListData.requireValue,
-                    courseProgressList: userCourseProgress,
-                  )
-                : noCourseData(),
+
+            progressData.when(
+              data: (data) {
+                if (progressCard.isNotEmpty) {
+                  return ExpandablePageView.builder(
+                    controller: carouselController,
+                    clipBehavior: Clip.none,
+                    itemCount: progressCard.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      if (!carouselController.position.haveDimensions) {
+                        return const SizedBox();
+                      }
+
+                      return AnimatedBuilder(
+                        animation: carouselController,
+                        builder: (context, child) {
+                          double scale = 1.0;
+                          if (carouselController.position.haveDimensions) {
+                            scale = max(0.8, 1 - (carouselController.page! - index).abs() * 0.2);
+                          }
+
+                          return Transform.scale(
+                            scale: scale,
+                            child: progressCard[index].create(context),
+                          );
+                        },
+                      );
+                    },
+                  );
+                }
+                return loadCourseData();
+              },
+              error: (error, stack) {
+                return noCourseData();
+              },
+              loading: () {
+                return loadCourseData();
+              },
+            ),
           ],
         ),
       ),
