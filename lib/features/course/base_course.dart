@@ -1,6 +1,7 @@
 import 'package:codexia_course_learning/core/app_constants.dart';
 import 'package:codexia_course_learning/features/course/course_content.dart';
 import 'package:codexia_course_learning/shared/enums/course_level.dart';
+import 'package:codexia_course_learning/shared/models/course.dart';
 import 'package:codexia_course_learning/shared/providers/auth_user_notifier.dart';
 import 'package:codexia_course_learning/shared/providers/course_list_notifier.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../shared/models/course/course_lesson.dart';
+import '../../shared/models/course/course_module.dart';
 import '../../shared/models/user_course_progress.dart';
 
 class BaseCourse extends ConsumerStatefulWidget {
@@ -98,6 +100,8 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
   }
 
   Future<void> updateProgress() async {
+    int totalExp = courseProgress?.totalExp ?? 0;
+
     if (listEquals(
       levelProgress?.completedLesson[widget._moduleId],
       widget._lessons.take(lastPage).map((lesson) => lesson.lessonId).toSet().toList(),
@@ -108,6 +112,21 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
 
     if (levelProgress?.completedLesson[widget._moduleId]?.length == widget._lessons.length) {
       return;
+    }
+
+    List<Course> courseList = await ref.read(courseListProvider.future);
+    Course? course = courseList.where((c) => c.courseId == widget._courseId).firstOrNull;
+    if (course != null) {
+      List<CourseModule> modules =
+          course.modules.entries
+              .where((entry) => entry.key.name == widget._level.name)
+              .map((value) => value.value)
+              .firstOrNull ??
+          [];
+      CourseModule? module = modules.where((m) => m.moduleId == widget._moduleId).firstOrNull;
+      if (module != null) {
+        totalExp += module.expAmount;
+      }
     }
 
     Map<String, List<String>> completedLesson = {...?levelProgress?.completedLesson};
@@ -125,6 +144,7 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
 
     UserCourseProgress updatedProgress = courseProgress != null
         ? courseProgress!.copyWith(
+            totalExp: totalExp,
             lastAccessedLevel: widget._level.name.toLowerCase(),
             lastAccessedModule: widget._moduleId,
             lastAccessedLesson: widget._lessons[currentPage].lessonId,
@@ -141,6 +161,7 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
           )
         : UserCourseProgress(
             courseId: widget._courseId,
+            totalExp: totalExp,
             lastAccessedLevel: widget._level.name.toLowerCase(),
             lastAccessedModule: widget._moduleId,
             lastAccessedLesson: widget._lessons[currentPage].lessonId,
