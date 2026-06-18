@@ -12,6 +12,9 @@ abstract class UserCourseProgress with _$UserCourseProgress {
 
   const factory UserCourseProgress({
     required String courseId,
+
+    @Default(0) int totalExp,
+
     required String lastAccessedLevel,
     required String lastAccessedModule,
     required String lastAccessedLesson,
