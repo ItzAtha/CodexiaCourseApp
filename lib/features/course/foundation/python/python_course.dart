@@ -27,6 +27,7 @@ class PythonCourse extends ConsumerStatefulWidget {
 }
 
 class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
+  int totalExp = 0;
   int totalModules = 0;
   int completedModules = 0;
   double overallProgress = 0.0;
@@ -99,6 +100,7 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
       }
 
       setState(() {
+        totalExp = courseProgress.totalExp;
         completedModules = completedMods;
         totalModules = totalMods;
         overallProgress = overall;
@@ -418,19 +420,26 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
                               color: AppColors.primary.toMaterialColor.shade700,
                               borderRadius: const BorderRadius.all(Radius.circular(15.0)),
                             ),
-                            child: const Column(
+                            child: Column(
                               children: <Widget>[
-                                FaIcon(FontAwesomeIcons.bolt, size: 28, color: Colors.white),
-                                SizedBox(height: 8.0),
-                                Text(
-                                  "453",
-                                  style: TextStyle(
-                                    fontSize: AppSizes.xlTextSize,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
+                                const FaIcon(FontAwesomeIcons.bolt, size: 28, color: Colors.white),
+                                const SizedBox(height: 8.0),
+                                TweenAnimationBuilder<double>(
+                                  duration: const Duration(seconds: 1),
+                                  curve: Curves.easeInOut,
+                                  tween: Tween<double>(begin: 0.0, end: totalExp.toDouble()),
+                                  builder: (context, value, child) {
+                                    return Text(
+                                      "${value.toInt()}",
+                                      style: const TextStyle(
+                                        fontSize: AppSizes.xlTextSize,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    );
+                                  },
                                 ),
-                                Text(
+                                const Text(
                                   "XP Earned",
                                   style: TextStyle(
                                     fontSize: AppSizes.smTextSize,
