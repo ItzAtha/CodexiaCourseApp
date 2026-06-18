@@ -7,15 +7,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'core/utils/logger.dart';
-import 'services/auth_services.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 
 import 'app.dart';
+import 'core/utils/logger.dart';
 import 'manager/firebase_options.dart';
+import 'services/auth_services.dart';
 
 Future main() async {
-  debugPrintRebuildDirtyWidgets = true;
   WidgetsFlutterBinding.ensureInitialized();
 
   await SystemChrome.setPreferredOrientations([
