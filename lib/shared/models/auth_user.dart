@@ -19,7 +19,7 @@ abstract class AuthUser with _$AuthUser {
     required DateTime createdAt,
     required DateTime lastSignIn,
 
-    @Default([]) List<UserCourseProgress> coursesProgress,
+    @Default([]) List<UserCourseProgress>? coursesProgress,
   }) = _AuthUser;
 
   factory AuthUser.fromJson(Map<String, dynamic> json) => _$AuthUserFromJson(json);
