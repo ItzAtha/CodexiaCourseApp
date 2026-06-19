@@ -934,84 +934,86 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
   Widget build(BuildContext context) {
     final userAvatar = ref.watch(authUserProvider.select((value) => value.value?.avatar));
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSizes.p12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          InkWell(
-            onTap: () => selectAvatarImage(ImageSource.camera, avatarPath: userAvatar),
-            customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-            child: SizedBox(
-              height: 100.0,
-              width: 100.0,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Icon(Icons.camera_alt, size: 40.0),
-                  const SizedBox(height: 5.0),
-                  Text(
-                    "Camera",
-                    style: TextStyle(
-                      fontSize: AppSizes.mTextSize,
-                      color: Theme.of(context).textTheme.labelSmall?.color,
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: AppSizes.p12),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            InkWell(
+              onTap: () => selectAvatarImage(ImageSource.camera, avatarPath: userAvatar),
+              customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+              child: SizedBox(
+                height: 100.0,
+                width: 100.0,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const Icon(Icons.camera_alt, size: 40.0),
+                    const SizedBox(height: 5.0),
+                    Text(
+                      "Camera",
+                      style: TextStyle(
+                        fontSize: AppSizes.mTextSize,
+                        color: Theme.of(context).textTheme.labelSmall?.color,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          InkWell(
-            onTap: () => selectAvatarImage(ImageSource.gallery, avatarPath: userAvatar),
-            customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-            child: SizedBox(
-              height: 100.0,
-              width: 100.0,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Icon(Icons.photo, size: 40.0),
-                  const SizedBox(height: 5.0),
-                  Text(
-                    "Gallery",
-                    style: TextStyle(
-                      fontSize: AppSizes.mTextSize,
-                      color: Theme.of(context).textTheme.labelSmall?.color,
+            InkWell(
+              onTap: () => selectAvatarImage(ImageSource.gallery, avatarPath: userAvatar),
+              customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+              child: SizedBox(
+                height: 100.0,
+                width: 100.0,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const Icon(Icons.photo, size: 40.0),
+                    const SizedBox(height: 5.0),
+                    Text(
+                      "Gallery",
+                      style: TextStyle(
+                        fontSize: AppSizes.mTextSize,
+                        color: Theme.of(context).textTheme.labelSmall?.color,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          InkWell(
-            onTap: () async {
-              setState(() => isDeleteButtonPress = true);
+            InkWell(
+              onTap: () async {
+                setState(() => isDeleteButtonPress = true);
 
-              await deleteCurrentAvatar(userAvatar);
+                await deleteCurrentAvatar(userAvatar);
 
-              setState(() => isDeleteButtonPress = false);
-            },
-            customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-            child: SizedBox(
-              height: 100.0,
-              width: 100.0,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Icon(Icons.delete, size: 40.0),
-                  const SizedBox(height: 5.0),
-                  Text(
-                    "Delete",
-                    style: TextStyle(
-                      fontSize: AppSizes.mTextSize,
-                      color: Theme.of(context).textTheme.labelSmall?.color,
+                setState(() => isDeleteButtonPress = false);
+              },
+              customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+              child: SizedBox(
+                height: 100.0,
+                width: 100.0,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const Icon(Icons.delete, size: 40.0),
+                    const SizedBox(height: 5.0),
+                    Text(
+                      "Delete",
+                      style: TextStyle(
+                        fontSize: AppSizes.mTextSize,
+                        color: Theme.of(context).textTheme.labelSmall?.color,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1091,77 +1093,79 @@ class _AccountDeleteConfirmationState extends ConsumerState<AccountDeleteConfirm
   Widget build(BuildContext context) {
     String? providerId = user?.providerData.firstOrNull?.providerId;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(left: AppSizes.p16, right: AppSizes.p16, bottom: AppSizes.p24),
-      child: Column(
-        children: <Widget>[
-          Text(
-            "Are you sure you want to delete your account? All data include Course "
-            "Progress and Chat will be deleted. This action cannot be undone.",
-            textAlign: TextAlign.justify,
-            style: TextStyle(
-              fontSize: AppSizes.mTextSize,
-              color: Theme.of(context).textTheme.labelSmall?.color,
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(left: AppSizes.p16, right: AppSizes.p16, bottom: AppSizes.p24),
+        child: Column(
+          children: <Widget>[
+            Text(
+              "Are you sure you want to delete your account? All data include Course "
+                  "Progress and Chat will be deleted. This action cannot be undone.",
+              textAlign: TextAlign.justify,
+              style: TextStyle(
+                fontSize: AppSizes.mTextSize,
+                color: Theme.of(context).textTheme.labelSmall?.color,
+              ),
             ),
-          ),
-          if (providerId == "password") buildEmailField(),
-          const SizedBox(height: 15.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              OutlinedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.grey,
-                  minimumSize: const Size(120.0, 40.0),
-                  side: BorderSide(color: Colors.grey.shade600),
+            if (providerId == "password") buildEmailField(),
+            const SizedBox(height: 15.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.grey,
+                    minimumSize: const Size(120.0, 40.0),
+                    side: BorderSide(color: Colors.grey.shade600),
+                  ),
+                  child: Text("Cancel", style: TextStyle(color: Colors.grey.shade600)),
                 ),
-                child: Text("Cancel", style: TextStyle(color: Colors.grey.shade600)),
-              ),
-              OutlinedButton(
-                onPressed: () async {
-                  String? password;
-                  if (providerId == "password" && !passwordFieldKey.currentState!.validate()) {
-                    return;
-                  } else if (providerId == "password") {
-                    password = passwordController.text.trim();
-                  }
+                OutlinedButton(
+                  onPressed: () async {
+                    String? password;
+                    if (providerId == "password" && !passwordFieldKey.currentState!.validate()) {
+                      return;
+                    } else if (providerId == "password") {
+                      password = passwordController.text.trim();
+                    }
 
-                  final authService = ref.read(authServiceProvider);
-                  final bool successDelete = await authService.deleteAccount(password: password);
+                    final authService = ref.read(authServiceProvider);
+                    final bool successDelete = await authService.deleteAccount(password: password);
 
-                  if (successDelete) {
-                    Toastification().show(
-                      title: const Text("Delete Account Success"),
-                      description: const Text("Your account has been deleted successfully."),
-                      type: ToastificationType.success,
-                      style: ToastificationStyle.flat,
-                      alignment: Alignment.topCenter,
-                      autoCloseDuration: ToastAnimations.closeDuration,
-                      animationDuration: ToastAnimations.animationDuration,
-                    );
-                  } else {
-                    Toastification().show(
-                      title: const Text("Delete Account Failed"),
-                      description: const Text("An error occurred while deleting your account."),
-                      type: ToastificationType.error,
-                      style: ToastificationStyle.flat,
-                      alignment: Alignment.topCenter,
-                      autoCloseDuration: ToastAnimations.closeDuration,
-                      animationDuration: ToastAnimations.animationDuration,
-                    );
-                  }
-                },
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.dangerZone,
-                  minimumSize: const Size(120.0, 40.0),
-                  side: const BorderSide(color: AppColors.dangerZone),
+                    if (successDelete) {
+                      Toastification().show(
+                        title: const Text("Delete Account Success"),
+                        description: const Text("Your account has been deleted successfully."),
+                        type: ToastificationType.success,
+                        style: ToastificationStyle.flat,
+                        alignment: Alignment.topCenter,
+                        autoCloseDuration: ToastAnimations.closeDuration,
+                        animationDuration: ToastAnimations.animationDuration,
+                      );
+                    } else {
+                      Toastification().show(
+                        title: const Text("Delete Account Failed"),
+                        description: const Text("An error occurred while deleting your account."),
+                        type: ToastificationType.error,
+                        style: ToastificationStyle.flat,
+                        alignment: Alignment.topCenter,
+                        autoCloseDuration: ToastAnimations.closeDuration,
+                        animationDuration: ToastAnimations.animationDuration,
+                      );
+                    }
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.dangerZone,
+                    minimumSize: const Size(120.0, 40.0),
+                    side: const BorderSide(color: AppColors.dangerZone),
+                  ),
+                  child: const Text("Confirm", style: TextStyle(color: AppColors.dangerZone)),
                 ),
-                child: const Text("Confirm", style: TextStyle(color: AppColors.dangerZone)),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
