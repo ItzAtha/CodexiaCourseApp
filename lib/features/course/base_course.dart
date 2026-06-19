@@ -54,7 +54,7 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
     ).wait;
 
     courseProgress = authUserState.coursesProgress
-        .where((progress) => progress.courseId == widget._courseId)
+        ?.where((progress) => progress.courseId == widget._courseId)
         .firstOrNull;
 
     levelProgress = courseProgress?.levels
@@ -110,27 +110,32 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
       return;
     }
 
-    List<Course> courseList = await ref.read(courseListProvider.future);
-    Course? course = courseList.where((c) => c.courseId == widget._courseId).firstOrNull;
-    if (course != null) {
-      List<CourseModule> modules =
-          course.modules.entries
-              .where((entry) => entry.key.name == widget._level.name)
-              .map((value) => value.value)
-              .firstOrNull ??
-          [];
-      CourseModule? module = modules.where((m) => m.moduleId == widget._moduleId).firstOrNull;
-      if (module != null) {
-        totalExp += module.expAmount;
-      }
-    }
-
     Map<String, List<String>> completedLesson = {...?levelProgress?.completedLesson};
     List<String> completedLessonList = widget._lessons
         .take(lastPage)
         .map((lesson) => lesson.lessonId)
         .toSet()
         .toList();
+
+    List<String> allLessonIds = widget._lessons.map((lesson) => lesson.lessonId).toSet().toList();
+
+    if (listEquals(completedLessonList, allLessonIds)) {
+      List<Course> courseList = await ref.read(courseListProvider.future);
+      Course? course = courseList.where((c) => c.courseId == widget._courseId).firstOrNull;
+      if (course != null) {
+        List<CourseModule> modules =
+            course.modules.entries
+                .where((entry) => entry.key.name == widget._level.name)
+                .map((value) => value.value)
+                .firstOrNull ??
+            [];
+
+        CourseModule? module = modules.where((m) => m.moduleId == widget._moduleId).firstOrNull;
+        if (module != null) {
+          totalExp += module.expAmount;
+        }
+      }
+    }
 
     completedLesson.update(
       widget._moduleId,
@@ -452,7 +457,7 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
 
   bool get isModuleCompleted => listEquals(
     levelProgress?.completedLesson[widget._moduleId],
-    widget._lessons.map((lesson) => lesson.lessonId).toSet().toList()
+    widget._lessons.map((lesson) => lesson.lessonId).toSet().toList(),
   );
 }
 
