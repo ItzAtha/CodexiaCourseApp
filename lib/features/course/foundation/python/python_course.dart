@@ -263,9 +263,12 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
     () async {
       try {
         await ref.read(authUserProvider.notifier).refetchProgress();
-        loadCourseStats();
-        loadCourseModules();
-        debugPrint('Successfully refetch progress!');
+
+        if (context.mounted) {
+          loadCourseStats();
+          loadCourseModules();
+          debugPrint('Successfully refetch progress!');
+        }
       } catch (e) {
         debugPrint('Failed to refetch progress: $e');
       }
