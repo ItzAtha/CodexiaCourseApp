@@ -153,8 +153,14 @@ class _HomePageState extends ConsumerState<HomePage> {
           String levelId = progress.levelId;
           Map<String, List<String>> lessons = progress.completedLesson;
 
-          int totalModules = 0;
           double levelProgress = 0;
+          int totalModules =
+              course.modules.entries
+                  .where((value) => value.key.name.toLowerCase() == levelId)
+                  .firstOrNull
+                  ?.value
+                  .length ??
+              0;
 
           for (final lesson in Map.fromEntries(
             lessons.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
@@ -174,7 +180,6 @@ class _HomePageState extends ConsumerState<HomePage> {
               if (module != null) {
                 List<CourseLesson> lessons = module.lessons;
                 levelProgress += completedLesson.length / lessons.length;
-                totalModules++;
               }
             }
           }
