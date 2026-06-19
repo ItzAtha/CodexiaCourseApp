@@ -47,10 +47,6 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
   UserLevelProgress? levelProgress;
   late PageController pageController;
 
-  void onQuizChange(int quizIndex) {
-    setState(() => indexLesson.insert(quizIndex, quizIndex));
-  }
-
   void loadProgressData() async {
     final (authUserState, courseListState) = await (
       ref.read(authUserProvider.future),
@@ -175,6 +171,10 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
           );
 
     await ref.read(authUserProvider.notifier).updateCourses(updatedProgress);
+  }
+
+  void onQuizChange(int quizIndex) {
+    setState(() => indexLesson.insert(quizIndex, quizIndex));
   }
 
   @override
@@ -389,14 +389,11 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
                       )
                     : const SizedBox.shrink(),
                 ElevatedButton.icon(
-                  onPressed: !indexLesson.contains(currentPage)
+                  onPressed: !isModuleCompleted && !indexLesson.contains(currentPage)
                       ? null
                       : () async {
                           if (currentPage == widget._lessons.length - 1) {
-                            if (!listEquals(
-                              levelProgress?.completedLesson[widget._moduleId],
-                              widget._lessons.map((lesson) => lesson.lessonId).toSet().toList(),
-                            )) {
+                            if (!isModuleCompleted) {
                               lastPage += 1;
                               await updateProgress();
                             }
@@ -411,10 +408,7 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
                             currentPage++;
 
                             if (lastPage < currentPage) {
-                              if (listEquals(
-                                levelProgress?.completedLesson[widget._moduleId],
-                                widget._lessons.map((lesson) => lesson.lessonId).toSet().toList(),
-                              )) {
+                              if (isModuleCompleted) {
                                 completedProgress = 1.0;
                               } else {
                                 completedProgress = currentPage / (widget._lessons.length - 1);
@@ -455,6 +449,11 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
       ),
     );
   }
+
+  bool get isModuleCompleted => listEquals(
+    levelProgress?.completedLesson[widget._moduleId],
+    widget._lessons.map((lesson) => lesson.lessonId).toSet().toList()
+  );
 }
 
 class PageViewIndicator extends StatelessWidget {
