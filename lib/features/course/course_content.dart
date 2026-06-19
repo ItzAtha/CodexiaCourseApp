@@ -55,6 +55,11 @@ class CourseContentState extends State<CourseContent> {
                 fontSize: AppSizes.smTextSize,
                 color: Theme.of(context).textTheme.labelSmall?.color,
               ),
+              listBullet: TextStyle(
+                height: 1.5,
+                fontSize: AppSizes.smTextSize,
+                color: Theme.of(context).textTheme.labelSmall?.color,
+              ),
               code: TextStyle(
                 height: 1.5,
                 fontSize: AppSizes.smTextSize,
@@ -281,7 +286,8 @@ class CourseContentState extends State<CourseContent> {
             fit: BoxFit.cover,
             progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(
               value: downloadProgress.progress,
-              backgroundColor: const Color(0xFF00CEC9),
+              color: AppColors.secondary,
+              backgroundColor: AppColors.secondary.withValues(alpha: 0.4),
             ),
             errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.red),
           ),
