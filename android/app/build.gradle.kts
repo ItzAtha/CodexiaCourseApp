@@ -48,6 +48,7 @@ android {
             )
         }
         debug {
+            applicationIdSuffix = ".debug"
             resValue("string", "app_name", "Codexia Learning Course (Debug)")
         }
     }
