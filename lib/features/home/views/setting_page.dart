@@ -1,5 +1,6 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:codexia_course_learning/core/utils/logger.dart';
 import 'package:codexia_course_learning/services/firebase_services.dart';
 import 'package:codexia_course_learning/shared/models/auth_user.dart';
@@ -670,7 +671,14 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       const SizedBox(height: 10.0),
                       OutlinedButton(
                         onPressed: () {
-                          DebugLogger(message: "Reset Course", level: LogLevel.debug).log();
+                          showModalBottomSheet(
+                            context: context,
+                            useRootNavigator: true,
+                            isScrollControlled: true,
+                            builder: (context) {
+                              return const ResetCourseConfirmation();
+                            },
+                          );
                         },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.dangerZone,
@@ -775,8 +783,6 @@ class AvatarSelector extends ConsumerStatefulWidget {
 }
 
 class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
-  bool isDeleteButtonPress = false;
-
   final FirebaseServices services = FirebaseServices();
 
   Future<void> selectAvatarImage(ImageSource source, {String? avatarPath}) async {
@@ -861,44 +867,42 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
     }
   }
 
-  Future<void> deleteCurrentAvatar(String? avatarPath) async {
+  Future<bool> deleteCurrentAvatar(String? avatarPath) async {
     if (avatarPath == null) {
       DebugLogger(message: "No avatar to delete", level: LogLevel.info).log();
-      return;
+      return false;
     }
 
     bool isDeleted = await services.deleteFile(avatarPath);
     if (isDeleted) {
       ref.read(authUserProvider.notifier).updateAvatar(null);
 
-      if (isDeleteButtonPress) {
-        Toastification().show(
-          title: const Text("Avatar Deleted"),
-          description: const Text("Your avatar has been deleted successfully."),
-          type: ToastificationType.success,
-          style: ToastificationStyle.flat,
-          alignment: Alignment.topCenter,
-          autoCloseDuration: ToastAnimations.closeDuration,
-          animationDuration: ToastAnimations.animationDuration,
-        );
-      }
+      Toastification().show(
+        title: const Text("Avatar Deleted"),
+        description: const Text("Your avatar has been deleted successfully."),
+        type: ToastificationType.success,
+        style: ToastificationStyle.flat,
+        alignment: Alignment.topCenter,
+        autoCloseDuration: ToastAnimations.closeDuration,
+        animationDuration: ToastAnimations.animationDuration,
+      );
 
       DebugLogger(message: "Avatar deleted successfully", level: LogLevel.info).log();
+      return true;
     } else {
-      if (isDeleteButtonPress) {
-        Toastification().show(
-          title: const Text("Error"),
-          description: const Text("An error occurred while deleting the avatar."),
-          type: ToastificationType.error,
-          style: ToastificationStyle.flat,
-          alignment: Alignment.topCenter,
-          autoCloseDuration: ToastAnimations.closeDuration,
-          animationDuration: ToastAnimations.animationDuration,
-        );
-      }
+      Toastification().show(
+        title: const Text("Error"),
+        description: const Text("An error occurred while deleting the avatar."),
+        type: ToastificationType.error,
+        style: ToastificationStyle.flat,
+        alignment: Alignment.topCenter,
+        autoCloseDuration: ToastAnimations.closeDuration,
+        animationDuration: ToastAnimations.animationDuration,
+      );
 
       DebugLogger(message: "Failed to delete avatar", level: LogLevel.info).log();
     }
+    return false;
   }
 
   Future<CroppedFile?> cropAvatarImage(String filePath) async {
@@ -986,11 +990,10 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
             ),
             InkWell(
               onTap: () async {
-                setState(() => isDeleteButtonPress = true);
-
-                await deleteCurrentAvatar(userAvatar);
-
-                setState(() => isDeleteButtonPress = false);
+                bool isSuccess = await deleteCurrentAvatar(userAvatar);
+                if (context.mounted && isSuccess) {
+                  context.pop();
+                }
               },
               customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
               child: SizedBox(
@@ -1011,6 +1014,133 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
                   ],
                 ),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ResetCourseConfirmation extends ConsumerStatefulWidget {
+  const ResetCourseConfirmation({super.key});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _ResetCourseConfirmationState();
+}
+
+class _ResetCourseConfirmationState extends ConsumerState<ResetCourseConfirmation> {
+  Future<bool> checkUserCourseProgress() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return false;
+
+    final String userId = currentUser.uid;
+    String provider = currentUser.providerData.isNotEmpty
+        ? currentUser.providerData[0].providerId
+        : 'anonymous';
+    final String docId = '${userId}_$provider';
+
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(docId)
+        .collection('CourseProgress')
+        .count()
+        .get();
+
+    return querySnapshot.count == 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(
+          left: AppSizes.p16,
+          right: AppSizes.p16,
+          bottom: AppSizes.p24,
+        ),
+        child: Column(
+          children: <Widget>[
+            Text(
+              "Are you sure you want to reset your Course? All data Course include"
+              " your current Course Progress will be reset. This action cannot be undone.",
+              textAlign: TextAlign.justify,
+              style: TextStyle(
+                fontSize: AppSizes.mTextSize,
+                color: Theme.of(context).textTheme.labelSmall?.color,
+              ),
+            ),
+            const SizedBox(height: 15.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.grey,
+                    minimumSize: const Size(120.0, 40.0),
+                    side: BorderSide(color: Colors.grey.shade600),
+                  ),
+                  child: Text("Cancel", style: TextStyle(color: Colors.grey.shade600)),
+                ),
+                OutlinedButton(
+                  onPressed: () async {
+                    bool isUserProgressEmpty = await checkUserCourseProgress();
+                    if (isUserProgressEmpty) {
+                      Toastification().show(
+                        title: const Text("Delete Course Progress Failed"),
+                        description: const Text("You don't have any Course progress to delete."),
+                        type: ToastificationType.error,
+                        style: ToastificationStyle.flat,
+                        alignment: Alignment.topCenter,
+                        autoCloseDuration: ToastAnimations.closeDuration,
+                        animationDuration: ToastAnimations.animationDuration,
+                      );
+                      return;
+                    }
+
+                    bool successReset = await ref
+                        .read(authUserProvider.notifier)
+                        .deleteCourseProgress();
+
+                    if (successReset) {
+                      Toastification().show(
+                        title: const Text("Delete Course Progress Success"),
+                        description: const Text(
+                          "Your course progress has been reset successfully.",
+                        ),
+                        type: ToastificationType.success,
+                        style: ToastificationStyle.flat,
+                        alignment: Alignment.topCenter,
+                        autoCloseDuration: ToastAnimations.closeDuration,
+                        animationDuration: ToastAnimations.animationDuration,
+                      );
+
+                      if (context.mounted) {
+                        context.pop();
+                      }
+                    } else {
+                      Toastification().show(
+                        title: const Text("Delete Course Progress Failed"),
+                        description: const Text(
+                          "An error occurred while resetting your course progress.",
+                        ),
+                        type: ToastificationType.error,
+                        style: ToastificationStyle.flat,
+                        alignment: Alignment.topCenter,
+                        autoCloseDuration: ToastAnimations.closeDuration,
+                        animationDuration: ToastAnimations.animationDuration,
+                      );
+                    }
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.dangerZone,
+                    minimumSize: const Size(120.0, 40.0),
+                    side: const BorderSide(color: AppColors.dangerZone),
+                  ),
+                  child: const Text("Confirm", style: TextStyle(color: AppColors.dangerZone)),
+                ),
+              ],
             ),
           ],
         ),
@@ -1095,12 +1225,16 @@ class _AccountDeleteConfirmationState extends ConsumerState<AccountDeleteConfirm
 
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: AppSizes.p16, right: AppSizes.p16, bottom: AppSizes.p24),
+        padding: const EdgeInsets.only(
+          left: AppSizes.p16,
+          right: AppSizes.p16,
+          bottom: AppSizes.p24,
+        ),
         child: Column(
           children: <Widget>[
             Text(
               "Are you sure you want to delete your account? All data include Course "
-                  "Progress and Chat will be deleted. This action cannot be undone.",
+              "Progress and Chat will be deleted. This action cannot be undone.",
               textAlign: TextAlign.justify,
               style: TextStyle(
                 fontSize: AppSizes.mTextSize,
