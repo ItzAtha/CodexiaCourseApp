@@ -173,7 +173,7 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     final String docId = '${userId}_$provider';
 
     final List<UserCourseProgress> currentProgressList = List<UserCourseProgress>.from(
-      state.value!.coursesProgress,
+      state.value!.coursesProgress ?? [],
     );
 
     int index = currentProgressList.indexWhere((item) => item.courseId == updatedProgress.courseId);
@@ -212,6 +212,45 @@ class AuthUserNotifier extends _$AuthUserNotifier {
         stackTrace: stackTrace,
         level: LogLevel.error,
       ).log();
+    }
+  }
+
+  Future<bool> deleteCourseProgress() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (state.value == null || currentUser == null) return false;
+
+    final String userId = currentUser.uid;
+    String provider = currentUser.providerData.isNotEmpty
+        ? currentUser.providerData[0].providerId
+        : 'anonymous';
+    final String docId = '${userId}_$provider';
+
+    try {
+      final courseProgressCollection = usersCollection.doc(docId).collection('CourseProgress');
+      final courseProgressDocs = await courseProgressCollection.get();
+
+      for (final courseProgressDoc in courseProgressDocs.docs) {
+        final levelsCollection = courseProgressCollection
+            .doc(courseProgressDoc.id)
+            .collection('Levels');
+        final levelsDocs = await levelsCollection.get();
+
+        for (final levelDoc in levelsDocs.docs) {
+          await levelDoc.reference.delete();
+        }
+
+        await courseProgressDoc.reference.delete();
+      }
+
+      state = AsyncData(state.value!.copyWith(coursesProgress: null));
+      return true;
+    } catch (error, stackTrace) {
+      DebugLogger(
+        message: 'Failed to delete course progress: $error',
+        stackTrace: stackTrace,
+        level: LogLevel.error,
+      ).log();
+      return false;
     }
   }
 }
