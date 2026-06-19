@@ -44,7 +44,7 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
 
     Map<CourseLevel, List<CourseModule>> modulesData = course?.modules ?? {};
     UserCourseProgress? courseProgress = authUser.coursesProgress
-        .where((course) => course.courseId == widget.courseId)
+        ?.where((course) => course.courseId == widget.courseId)
         .firstOrNull;
 
     if (modulesData.isNotEmpty && courseProgress != null) {
@@ -120,7 +120,7 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
 
     Map<CourseLevel, List<CourseModule>>? modulesData = course?.modules;
     UserCourseProgress? courseProgress = authUser.coursesProgress
-        .where((course) => course.courseId == widget.courseId)
+        ?.where((course) => course.courseId == widget.courseId)
         .firstOrNull;
 
     if (modulesData != null) {

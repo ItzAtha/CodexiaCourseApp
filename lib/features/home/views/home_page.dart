@@ -214,7 +214,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       next.whenData((data) {
         AuthUser authUser = data[0];
         List<Course> courseListData = data[1];
-        List<UserCourseProgress> userCourseProgress = authUser.coursesProgress;
+        List<UserCourseProgress> userCourseProgress = authUser.coursesProgress ?? [];
 
         if (!isProgressTrackerLoad) {
           loadProgressData(courseListData: courseListData, courseProgressList: userCourseProgress);
