@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:toastification/toastification.dart';
 
-import '../../../core/app_constants.dart' show ToastAnimations;
+import '../../../core/app_constants.dart' hide AppRoutes;
 import '../../../core/utils/logger.dart';
 import '../widgets/course_card.dart';
 
@@ -112,14 +112,7 @@ class _CoursePageState extends ConsumerState<CoursePage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(
-              type.name,
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.labelMedium?.color,
-              ),
-            ),
+            Text(type.name, style: Theme.of(context).textTheme.titleMedium),
             for (CourseCard element in filteredList[type] ?? []) element.create(context),
             const SizedBox(height: 15.0),
           ],
@@ -135,16 +128,9 @@ class _CoursePageState extends ConsumerState<CoursePage> {
       children: <Widget>[
         Text(
           "No courses found!",
-          style: TextStyle(
-            fontSize: 16.0,
-            fontWeight: FontWeight.w500,
-            color: Theme.of(context).textTheme.labelSmall?.color,
-          ),
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w500),
         ),
-        Text(
-          "Try to search another course.",
-          style: TextStyle(fontSize: 16.0, color: Theme.of(context).textTheme.labelSmall?.color),
-        ),
+        Text("Try to search another course.", style: Theme.of(context).textTheme.labelLarge),
       ],
     );
   }
@@ -153,13 +139,10 @@ class _CoursePageState extends ConsumerState<CoursePage> {
     return Column(
       children: <Widget>[
         const CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Color(0xCC00CEC9)),
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondary),
         ),
         const SizedBox(height: 15.0),
-        Text(
-          "Loading courses...",
-          style: TextStyle(fontSize: 16.0, color: Theme.of(context).textTheme.labelSmall?.color),
-        ),
+        Text("Loading courses...", style: Theme.of(context).textTheme.labelLarge),
       ],
     );
   }
@@ -243,7 +226,11 @@ class _CoursePageState extends ConsumerState<CoursePage> {
       resizeToAvoidBottomInset: false,
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.only(top: 15.0, left: 20.0, right: 20.0),
+          padding: const EdgeInsets.only(
+            top: AppSizes.p16,
+            left: AppSizes.p16,
+            right: AppSizes.p16,
+          ),
           child: Column(
             children: <Widget>[
               SizedBox(
@@ -258,11 +245,6 @@ class _CoursePageState extends ConsumerState<CoursePage> {
                           if (searchController.text.isNotEmpty)
                             IconButton(
                               onPressed: () {
-                                DebugLogger(
-                                  message: "Clear search input",
-                                  level: LogLevel.debug,
-                                ).log();
-
                                 searchFilterList("");
                                 searchController.clear();
                               },
@@ -283,7 +265,7 @@ class _CoursePageState extends ConsumerState<CoursePage> {
                       height: 45.0,
                       child: Material(
                         elevation:
-                            Theme.of(context).iconButtonTheme.style?.elevation?.resolve({}) ?? 0.0,
+                            Theme.of(context).iconButtonTheme.style?.elevation?.resolve({}) ?? 4.0,
                         shape: Theme.of(context).iconButtonTheme.style?.shape?.resolve({}),
                         child: IconButton(
                           onPressed: () {
@@ -352,135 +334,134 @@ class _FilterSelectorState extends State<FilterSelector> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 24.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Text(
-            "Filter Courses",
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).textTheme.labelMedium?.color,
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.only(
+          left: AppSizes.p16,
+          right: AppSizes.p16,
+          bottom: AppSizes.p24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text(
+              "Filter Courses",
+              style: Theme.of(context).textTheme.titleMedium,
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 15.0),
-          Text(
-            "Sort by",
-            style: TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).textTheme.labelSmall?.color,
+            const SizedBox(height: 15.0),
+            Text(
+              "Sort by",
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
-          ),
-          Divider(thickness: 0.8, color: Colors.grey.shade300, height: 10.0),
-          const SizedBox(height: 10.0),
-          Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  FilterChip(
-                    label: const Text("Popular", style: TextStyle(fontSize: 14.0)),
-                    onSelected: (selected) {
-                      setState(() {
-                        isSelected = (popular: selected, rating: false, newest: false);
-                      });
-                      widget.onFilterChange(isSelected);
-                    },
-                    selected: isSelected.popular,
-                  ),
-                  FilterChip(
-                    label: const Text("Rating", style: TextStyle(fontSize: 14.0)),
-                    onSelected: (selected) {
-                      setState(() {
-                        isSelected = (popular: false, rating: selected, newest: false);
-                      });
-                      widget.onFilterChange(isSelected);
-                    },
-                    selected: isSelected.rating,
-                  ),
-                  FilterChip(
-                    label: const Text("Newest", style: TextStyle(fontSize: 14.0)),
-                    onSelected: (selected) {
-                      setState(() {
-                        isSelected = (popular: false, rating: false, newest: selected);
-                      });
-                      widget.onFilterChange(isSelected);
-                    },
-                    selected: isSelected.newest,
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 20.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    isSelected = (popular: false, rating: false, newest: false);
-
-                    widget.onFilterUpdate(FilterType.clear);
-                    Navigator.pop(context);
-                  },
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.grey,
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                    side: BorderSide(color: Colors.grey.shade600),
-                    minimumSize: const Size(120.0, 40.0),
-                  ),
-                  child: Text(
-                    "Clear",
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 16.0),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 15.0),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (isSelected.popular) {
-                      widget.onFilterUpdate(FilterType.popular);
-                    }
-
-                    if (isSelected.rating) {
-                      widget.onFilterUpdate(FilterType.rating);
-                    }
-
-                    if (isSelected.newest) {
-                      widget.onFilterUpdate(FilterType.newest);
-                    }
-
-                    if (!isSelected.popular && !isSelected.rating && !isSelected.newest) {
-                      widget.onFilterUpdate(FilterType.clear);
-                    }
-
-                    Navigator.pop(context);
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: const WidgetStatePropertyAll(Color(0xFF0984E3)),
-                    padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 12.0)),
-                    shape: WidgetStatePropertyAll(
-                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+            const Divider(thickness: 0.8, height: 10.0),
+            const SizedBox(height: 10.0),
+            Column(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    FilterChip(
+                      label: Text("Popular", style: Theme.of(context).textTheme.labelMedium),
+                      onSelected: (selected) {
+                        setState(() {
+                          isSelected = (popular: selected, rating: false, newest: false);
+                        });
+                        widget.onFilterChange(isSelected);
+                      },
+                      selected: isSelected.popular,
                     ),
-                    minimumSize: const WidgetStatePropertyAll(Size(120.0, 40.0)),
-                  ),
-                  child: const Text(
-                    "Apply",
-                    style: TextStyle(color: Color(0xFFF5F6FA), fontSize: 16.0),
+                    FilterChip(
+                      label: Text("Rating", style: Theme.of(context).textTheme.labelMedium),
+                      onSelected: (selected) {
+                        setState(() {
+                          isSelected = (popular: false, rating: selected, newest: false);
+                        });
+                        widget.onFilterChange(isSelected);
+                      },
+                      selected: isSelected.rating,
+                    ),
+                    FilterChip(
+                      label: Text("Newest", style: Theme.of(context).textTheme.labelMedium),
+                      onSelected: (selected) {
+                        setState(() {
+                          isSelected = (popular: false, rating: false, newest: selected);
+                        });
+                        widget.onFilterChange(isSelected);
+                      },
+                      selected: isSelected.newest,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 20.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      isSelected = (popular: false, rating: false, newest: false);
+
+                      widget.onFilterUpdate(FilterType.clear);
+                      Navigator.pop(context);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.grey,
+                      padding: const EdgeInsets.symmetric(vertical: AppSizes.p12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                      side: BorderSide(color: Colors.grey.shade600),
+                      minimumSize: const Size(120.0, 40.0),
+                    ),
+                    child: Text(
+                      "Clear",
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelLarge?.copyWith(color: Colors.grey.shade600),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(width: 15.0),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (isSelected.popular) {
+                        widget.onFilterUpdate(FilterType.popular);
+                      }
+
+                      if (isSelected.rating) {
+                        widget.onFilterUpdate(FilterType.rating);
+                      }
+
+                      if (isSelected.newest) {
+                        widget.onFilterUpdate(FilterType.newest);
+                      }
+
+                      if (!isSelected.popular && !isSelected.rating && !isSelected.newest) {
+                        widget.onFilterUpdate(FilterType.clear);
+                      }
+
+                      Navigator.pop(context);
+                    },
+                    style: const ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(AppColors.primary),
+                      padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: AppSizes.p12)),
+                      shape: WidgetStatePropertyAll(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                        ),
+                      ),
+                      minimumSize: WidgetStatePropertyAll(Size(120.0, 40.0)),
+                    ),
+                    child: Text("Apply", style: Theme.of(context).textTheme.labelLarge),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
