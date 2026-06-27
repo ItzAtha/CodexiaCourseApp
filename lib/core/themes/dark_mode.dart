@@ -1,19 +1,32 @@
 import 'package:flutter/material.dart';
 
+import '../app_constants.dart' show AppColors, AppSizes;
+
 class DarkMode {
   static ThemeData initialize() {
     return ThemeData(
       useMaterial3: true,
-      canvasColor: const Color(0xFF212121),
-      scaffoldBackgroundColor: const Color(0xFF212121),
+      canvasColor: AppColors.bgDark,
+      scaffoldBackgroundColor: AppColors.bgDark,
       dividerColor: Colors.transparent,
-      iconTheme: const IconThemeData(color: Color(0xCCF5F6FA)),
+      iconTheme: const IconThemeData(color: AppColors.iconDark),
       radioTheme: const RadioThemeData(fillColor: WidgetStatePropertyAll(Color(0x80F5F6FA))),
-      textTheme: const TextTheme(
-        labelLarge: TextStyle(color: Color(0xFFF5F6FA)),
-        labelMedium: TextStyle(color: Color(0xFFF5F6FA)),
-        labelSmall: TextStyle(color: Color(0xFFF5F6FA)),
-      ),
+      textTheme: (() {
+        final textBase = Typography(platform: TargetPlatform.android).black.apply(
+          bodyColor: AppColors.textDark,
+          displayColor: AppColors.textDark,
+        );
+
+        return textBase.copyWith(
+          displaySmall: textBase.displaySmall?.copyWith(fontSize: AppSizes.xxlTextSize, fontWeight: FontWeight.bold),
+          titleSmall: textBase.titleSmall?.copyWith(fontSize: AppSizes.mlTextSize, fontWeight: FontWeight.bold),
+          titleMedium: textBase.titleMedium?.copyWith(fontSize: AppSizes.lTextSize, fontWeight: FontWeight.bold),
+          titleLarge: textBase.titleLarge?.copyWith(fontSize: AppSizes.xlTextSize, fontWeight: FontWeight.bold),
+          labelLarge: textBase.labelLarge?.copyWith(fontSize: AppSizes.mTextSize, fontWeight: FontWeight.normal),
+          labelMedium: textBase.labelMedium?.copyWith(fontSize: AppSizes.smTextSize, fontWeight: FontWeight.normal),
+          labelSmall: textBase.labelSmall?.copyWith(fontSize: AppSizes.sTextSize, fontWeight: FontWeight.normal),
+        );
+      }()),
       textSelectionTheme: const TextSelectionThemeData(
         cursorColor: Color(0xFF00CEC9),
         selectionColor: Color(0x8000CEC9),
