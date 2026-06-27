@@ -12,42 +12,62 @@ class DarkMode {
       iconTheme: const IconThemeData(color: AppColors.iconDark),
       radioTheme: const RadioThemeData(fillColor: WidgetStatePropertyAll(Color(0x80F5F6FA))),
       textTheme: (() {
-        final textBase = Typography(platform: TargetPlatform.android).black.apply(
-          bodyColor: AppColors.textDark,
-          displayColor: AppColors.textDark,
-        );
+        final textBase = Typography(
+          platform: TargetPlatform.android,
+        ).black.apply(bodyColor: AppColors.textDark, displayColor: AppColors.textDark);
 
         return textBase.copyWith(
-          displaySmall: textBase.displaySmall?.copyWith(fontSize: AppSizes.xxlTextSize, fontWeight: FontWeight.bold),
-          titleSmall: textBase.titleSmall?.copyWith(fontSize: AppSizes.mlTextSize, fontWeight: FontWeight.bold),
-          titleMedium: textBase.titleMedium?.copyWith(fontSize: AppSizes.lTextSize, fontWeight: FontWeight.bold),
-          titleLarge: textBase.titleLarge?.copyWith(fontSize: AppSizes.xlTextSize, fontWeight: FontWeight.bold),
-          labelLarge: textBase.labelLarge?.copyWith(fontSize: AppSizes.mTextSize, fontWeight: FontWeight.normal),
-          labelMedium: textBase.labelMedium?.copyWith(fontSize: AppSizes.smTextSize, fontWeight: FontWeight.normal),
-          labelSmall: textBase.labelSmall?.copyWith(fontSize: AppSizes.sTextSize, fontWeight: FontWeight.normal),
+          displaySmall: textBase.displaySmall?.copyWith(
+            fontSize: AppSizes.xxlTextSize,
+            fontWeight: FontWeight.bold,
+          ),
+          titleSmall: textBase.titleSmall?.copyWith(
+            fontSize: AppSizes.mlTextSize,
+            fontWeight: FontWeight.bold,
+          ),
+          titleMedium: textBase.titleMedium?.copyWith(
+            fontSize: AppSizes.lTextSize,
+            fontWeight: FontWeight.bold,
+          ),
+          titleLarge: textBase.titleLarge?.copyWith(
+            fontSize: AppSizes.xlTextSize,
+            fontWeight: FontWeight.bold,
+          ),
+          labelLarge: textBase.labelLarge?.copyWith(
+            fontSize: AppSizes.mTextSize,
+            fontWeight: FontWeight.normal,
+          ),
+          labelMedium: textBase.labelMedium?.copyWith(
+            fontSize: AppSizes.smTextSize,
+            fontWeight: FontWeight.normal,
+          ),
+          labelSmall: textBase.labelSmall?.copyWith(
+            fontSize: AppSizes.sTextSize,
+            fontWeight: FontWeight.normal,
+          ),
         );
       }()),
-      textSelectionTheme: const TextSelectionThemeData(
-        cursorColor: Color(0xFF00CEC9),
-        selectionColor: Color(0x8000CEC9),
-        selectionHandleColor: Color(0xFF00CEC9),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: AppColors.secondary,
+        selectionColor: AppColors.secondary.withValues(alpha: 0.4),
+        selectionHandleColor: AppColors.secondary,
       ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
+      elevatedButtonTheme: const ElevatedButtonThemeData(
         style: ButtonStyle(
-          minimumSize: const WidgetStatePropertyAll(Size(200.0, 40.0)),
-          backgroundColor: const WidgetStatePropertyAll(Color(0xFF0984E3)),
+          minimumSize: WidgetStatePropertyAll(Size(200.0, 40.0)),
+          backgroundColor: WidgetStatePropertyAll(AppColors.primary),
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
           ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: ButtonStyle(
           minimumSize: const WidgetStatePropertyAll(Size(180.0, 40.0)),
-          overlayColor: const WidgetStatePropertyAll(Color(0x1A00CEC9)),
-          side: const WidgetStatePropertyAll(BorderSide(color: Color(0xFF00CEC9))),
-          shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          overlayColor: WidgetStatePropertyAll(AppColors.secondary.withValues(alpha: 0.1)),
+          side: const WidgetStatePropertyAll(BorderSide(color: AppColors.secondary)),
+          shape: const WidgetStatePropertyAll(
+            RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
           ),
         ),
       ),
@@ -71,35 +91,37 @@ class DarkMode {
           return null;
         }),
       ),
-      cardTheme: CardThemeData(
+      cardTheme: const CardThemeData(
         elevation: 4.0,
-        color: const Color(0xFF28282B),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+        color: AppColors.cardDark,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
       ),
       searchBarTheme: SearchBarThemeData(
         elevation: const WidgetStatePropertyAll(8.0),
-        backgroundColor: const WidgetStatePropertyAll(Color(0xFF28282B)),
-        hintStyle: const WidgetStatePropertyAll(TextStyle(color: Color(0xFFF5F6FA))),
-        textStyle: const WidgetStatePropertyAll(TextStyle(color: Color(0xFFF5F6FA))),
-        shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+        backgroundColor: const WidgetStatePropertyAll(AppColors.cardDark),
+        hintStyle: WidgetStatePropertyAll(
+          TextStyle(color: AppColors.textDark.withValues(alpha: 0.8)),
+        ),
+        textStyle: const WidgetStatePropertyAll(TextStyle(color: AppColors.textDark)),
+        shape: const WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
         ),
       ),
-      iconButtonTheme: IconButtonThemeData(
+      iconButtonTheme: const IconButtonThemeData(
         style: ButtonStyle(
-          elevation: const WidgetStatePropertyAll(16.0),
-          backgroundColor: const WidgetStatePropertyAll(Color(0xFF28282B)),
+          elevation: WidgetStatePropertyAll(16.0),
+          backgroundColor: WidgetStatePropertyAll(AppColors.cardDark),
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
           ),
         ),
       ),
-      chipTheme: const ChipThemeData(
+      chipTheme: ChipThemeData(
         elevation: 4.0,
-        selectedColor: Color(0xFF00CEC9),
-        backgroundColor: Color(0x8000CEC9),
-        checkmarkColor: Color(0xFFFCFBFB),
-        side: BorderSide(color: Color(0xFF006462), width: 1.5),
+        selectedColor: AppColors.secondary,
+        backgroundColor: AppColors.secondary.withValues(alpha: 0.5),
+        checkmarkColor: AppColors.textDark,
+        side: const BorderSide(color: Color(0xFF006462), width: 1.5),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         elevation: 12.0,
