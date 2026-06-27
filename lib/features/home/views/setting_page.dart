@@ -96,7 +96,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                                         backgroundColor: AppColors.secondary.withValues(alpha: 0.4),
                                       ),
                                   errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error, color: Colors.red),
+                                      const Icon(Icons.error, size: 32.0, color: Colors.red),
                                 ),
                               ),
                             ),
@@ -128,18 +128,11 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                     ),
                     Text(
                       authUser?.displayName ?? authUser?.username ?? "Guest",
-                      style: TextStyle(
-                        fontSize: AppSizes.xxlTextSize,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).textTheme.labelLarge?.color,
-                      ),
+                      style: Theme.of(context).textTheme.displaySmall,
                     ),
                     Text(
                       authUser?.email ?? "guest@gmail.com",
-                      style: TextStyle(
-                        fontSize: AppSizes.mTextSize,
-                        color: Theme.of(context).textTheme.labelSmall?.color,
-                      ),
+                      style: Theme.of(context).textTheme.labelLarge,
                     ),
                   ],
                 ),
@@ -149,13 +142,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                 onPressed: () {
                   context.pushNamed(AppRoutes.editProfileRoute.name);
                 },
-                child: Text(
-                  "Edit Profile",
-                  style: TextStyle(
-                    fontSize: AppSizes.mTextSize,
-                    color: Theme.of(context).textTheme.labelSmall?.color,
-                  ),
-                ),
+                child: Text("Edit Profile", style: Theme.of(context).textTheme.labelLarge),
               ),
               const SizedBox(height: 40.0),
               Card(
@@ -165,14 +152,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                     children: <Widget>[
                       Row(
                         children: <Widget>[
-                          Text(
-                            "General",
-                            style: TextStyle(
-                              fontSize: AppSizes.lTextSize,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).textTheme.labelMedium?.color,
-                            ),
-                          ),
+                          Text("General", style: Theme.of(context).textTheme.titleMedium),
                           const SizedBox(width: 10.0),
                           const Expanded(child: Divider(thickness: 1.2, height: 20.0)),
                         ],
@@ -183,13 +163,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           setState(() => isThemeOptionOpened = value);
                         },
                         leading: Icon(Icons.color_lens, color: Theme.of(context).iconTheme.color),
-                        title: Text(
-                          "Change Theme",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
-                        ),
+                        title: Text("Change Theme", style: Theme.of(context).textTheme.labelLarge),
                         trailing: AnimatedRotation(
                           turns: isThemeOptionOpened ? 0.25 : 0.0,
                           duration: const Duration(milliseconds: 500),
@@ -221,10 +195,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                                 RadioListTile<AdaptiveThemeMode>(
                                   title: Text(
                                     "Auto",
-                                    style: TextStyle(
-                                      fontSize: AppSizes.mTextSize,
-                                      color: Theme.of(context).textTheme.labelSmall?.color,
-                                    ),
+                                    style: Theme.of(context).textTheme.labelLarge,
                                   ),
                                   value: AdaptiveThemeMode.system,
                                   activeColor: AppColors.secondary,
@@ -232,10 +203,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                                 RadioListTile<AdaptiveThemeMode>(
                                   title: Text(
                                     "Light",
-                                    style: TextStyle(
-                                      fontSize: AppSizes.mTextSize,
-                                      color: Theme.of(context).textTheme.labelSmall?.color,
-                                    ),
+                                    style: Theme.of(context).textTheme.labelLarge,
                                   ),
                                   value: AdaptiveThemeMode.light,
                                   activeColor: AppColors.secondary,
@@ -243,10 +211,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                                 RadioListTile<AdaptiveThemeMode>(
                                   title: Text(
                                     "Dark",
-                                    style: TextStyle(
-                                      fontSize: AppSizes.mTextSize,
-                                      color: Theme.of(context).textTheme.labelSmall?.color,
-                                    ),
+                                    style: Theme.of(context).textTheme.labelLarge,
                                   ),
                                   value: AdaptiveThemeMode.dark,
                                   activeColor: AppColors.secondary,
@@ -265,13 +230,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Icons.notifications,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        title: Text(
-                          "Notifications",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
-                        ),
+                        title: Text("Notifications", style: Theme.of(context).textTheme.labelLarge),
                         trailing: Icon(
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
@@ -287,13 +246,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Icons.accessibility,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        title: Text(
-                          "Accessibility",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
-                        ),
+                        title: Text("Accessibility", style: Theme.of(context).textTheme.labelLarge),
                         trailing: Icon(
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
@@ -309,10 +262,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         leading: Icon(Icons.language, color: Theme.of(context).iconTheme.color),
                         title: Text(
                           "Change Language",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
+                          style: Theme.of(context).textTheme.labelLarge,
                         ),
                         trailing: AnimatedRotation(
                           turns: isLanguageOptionOpened ? 0.25 : 0.0,
@@ -344,10 +294,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                                 RadioListTile<LanguageOptions>(
                                   title: Text(
                                     "English",
-                                    style: TextStyle(
-                                      fontSize: AppSizes.mTextSize,
-                                      color: Theme.of(context).textTheme.labelSmall?.color,
-                                    ),
+                                    style: Theme.of(context).textTheme.labelLarge,
                                   ),
                                   value: LanguageOptions.en,
                                   activeColor: AppColors.secondary,
@@ -355,10 +302,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                                 RadioListTile<LanguageOptions>(
                                   title: Text(
                                     "Indonesia",
-                                    style: TextStyle(
-                                      fontSize: AppSizes.mTextSize,
-                                      color: Theme.of(context).textTheme.labelSmall?.color,
-                                    ),
+                                    style: Theme.of(context).textTheme.labelLarge,
                                   ),
                                   value: LanguageOptions.id,
                                   activeColor: AppColors.secondary,
@@ -380,14 +324,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                     children: <Widget>[
                       Row(
                         children: <Widget>[
-                          Text(
-                            "Security",
-                            style: TextStyle(
-                              fontSize: AppSizes.lTextSize,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).textTheme.labelMedium?.color,
-                            ),
-                          ),
+                          Text("Security", style: Theme.of(context).textTheme.titleMedium),
                           const SizedBox(width: 10.0),
                           const Expanded(child: Divider(thickness: 1.2, height: 20.0)),
                         ],
@@ -406,10 +343,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         leading: Icon(Icons.fingerprint, color: Theme.of(context).iconTheme.color),
                         title: Text(
                           "Enable Fingerprint",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
+                          style: Theme.of(context).textTheme.labelLarge,
                         ),
                         trailing: Transform.scale(
                           scale: 0.8,
@@ -433,13 +367,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           DebugLogger(message: "Enable 2FA", level: LogLevel.debug).log();
                         },
                         leading: Icon(Icons.security, color: Theme.of(context).iconTheme.color),
-                        title: Text(
-                          "Enable 2FA",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
-                        ),
+                        title: Text("Enable 2FA", style: Theme.of(context).textTheme.labelLarge),
                         trailing: Icon(
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
@@ -454,10 +382,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         leading: Icon(Icons.devices, color: Theme.of(context).iconTheme.color),
                         title: Text(
                           "Device Management",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
+                          style: Theme.of(context).textTheme.labelLarge,
                         ),
                         trailing: Icon(
                           Icons.arrow_forward_ios,
@@ -476,10 +401,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         ),
                         title: Text(
                           "App Permissions",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
+                          style: Theme.of(context).textTheme.labelLarge,
                         ),
                         trailing: Icon(
                           Icons.arrow_forward_ios,
@@ -499,14 +421,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                     children: <Widget>[
                       Row(
                         children: <Widget>[
-                          Text(
-                            "Help Center",
-                            style: TextStyle(
-                              fontSize: AppSizes.lTextSize,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).textTheme.labelMedium?.color,
-                            ),
-                          ),
+                          Text("Help Center", style: Theme.of(context).textTheme.titleMedium),
                           const SizedBox(width: 10.0),
                           const Expanded(child: Divider(thickness: 1.2, height: 20.0)),
                         ],
@@ -520,13 +435,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           Icons.question_answer,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        title: Text(
-                          "FAQ",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
-                        ),
+                        title: Text("FAQ", style: Theme.of(context).textTheme.labelLarge),
                         trailing: Icon(
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
@@ -539,13 +448,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           DebugLogger(message: "About Us", level: LogLevel.debug).log();
                         },
                         leading: Icon(Icons.info, color: Theme.of(context).iconTheme.color),
-                        title: Text(
-                          "About Us",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
-                        ),
+                        title: Text("About Us", style: Theme.of(context).textTheme.labelLarge),
                         trailing: Icon(
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
@@ -558,13 +461,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           DebugLogger(message: "Rate Us", level: LogLevel.debug).log();
                         },
                         leading: Icon(Icons.star, color: Theme.of(context).iconTheme.color),
-                        title: Text(
-                          "Rate Us",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
-                        ),
+                        title: Text("Rate Us", style: Theme.of(context).textTheme.labelLarge),
                         trailing: Icon(
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).iconTheme.color,
@@ -580,10 +477,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         leading: Icon(Icons.policy, color: Theme.of(context).iconTheme.color),
                         title: Text(
                           "Privacy Policy",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
+                          style: Theme.of(context).textTheme.labelLarge,
                         ),
                         trailing: Icon(
                           Icons.arrow_forward_ios,
@@ -600,10 +494,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         leading: Icon(Icons.privacy_tip, color: Theme.of(context).iconTheme.color),
                         title: Text(
                           "Term of Service",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
+                          style: Theme.of(context).textTheme.labelLarge,
                         ),
                         trailing: Icon(
                           Icons.arrow_forward_ios,
@@ -622,10 +513,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         ),
                         title: Text(
                           "Contact Support",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
+                          style: Theme.of(context).textTheme.labelLarge,
                         ),
                         trailing: Icon(
                           Icons.arrow_forward_ios,
@@ -636,11 +524,10 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       const SizedBox(height: 10.0),
                       Text(
                         "App Version $appVersion",
-                        style: TextStyle(
-                          fontSize: AppSizes.sTextSize,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: Theme.of(
                             context,
-                          ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
+                          ).textTheme.labelSmall?.color?.withValues(alpha: 0.6),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -658,11 +545,9 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         children: <Widget>[
                           Text(
                             "Danger Zone",
-                            style: TextStyle(
-                              fontSize: AppSizes.lTextSize,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).textTheme.labelMedium?.color,
-                            ),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.titleMedium?.copyWith(color: AppColors.dangerZone),
                           ),
                           const SizedBox(width: 10.0),
                           const Expanded(child: Divider(thickness: 1.2, height: 20.0)),
@@ -685,12 +570,17 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           minimumSize: const Size(double.infinity, 40.0),
                           side: const BorderSide(color: AppColors.dangerZone),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Text("Reset Course", style: TextStyle(color: AppColors.dangerZone)),
-                            SizedBox(width: 10.0),
-                            Icon(Icons.restart_alt, color: AppColors.dangerZone),
+                            Text(
+                              "Reset Course",
+                              style: Theme.of(
+                                context,
+                              ).textTheme.labelLarge?.copyWith(color: AppColors.dangerZone),
+                            ),
+                            const SizedBox(width: 10.0),
+                            const Icon(Icons.restart_alt, color: AppColors.dangerZone),
                           ],
                         ),
                       ),
@@ -725,12 +615,17 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           minimumSize: const Size(double.infinity, 40.0),
                           side: const BorderSide(color: AppColors.dangerZone),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Text("Logout Account", style: TextStyle(color: AppColors.dangerZone)),
-                            SizedBox(width: 10.0),
-                            Icon(Icons.logout, color: AppColors.dangerZone),
+                            Text(
+                              "Logout Account",
+                              style: Theme.of(
+                                context,
+                              ).textTheme.labelLarge?.copyWith(color: AppColors.dangerZone),
+                            ),
+                            const SizedBox(width: 10.0),
+                            const Icon(Icons.logout, color: AppColors.dangerZone),
                           ],
                         ),
                       ),
@@ -742,7 +637,12 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                             useRootNavigator: true,
                             isScrollControlled: true,
                             builder: (context) {
-                              return const AccountDeleteConfirmation();
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                                ),
+                                child: const AccountDeleteConfirmation(),
+                              );
                             },
                           );
                         },
@@ -751,12 +651,17 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           minimumSize: const Size(double.infinity, 40.0),
                           side: const BorderSide(color: AppColors.dangerZone),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Text("Delete Account", style: TextStyle(color: AppColors.dangerZone)),
-                            SizedBox(width: 10.0),
-                            Icon(Icons.delete_forever, color: AppColors.dangerZone),
+                            Text(
+                              "Delete Account",
+                              style: Theme.of(
+                                context,
+                              ).textTheme.labelLarge?.copyWith(color: AppColors.dangerZone),
+                            ),
+                            const SizedBox(width: 10.0),
+                            const Icon(Icons.delete_forever, color: AppColors.dangerZone),
                           ],
                         ),
                       ),
@@ -955,13 +860,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
                   children: <Widget>[
                     const Icon(Icons.camera_alt, size: 40.0),
                     const SizedBox(height: 5.0),
-                    Text(
-                      "Camera",
-                      style: TextStyle(
-                        fontSize: AppSizes.mTextSize,
-                        color: Theme.of(context).textTheme.labelSmall?.color,
-                      ),
-                    ),
+                    Text("Camera", style: Theme.of(context).textTheme.labelLarge),
                   ],
                 ),
               ),
@@ -977,13 +876,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
                   children: <Widget>[
                     const Icon(Icons.photo, size: 40.0),
                     const SizedBox(height: 5.0),
-                    Text(
-                      "Gallery",
-                      style: TextStyle(
-                        fontSize: AppSizes.mTextSize,
-                        color: Theme.of(context).textTheme.labelSmall?.color,
-                      ),
-                    ),
+                    Text("Gallery", style: Theme.of(context).textTheme.labelLarge),
                   ],
                 ),
               ),
@@ -1004,13 +897,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
                   children: <Widget>[
                     const Icon(Icons.delete, size: 40.0),
                     const SizedBox(height: 5.0),
-                    Text(
-                      "Delete",
-                      style: TextStyle(
-                        fontSize: AppSizes.mTextSize,
-                        color: Theme.of(context).textTheme.labelSmall?.color,
-                      ),
-                    ),
+                    Text("Delete", style: Theme.of(context).textTheme.labelLarge),
                   ],
                 ),
               ),
@@ -1065,10 +952,7 @@ class _ResetCourseConfirmationState extends ConsumerState<ResetCourseConfirmatio
               "Are you sure you want to reset your Course? All data Course include"
               " your current Course Progress will be reset. This action cannot be undone.",
               textAlign: TextAlign.justify,
-              style: TextStyle(
-                fontSize: AppSizes.mTextSize,
-                color: Theme.of(context).textTheme.labelSmall?.color,
-              ),
+              style: Theme.of(context).textTheme.labelLarge,
             ),
             const SizedBox(height: 15.0),
             Row(
@@ -1081,7 +965,12 @@ class _ResetCourseConfirmationState extends ConsumerState<ResetCourseConfirmatio
                     minimumSize: const Size(120.0, 40.0),
                     side: BorderSide(color: Colors.grey.shade600),
                   ),
-                  child: Text("Cancel", style: TextStyle(color: Colors.grey.shade600)),
+                  child: Text(
+                    "Cancel",
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelLarge?.copyWith(color: Colors.grey.shade600),
+                  ),
                 ),
                 OutlinedButton(
                   onPressed: () async {
@@ -1138,7 +1027,12 @@ class _ResetCourseConfirmationState extends ConsumerState<ResetCourseConfirmatio
                     minimumSize: const Size(120.0, 40.0),
                     side: const BorderSide(color: AppColors.dangerZone),
                   ),
-                  child: const Text("Confirm", style: TextStyle(color: AppColors.dangerZone)),
+                  child: Text(
+                    "Confirm",
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelLarge?.copyWith(color: AppColors.dangerZone),
+                  ),
                 ),
               ],
             ),
@@ -1170,10 +1064,9 @@ class _AccountDeleteConfirmationState extends ConsumerState<AccountDeleteConfirm
         Text(
           "To protect your account, please enter your password to confirm deletion.",
           textAlign: TextAlign.justify,
-          style: TextStyle(
-            fontSize: AppSizes.mTextSize,
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
             fontStyle: FontStyle.italic,
-            color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
+            color: Theme.of(context).textTheme.labelLarge?.color?.withValues(alpha: 0.6),
           ),
         ),
         const SizedBox(height: 10.0),
@@ -1183,9 +1076,7 @@ class _AccountDeleteConfirmationState extends ConsumerState<AccountDeleteConfirm
           obscureText: !passwordVisible,
           autocorrect: false,
           enableSuggestions: false,
-          style: TextStyle(
-            color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
-          ),
+          style: Theme.of(context).textTheme.labelLarge,
           decoration: InputDecoration(
             suffixIcon: InkWell(
               onTap: () {
@@ -1197,7 +1088,7 @@ class _AccountDeleteConfirmationState extends ConsumerState<AccountDeleteConfirm
               child: Icon(
                 passwordVisible ? Icons.visibility : Icons.visibility_off,
                 size: 24.0,
-                color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.7),
+                color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.8),
               ),
             ),
           ),
@@ -1236,10 +1127,7 @@ class _AccountDeleteConfirmationState extends ConsumerState<AccountDeleteConfirm
               "Are you sure you want to delete your account? All data include Course "
               "Progress and Chat will be deleted. This action cannot be undone.",
               textAlign: TextAlign.justify,
-              style: TextStyle(
-                fontSize: AppSizes.mTextSize,
-                color: Theme.of(context).textTheme.labelSmall?.color,
-              ),
+              style: Theme.of(context).textTheme.labelLarge,
             ),
             if (providerId == "password") buildEmailField(),
             const SizedBox(height: 15.0),
@@ -1253,7 +1141,12 @@ class _AccountDeleteConfirmationState extends ConsumerState<AccountDeleteConfirm
                     minimumSize: const Size(120.0, 40.0),
                     side: BorderSide(color: Colors.grey.shade600),
                   ),
-                  child: Text("Cancel", style: TextStyle(color: Colors.grey.shade600)),
+                  child: Text(
+                    "Cancel",
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelLarge?.copyWith(color: Colors.grey.shade600),
+                  ),
                 ),
                 OutlinedButton(
                   onPressed: () async {
@@ -1294,7 +1187,12 @@ class _AccountDeleteConfirmationState extends ConsumerState<AccountDeleteConfirm
                     minimumSize: const Size(120.0, 40.0),
                     side: const BorderSide(color: AppColors.dangerZone),
                   ),
-                  child: const Text("Confirm", style: TextStyle(color: AppColors.dangerZone)),
+                  child: Text(
+                    "Confirm",
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelLarge?.copyWith(color: AppColors.dangerZone),
+                  ),
                 ),
               ],
             ),
