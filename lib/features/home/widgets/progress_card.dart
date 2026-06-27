@@ -2,6 +2,7 @@ import 'package:codexia_course_learning/shared/enums/course_level.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../core/app_constants.dart' show AppSizes, AppColors;
@@ -28,7 +29,7 @@ class ProgressCard {
   Widget create(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(AppSizes.p16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -38,22 +39,20 @@ class ProgressCard {
                 Skeleton.unite(
                   child: Row(
                     children: <Widget>[
-                      const Icon(Icons.calendar_today, size: 16.0, color: Color(0xFF0984E3)),
-                      const SizedBox(width: 5.0),
-                      Text(
-                        _lastAccessedDate,
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          color: Theme.of(context).textTheme.labelSmall?.color,
-                        ),
+                      const FaIcon(
+                        FontAwesomeIcons.clockRotateLeft,
+                        size: 16.0,
+                        color: Color(0xFF0984E3),
                       ),
+                      const SizedBox(width: 5.0),
+                      Text(_lastAccessedDate, style: Theme.of(context).textTheme.labelMedium),
                     ],
                   ),
                 ),
-                Skeleton.leaf(child: _getLevelBadge(_level)),
+                Skeleton.leaf(child: _getLevelBadge(context, _level)),
               ],
             ),
-            Divider(thickness: 1.0, color: Colors.grey.shade300, height: 20.0),
+            const Divider(thickness: 1.0, height: 20.0),
             const SizedBox(height: 10.0),
             Row(
               children: <Widget>[
@@ -66,11 +65,9 @@ class ProgressCard {
                 Expanded(
                   child: Text(
                     _title,
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).textTheme.labelSmall?.color,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -79,7 +76,7 @@ class ProgressCard {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text("Progress", style: TextStyle(fontSize: 14.0, color: Colors.grey.shade600)),
+                Text("Progress", style: Theme.of(context).textTheme.labelMedium),
                 const SizedBox(width: 10.0),
                 Skeleton.leaf(
                   child: Container(
@@ -99,8 +96,7 @@ class ProgressCard {
                       builder: (context, value, child) {
                         return Text(
                           "${NumberFormat.percentPattern().format(value)} Done",
-                          style: const TextStyle(
-                            fontSize: AppSizes.sTextSize,
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: AppColors.primary,
                           ),
@@ -119,8 +115,8 @@ class ProgressCard {
               builder: (context, value, child) {
                 return LinearProgressIndicator(
                   value: value,
-                  backgroundColor: const Color(0x6600CEC9),
-                  color: const Color(0xFF00CEC9),
+                  backgroundColor: AppColors.secondary.withValues(alpha: 0.25),
+                  color: AppColors.secondary,
                   minHeight: 6.0,
                   borderRadius: const BorderRadius.all(Radius.circular(8.0)),
                 );
@@ -132,7 +128,7 @@ class ProgressCard {
     );
   }
 
-  Widget _getLevelBadge(CourseLevel level) {
+  Widget _getLevelBadge(BuildContext context, CourseLevel level) {
     String text;
     MaterialColor color;
 
@@ -160,16 +156,19 @@ class ProgressCard {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.p8, vertical: AppSizes.p8 / 2),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [color.shade100, color.shade300],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: const BorderRadius.all(Radius.circular(12.0)),
       ),
-      child: Text(text, style: TextStyle(fontSize: 12.0, color: color.shade900)),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color.shade900),
+      ),
     );
   }
 }
