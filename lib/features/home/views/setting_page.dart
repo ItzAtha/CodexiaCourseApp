@@ -80,24 +80,36 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                         child: Stack(
                           alignment: AlignmentGeometry.center,
                           children: <Widget>[
-                            SizedBox(
-                              height: 120.0,
-                              width: 120.0,
-                              child: ClipOval(
-                                child: CachedNetworkImage(
-                                  imageUrl:
-                                      authUser?.avatar ??
-                                      "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
-                                  fit: BoxFit.cover,
-                                  progressIndicatorBuilder: (context, url, downloadProgress) =>
-                                      CircularProgressIndicator(
-                                        value: downloadProgress.progress,
-                                        color: AppColors.secondary,
-                                        backgroundColor: AppColors.secondary.withValues(alpha: 0.4),
-                                      ),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error, size: 32.0, color: Colors.red),
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(minHeight: 150.0),
+                              child: CachedNetworkImage(
+                                imageUrl:
+                                    authUser?.avatar ??
+                                    "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
+                                imageBuilder: (context, imageProvider) => Container(
+                                  height: 120.0,
+                                  width: 120.0,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                                  ),
                                 ),
+                                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                    Center(
+                                      child: SizedBox(
+                                        height: 50.0,
+                                        width: 50.0,
+                                        child: CircularProgressIndicator(
+                                          value: downloadProgress.progress,
+                                          color: AppColors.secondary,
+                                          backgroundColor: AppColors.secondary.withValues(
+                                            alpha: 0.4,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.error, size: 32.0, color: Colors.red),
                               ),
                             ),
                             Positioned(
