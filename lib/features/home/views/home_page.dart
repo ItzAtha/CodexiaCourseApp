@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+import '../../../core/app_constants.dart' show AppSizes;
 import '../../../shared/models/auth_user.dart';
 import '../../../shared/models/course/course_lesson.dart';
 import '../../../shared/models/user_course_progress.dart';
@@ -43,9 +44,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   Widget loadCourseData() {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      margin: const EdgeInsets.symmetric(horizontal: AppSizes.p16),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(AppSizes.p16),
         child: Container(
           constraints: const BoxConstraints(maxHeight: 150.0),
           child: Skeletonizer(
@@ -62,36 +63,43 @@ class _HomePageState extends ConsumerState<HomePage> {
                     children: <Widget>[
                       Skeleton.unite(
                         key: skeletonizerKey,
-                        child: Row(
+                        child: const Row(
                           children: <Widget>[
-                            const Bone.icon(size: 16.0),
-                            const SizedBox(width: 5.0),
+                            Bone.icon(size: 16.0),
+                            SizedBox(width: 5.0),
                             Bone.text(
                               width: 60.0,
                               fontSize: 14.0,
-                              borderRadius: BorderRadius.circular(7.0),
+                              borderRadius: BorderRadius.all(Radius.circular(7.0)),
                             ),
                           ],
                         ),
                       ),
-                      Bone(width: 80.0, height: 24.0, borderRadius: BorderRadius.circular(12.0)),
+                      const Bone(
+                        width: 80.0,
+                        height: 24.0,
+                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 40.0),
-                  Row(
+                  const Row(
                     children: <Widget>[
-                      const Bone.icon(size: 50.0),
-                      const SizedBox(width: 15.0),
+                      Bone.icon(size: 50.0),
+                      SizedBox(width: 15.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Bone.text(
                             width: 180.0,
                             fontSize: 16.0,
-                            borderRadius: BorderRadius.circular(7.0),
+                            borderRadius: BorderRadius.all(Radius.circular(7.0)),
                           ),
-                          const SizedBox(height: 25.0),
-                          Bone.text(fontSize: 16.0, borderRadius: BorderRadius.circular(7.0)),
+                          SizedBox(height: 25.0),
+                          Bone.text(
+                            fontSize: 16.0,
+                            borderRadius: BorderRadius.all(Radius.circular(7.0)),
+                          ),
                         ],
                       ),
                     ],
@@ -108,9 +116,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   Widget noCourseData() {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      margin: const EdgeInsets.symmetric(horizontal: AppSizes.p16),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(AppSizes.p16),
         child: Container(
           width: double.infinity,
           constraints: const BoxConstraints(maxHeight: 150.0),
@@ -120,10 +128,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               Text(
                 "You don't have any courses progress yet. Start learning now to track your progress here!",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16.0,
-                  color: Theme.of(context).textTheme.labelSmall?.color,
-                ),
+                style: Theme.of(context).textTheme.labelLarge,
               ),
               const SizedBox(height: 15.0),
             ],
