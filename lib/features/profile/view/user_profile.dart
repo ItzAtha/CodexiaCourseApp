@@ -75,23 +75,32 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
         child: Column(
           children: <Widget>[
             const SizedBox(height: 40.0),
-            SizedBox(
-              height: 150.0,
-              width: 150.0,
-              child: ClipOval(
-                child: CachedNetworkImage(
-                  imageUrl:
-                      authUser?.avatar ?? "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
-                  fit: BoxFit.cover,
-                  progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      CircularProgressIndicator(
-                        value: downloadProgress.progress,
-                        color: AppColors.secondary,
-                        backgroundColor: AppColors.secondary.withValues(alpha: 0.4),
-                      ),
-                  errorWidget: (context, url, error) =>
-                      const Icon(Icons.error, size: 32.0, color: Colors.red),
+            ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 150.0),
+              child: CachedNetworkImage(
+                imageUrl:
+                    authUser?.avatar ?? "https://cdn-icons-png.flaticon.com/128/3135/3135715.png",
+                imageBuilder: (context, imageProvider) => Container(
+                  height: 150.0,
+                  width: 150.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                  ),
                 ),
+                progressIndicatorBuilder: (context, url, downloadProgress) => Center(
+                  child: SizedBox(
+                    height: 50.0,
+                    width: 50.0,
+                    child: CircularProgressIndicator(
+                      value: downloadProgress.progress,
+                      color: AppColors.secondary,
+                      backgroundColor: AppColors.secondary.withValues(alpha: 0.4),
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) =>
+                    const Icon(Icons.error, size: 32.0, color: Colors.red),
               ),
             ),
             const SizedBox(height: 40.0),
@@ -108,6 +117,21 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                   controller: displayNameController,
                   style: Theme.of(context).textTheme.labelLarge,
                   textInputAction: TextInputAction.next,
+                  contextMenuBuilder: (context, editableTextState) {
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        iconButtonTheme: IconButtonThemeData(
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.grey[800],
+                          ),
+                        ),
+                      ),
+                      child: AdaptiveTextSelectionToolbar.editableText(
+                        editableTextState: editableTextState,
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 15.0),
                 Text(
@@ -135,6 +159,21 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                     }
 
                     return null;
+                  },
+                  contextMenuBuilder: (context, editableTextState) {
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        iconButtonTheme: IconButtonThemeData(
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.grey[800],
+                          ),
+                        ),
+                      ),
+                      child: AdaptiveTextSelectionToolbar.editableText(
+                        editableTextState: editableTextState,
+                      ),
+                    );
                   },
                 ),
               ],
