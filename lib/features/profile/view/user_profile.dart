@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,13 +40,25 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Profile"),
+        title: Text("Edit Profile", style: Theme.of(context).textTheme.titleMedium),
         centerTitle: true,
         backgroundColor: Colors.transparent,
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back),
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
+        leading: ValueListenableBuilder(
+          valueListenable: AdaptiveTheme.of(context).modeChangeNotifier,
+          builder: (_, mode, child) {
+            bool isDarkMode = false;
+            if (mode == AdaptiveThemeMode.system) {
+              isDarkMode = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+            } else {
+              isDarkMode = mode == AdaptiveThemeMode.dark;
+            }
+
+            return IconButton(
+              onPressed: () => context.pop(),
+              icon: Icon(Icons.arrow_back, color: isDarkMode ? Colors.white : Colors.black),
+              style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
+            );
+          },
         ),
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -76,7 +89,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                         color: AppColors.secondary,
                         backgroundColor: AppColors.secondary.withValues(alpha: 0.4),
                       ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.red),
+                  errorWidget: (context, url, error) =>
+                      const Icon(Icons.error, size: 32.0, color: Colors.red),
                 ),
               ),
             ),
@@ -86,35 +100,27 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
               children: <Widget>[
                 Text(
                   "DisplayName",
-                  style: TextStyle(
-                    fontSize: AppSizes.mTextSize,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).textTheme.labelSmall?.color,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 TextField(
                   controller: displayNameController,
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
-                  ),
+                  style: Theme.of(context).textTheme.labelLarge,
                   textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 15.0),
                 Text(
                   "Email Address",
-                  style: TextStyle(
-                    fontSize: AppSizes.mTextSize,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).textTheme.labelSmall?.color,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 TextFormField(
                   key: emailFieldKey,
                   controller: emailController,
                   readOnly: true,
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
-                  ),
+                  style: Theme.of(context).textTheme.labelLarge,
                   decoration: const InputDecoration(hintText: "example@gmail.com"),
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
@@ -159,7 +165,10 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
               style: const ButtonStyle(
                 minimumSize: WidgetStatePropertyAll(Size(double.infinity, 40.0)),
               ),
-              child: const Text("Save", style: TextStyle(fontSize: 14.0, color: Colors.white)),
+              child: Text(
+                "Save",
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.white),
+              ),
             ),
           ],
         ),
