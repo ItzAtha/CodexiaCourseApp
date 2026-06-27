@@ -3,6 +3,7 @@ import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:toastification/toastification.dart';
 
+import '../../../core/app_constants.dart' show AppColors, AppSizes;
 import '../../../shared/enums/course_level.dart';
 
 class CourseCard {
@@ -43,23 +44,22 @@ class CourseCard {
     return Card(
       elevation: 2.0,
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
-      margin: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+      margin: const EdgeInsets.symmetric(horizontal: AppSizes.p8 / 2, vertical: AppSizes.p8),
       child: Column(
         children: <Widget>[
           if (_isNewestCourse)
             Container(
-              color: const Color(0x9900CEC9),
+              color: AppColors.secondary.withValues(alpha: 0.8),
               height: 30.0,
               alignment: Alignment.centerLeft,
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.0),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSizes.p12),
                 child: Text(
                   "New Course!",
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: Colors.white,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -67,11 +67,7 @@ class CourseCard {
           ExpansionTile(
             title: Text(
               _title,
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).textTheme.labelSmall?.color,
-              ),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
             subtitle: Row(
               mainAxisSize: MainAxisSize.min,
@@ -93,11 +89,9 @@ class CourseCard {
                       const SizedBox(width: 6.0),
                       Text(
                         _rating.toStringAsFixed(_rating % 1 == 0 ? 0 : 1),
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          color: Theme.of(context).textTheme.labelSmall?.color,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -112,11 +106,9 @@ class CourseCard {
                       const SizedBox(width: 6.0),
                       Text(
                         _formatPopular(_popular),
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          color: Theme.of(context).textTheme.labelSmall?.color,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -135,11 +127,7 @@ class CourseCard {
                   turns: isOpened ? 0.25 : 0.0,
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.easeInOut,
-                  child: Icon(
-                    Icons.arrow_forward_ios,
-                    size: 20.0,
-                    color: Theme.of(context).iconTheme.color,
-                  ),
+                  child: Icon(Icons.arrow_forward_ios, color: Theme.of(context).iconTheme.color),
                 );
               },
             ),
@@ -155,43 +143,28 @@ class CourseCard {
             children: <Widget>[
               const Divider(thickness: 1.5, height: 2.0),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(AppSizes.p16),
                 child: Column(
                   children: <Widget>[
-                    Text(
-                      "Course Description",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).textTheme.labelSmall?.color,
-                      ),
-                    ),
+                    Text("Course Description", style: Theme.of(context).textTheme.titleSmall),
                     const SizedBox(height: 10.0),
                     Text(
                       _description,
                       textAlign: TextAlign.justify,
-                      style: TextStyle(
-                        fontSize: 14.0,
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: Theme.of(
                           context,
-                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
+                        ).textTheme.labelMedium?.color?.withValues(alpha: 0.9),
                       ),
                     ),
                     const SizedBox(height: 20.0),
-                    Text(
-                      "Available Levels",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).textTheme.labelSmall?.color,
-                      ),
-                    ),
+                    Text("Available Levels", style: Theme.of(context).textTheme.titleSmall),
                     const SizedBox(height: 10.0),
                     Wrap(
                       spacing: 12.0,
                       runSpacing: 12.0,
                       alignment: WrapAlignment.center,
-                      children: <Widget>[for (var level in _levels) _getLevelBadge(level)],
+                      children: <Widget>[for (var level in _levels) _getLevelBadge(context, level)],
                     ),
                     const SizedBox(height: 20.0),
                     ElevatedButton(
@@ -216,9 +189,11 @@ class CourseCard {
                           pathParameters: {'courseId': _id},
                         );
                       },
-                      child: const Text(
+                      child: Text(
                         "Start Course",
-                        style: TextStyle(fontSize: 14.0, color: Color(0xFFF5F6FA)),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelLarge?.copyWith(color: Colors.white),
                       ),
                     ),
                   ],
@@ -244,7 +219,7 @@ class CourseCard {
     return p.toStringAsFixed(1);
   }
 
-  Widget _getLevelBadge(CourseLevel level) {
+  Widget _getLevelBadge(BuildContext context, CourseLevel level) {
     String text;
     MaterialColor color;
 
@@ -272,16 +247,19 @@ class CourseCard {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.p8, vertical: AppSizes.p8 / 2),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [color.shade100, color.shade300],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: const BorderRadius.all(Radius.circular(12.0)),
       ),
-      child: Text(text, style: TextStyle(fontSize: 12.0, color: color.shade900)),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color.shade900),
+      ),
     );
   }
 
