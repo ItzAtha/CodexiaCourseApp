@@ -1,7 +1,7 @@
+import 'package:cached_network_svg_image/cached_network_svg_image.dart';
 import 'package:codexia_course_learning/shared/enums/course_level.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -56,11 +56,24 @@ class ProgressCard {
             const SizedBox(height: 10.0),
             Row(
               children: <Widget>[
-                CircleAvatar(
-                  radius: 20.0,
-                  backgroundColor: Colors.transparent,
-                  backgroundImage: Svg('assets/icons/$_courseImage'),
+                ClipOval(
+                  child: CachedNetworkSVGImage(
+                    _courseImage,
+                    width: 50.0,
+                    height: 50.0,
+                    fit: BoxFit.cover,
+                    placeholder: Skeletonizer(
+                      enabled: true,
+                      child: Container(
+                        width: 50.0,
+                        height: 50.0,
+                        decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
+                      ),
+                    ),
+                    errorWidget: const Icon(Icons.error, size: 32.0, color: Colors.red),
+                  ),
                 ),
+
                 const SizedBox(width: 10.0),
                 Expanded(
                   child: Text(
