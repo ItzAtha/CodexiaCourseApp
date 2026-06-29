@@ -29,6 +29,9 @@ abstract class Course with _$Course {
 
     required String title,
     required String description,
+
+    @JsonKey(name: 'icon') @Default("") String iconUrl,
+
     required double rating,
     required double popular,
     required CourseType type,
