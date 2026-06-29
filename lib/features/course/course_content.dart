@@ -50,22 +50,10 @@ class CourseContentState extends State<CourseContent> {
             data: lesson.content[MaterialContentType.explain] ?? "",
             styleSheet: MarkdownStyleSheet(
               textAlign: WrapAlignment.spaceAround,
-              p: TextStyle(
-                height: 1.5,
-                fontSize: AppSizes.smTextSize,
-                color: Theme.of(context).textTheme.labelSmall?.color,
-              ),
-              listBullet: TextStyle(
-                height: 1.5,
-                fontSize: AppSizes.smTextSize,
-                color: Theme.of(context).textTheme.labelSmall?.color,
-              ),
-              code: TextStyle(
-                height: 1.5,
-                fontSize: AppSizes.smTextSize,
-                color: Theme.of(context).textTheme.labelSmall?.color,
-              ),
-              blockquote: const TextStyle(height: 1.5, fontSize: AppSizes.smTextSize),
+              p: Theme.of(context).textTheme.labelMedium,
+              listBullet: Theme.of(context).textTheme.labelMedium,
+              code: Theme.of(context).textTheme.labelMedium,
+              blockquote: Theme.of(context).textTheme.labelMedium,
             ),
           ),
         );
@@ -78,7 +66,9 @@ class CourseContentState extends State<CourseContent> {
           Card(
             elevation: 1.5,
             clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15.0)),
+            ),
             child: IntrinsicHeight(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -114,7 +104,7 @@ class CourseContentState extends State<CourseContent> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
-                              borderRadius: BorderRadius.circular(12.0),
+                              borderRadius: const BorderRadius.all(Radius.circular(12.0)),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -127,10 +117,9 @@ class CourseContentState extends State<CourseContent> {
                                 const SizedBox(width: 6.0),
                                 Text(
                                   "KEY CONCEPT",
-                                  style: TextStyle(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.bold,
+                                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
                                     color: Colors.blue.shade800,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
@@ -143,11 +132,7 @@ class CourseContentState extends State<CourseContent> {
                               data: lesson.content[MaterialContentType.important] ?? "",
                               styleSheet: MarkdownStyleSheet(
                                 textAlign: WrapAlignment.spaceAround,
-                                p: TextStyle(
-                                  height: 1.5,
-                                  fontSize: AppSizes.smTextSize,
-                                  color: Theme.of(context).textTheme.labelSmall?.color,
-                                ),
+                                p: Theme.of(context).textTheme.labelMedium,
                               ),
                             ),
                           ),
@@ -170,10 +155,12 @@ class CourseContentState extends State<CourseContent> {
           Card(
             elevation: 1.5,
             clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15.0)),
+            ),
             child: IntrinsicHeight(
               child: Row(
-                crossAxisAlignment: .stretch,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Container(
                     width: 6.0,
@@ -206,7 +193,7 @@ class CourseContentState extends State<CourseContent> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
-                              borderRadius: BorderRadius.circular(12.0),
+                              borderRadius: const BorderRadius.all(Radius.circular(12.0)),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -219,8 +206,7 @@ class CourseContentState extends State<CourseContent> {
                                 const SizedBox(width: 6.0),
                                 Text(
                                   "WARNING",
-                                  style: TextStyle(
-                                    fontSize: 14.0,
+                                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.orange.shade800,
                                   ),
@@ -235,11 +221,7 @@ class CourseContentState extends State<CourseContent> {
                               data: lesson.content[MaterialContentType.warning] ?? "",
                               styleSheet: MarkdownStyleSheet(
                                 textAlign: WrapAlignment.spaceAround,
-                                p: TextStyle(
-                                  height: 1.5,
-                                  fontSize: AppSizes.smTextSize,
-                                  color: Theme.of(context).textTheme.labelSmall?.color,
-                                ),
+                                p: Theme.of(context).textTheme.labelMedium,
                               ),
                             ),
                           ),
@@ -270,26 +252,32 @@ class CourseContentState extends State<CourseContent> {
 
     return Column(
       children: <Widget>[
-        const SizedBox(height: 16.0),
         Text(
           lesson.title,
-          style: TextStyle(
-            fontSize: AppSizes.xxlTextSize,
-            color: Theme.of(context).textTheme.labelSmall?.color,
-            fontWeight: FontWeight.bold,
-          ),
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.displaySmall,
         ),
         const SizedBox(height: 8.0),
         if (lesson.imageUrl.isNotEmpty)
-          CachedNetworkImage(
-            imageUrl: lesson.imageUrl,
-            fit: BoxFit.cover,
-            progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(
-              value: downloadProgress.progress,
-              color: AppColors.secondary,
-              backgroundColor: AppColors.secondary.withValues(alpha: 0.4),
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: AppSizes.p8),
+            constraints: const BoxConstraints(minHeight: 200.0),
+            child: CachedNetworkImage(
+              imageUrl: lesson.imageUrl,
+              fit: BoxFit.cover,
+              progressIndicatorBuilder: (context, url, downloadProgress) => Center(
+                child: SizedBox(
+                  height: 50.0,
+                  width: 50.0,
+                  child: CircularProgressIndicator(
+                    value: downloadProgress.progress,
+                    color: AppColors.secondary,
+                    backgroundColor: AppColors.secondary.withValues(alpha: 0.4),
+                  ),
+                ),
+              ),
+              errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.red),
             ),
-            errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.red),
           ),
         const SizedBox(height: 8.0),
         ...getContent(),
@@ -303,10 +291,10 @@ class CourseContentState extends State<CourseContent> {
     Widget feedbackCard = Card(
       elevation: 1.5,
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
       child: IntrinsicHeight(
         child: Row(
-          crossAxisAlignment: .stretch,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Container(
               width: 6.0,
@@ -339,7 +327,7 @@ class CourseContentState extends State<CourseContent> {
                         color: quiz.correctAnswerIndex == pickedAnswerIndex[index]
                             ? Colors.green.shade100
                             : Colors.red.shade100,
-                        borderRadius: BorderRadius.circular(12.0),
+                        borderRadius: const BorderRadius.all(Radius.circular(12.0)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -360,8 +348,7 @@ class CourseContentState extends State<CourseContent> {
                             quiz.correctAnswerIndex == pickedAnswerIndex[index]
                                 ? "THE ANSWER IS CORRECT!"
                                 : "THE ANSWER IS INCORRECT!",
-                            style: TextStyle(
-                              fontSize: 14.0,
+                            style: Theme.of(context).textTheme.labelMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: quiz.correctAnswerIndex == pickedAnswerIndex[index]
                                   ? Colors.green
@@ -378,16 +365,8 @@ class CourseContentState extends State<CourseContent> {
                         data: quiz.feedback,
                         styleSheet: MarkdownStyleSheet(
                           textAlign: WrapAlignment.spaceAround,
-                          p: TextStyle(
-                            height: 1.5,
-                            fontSize: AppSizes.smTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
-                          code: TextStyle(
-                            height: 1.5,
-                            fontSize: AppSizes.smTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
+                          p: Theme.of(context).textTheme.labelMedium,
+                          code: Theme.of(context).textTheme.labelMedium,
                         ),
                       ),
                     ),
@@ -413,36 +392,34 @@ class CourseContentState extends State<CourseContent> {
 
     return Column(
       children: <Widget>[
-        const SizedBox(height: 16.0),
-        Text(
-          quiz.title,
-          style: TextStyle(
-            fontSize: AppSizes.xxlTextSize,
-            color: Theme.of(context).textTheme.labelSmall?.color,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        Text(quiz.title, style: Theme.of(context).textTheme.displaySmall),
         const SizedBox(height: 8.0),
         if (quiz.imageUrl.isNotEmpty)
-          CachedNetworkImage(
-            imageUrl: quiz.imageUrl,
-            fit: BoxFit.cover,
-            progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(
-              value: downloadProgress.progress,
-              color: AppColors.secondary,
-              backgroundColor: AppColors.secondary.withValues(alpha: 0.4),
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: AppSizes.p8),
+            constraints: const BoxConstraints(minHeight: 200.0),
+            child: CachedNetworkImage(
+              imageUrl: quiz.imageUrl,
+              fit: BoxFit.cover,
+              progressIndicatorBuilder: (context, url, downloadProgress) => Center(
+                child: SizedBox(
+                  height: 50.0,
+                  width: 50.0,
+                  child: CircularProgressIndicator(
+                    value: downloadProgress.progress,
+                    color: AppColors.secondary,
+                    backgroundColor: AppColors.secondary.withValues(alpha: 0.4),
+                  ),
+                ),
+              ),
+              errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.red),
             ),
-            errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.red),
           ),
         const SizedBox(height: 8.0),
         Text(
           quiz.question,
           textAlign: TextAlign.justify,
-          style: TextStyle(
-            height: 1.5,
-            fontSize: AppSizes.smTextSize,
-            color: Theme.of(context).textTheme.labelSmall?.color,
-          ),
+          style: Theme.of(context).textTheme.labelMedium,
         ),
         const SizedBox(height: 16.0),
         LayoutBuilder(
@@ -496,14 +473,13 @@ class CourseContentState extends State<CourseContent> {
                                   ? Colors.green.shade50
                                   : Colors.red.shade50
                             : null,
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+                        padding: const EdgeInsets.all(AppSizes.p12),
                       ),
                       child: Align(
                         alignment: AlignmentGeometry.centerStart,
                         child: Text(
                           "${options[i]}. ${quiz.options[i]}",
-                          style: TextStyle(
-                            fontSize: AppSizes.smTextSize,
+                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
                             color: pickedAnswerIndex.containsKey(index)
                                 ? Colors.grey.shade800
                                 : Theme.of(context).textTheme.labelSmall?.color,
@@ -546,7 +522,7 @@ class CourseContentState extends State<CourseContent> {
 
         return Scrollbar(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: AppSizes.p16, vertical: AppSizes.p8),
+            padding: const EdgeInsets.all(AppSizes.p16),
             child: Center(child: buildLesson(index, lesson)),
           ),
         );
