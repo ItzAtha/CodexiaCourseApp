@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../core/app_constants.dart' show AppColors;
 
@@ -50,7 +51,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
                 index: 1,
                 currentIndex: selectedIndex,
                 label: "Course",
-                icon: Icons.book,
+                icon: FontAwesomeIcons.laptopCode.data,
                 onPress: (index) {
                   setState(() => selectedIndex.value = index);
                   widget._onItemSelected(index);
@@ -131,14 +132,18 @@ class BottomNavbarItem {
                           Icon(
                             icon,
                             size: 24.0,
-                            color: value == index ? const Color(0xFFF5F6FA) : const Color(0xB3F5F6FA),
+                            color: value == index
+                                ? const Color(0xFFF5F6FA)
+                                : const Color(0xB3F5F6FA),
                           ),
                           const SizedBox(height: 4.0),
                           Text(
                             label,
                             style: TextStyle(
                               fontSize: 12.0,
-                              color: value == index ? const Color(0xFFF5F6FA) : const Color(0xB3F5F6FA),
+                              color: value == index
+                                  ? const Color(0xFFF5F6FA)
+                                  : const Color(0xB3F5F6FA),
                             ),
                           ),
                         ],
