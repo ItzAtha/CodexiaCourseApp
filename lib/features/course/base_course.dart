@@ -1,4 +1,5 @@
-import 'package:codexia_course_learning/core/app_constants.dart';
+import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:codexia_course_learning/core/app_constants.dart' show AppSizes, AppColors;
 import 'package:codexia_course_learning/features/course/course_content.dart';
 import 'package:codexia_course_learning/shared/enums/course_level.dart';
 import 'package:codexia_course_learning/shared/models/course.dart';
@@ -208,19 +209,31 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title ?? ""),
+        title: Text(title ?? "", style: Theme.of(context).textTheme.titleLarge),
         centerTitle: true,
         backgroundColor: Colors.transparent,
-        leading: IconButton(
-          onPressed: () async {
-            await updateProgress();
-
-            if (context.mounted) {
-              context.pop();
+        leading: ValueListenableBuilder(
+          valueListenable: AdaptiveTheme.of(context).modeChangeNotifier,
+          builder: (_, mode, child) {
+            bool isDarkMode = false;
+            if (mode == AdaptiveThemeMode.system) {
+              isDarkMode = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+            } else {
+              isDarkMode = mode == AdaptiveThemeMode.dark;
             }
+
+            return IconButton(
+              onPressed: () async {
+                await updateProgress();
+
+                if (context.mounted) {
+                  context.pop();
+                }
+              },
+              icon: Icon(Icons.arrow_back, color: isDarkMode ? Colors.white : Colors.black),
+              style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
+            );
           },
-          icon: const Icon(Icons.arrow_back),
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
         ),
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -235,12 +248,7 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
       body: Column(
         children: <Widget>[
           Container(
-            padding: const EdgeInsets.only(
-              top: AppSizes.p16,
-              bottom: AppSizes.p16,
-              left: AppSizes.p24,
-              right: AppSizes.p24,
-            ),
+            padding: const EdgeInsets.symmetric(vertical: AppSizes.p16, horizontal: AppSizes.p24),
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
               boxShadow: [
@@ -258,48 +266,28 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(
-                      "Lesson Progress",
-                      style: TextStyle(
-                        fontSize: AppSizes.sTextSize,
-                        color: Theme.of(
-                          context,
-                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
-                      ),
-                    ),
+                    Text("Lesson Progress", style: Theme.of(context).textTheme.labelSmall),
                     Row(
                       children: <Widget>[
                         Text(
                           "Page ${currentPage + 1} of ${widget._lessons.length}",
-                          style: TextStyle(
-                            fontSize: AppSizes.sTextSize,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(
-                              context,
-                            ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
-                          ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(width: 2.5),
                         Text(
                           "•",
-                          style: TextStyle(
-                            fontSize: AppSizes.sTextSize,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(
-                              context,
-                            ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
-                          ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(width: 2.5),
                         Text(
                           NumberFormat.percentPattern().format(completedProgress),
-                          style: TextStyle(
-                            fontSize: AppSizes.sTextSize,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(
-                              context,
-                            ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
-                          ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -384,13 +372,7 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
                           size: 16.0,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        label: Text(
-                          "Previous",
-                          style: TextStyle(
-                            fontSize: AppSizes.mTextSize,
-                            color: Theme.of(context).textTheme.labelSmall?.color,
-                          ),
-                        ),
+                        label: Text("Previous", style: Theme.of(context).textTheme.labelLarge),
                       )
                     : const SizedBox.shrink(),
                 ElevatedButton.icon(
@@ -438,13 +420,17 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
                   iconAlignment: IconAlignment.end,
                   icon: const Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.white),
                   label: currentPage != widget._lessons.length - 1
-                      ? const Text(
+                      ? Text(
                           "Continue",
-                          style: TextStyle(fontSize: AppSizes.mTextSize, color: Colors.white),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelLarge?.copyWith(color: Colors.white),
                         )
-                      : const Text(
+                      : Text(
                           "Finish",
-                          style: TextStyle(fontSize: AppSizes.mTextSize, color: Colors.white),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelLarge?.copyWith(color: Colors.white),
                         ),
                 ),
               ],
@@ -477,7 +463,7 @@ class PageViewIndicator extends StatelessWidget {
           width: currentIndex == index ? 42.0 : 24.0,
           height: 8.0,
           duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.symmetric(horizontal: 4),
+          margin: const EdgeInsets.symmetric(horizontal: AppSizes.p8 / 2),
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.all(Radius.circular(4.0)),
             color: currentIndex == index
