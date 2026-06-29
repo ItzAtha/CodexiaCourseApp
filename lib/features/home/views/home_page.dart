@@ -200,7 +200,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   orElse: () => CourseLevel.beginner,
                 ),
                 progress: levelProgress,
-                courseImage: '${course.title.split(' ')[0].toLowerCase()}.svg',
+                courseImage: course.iconUrl,
               ),
             );
           }
