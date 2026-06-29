@@ -41,7 +41,7 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                     width: 45.0,
                     height: 45.0,
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20.0),
+                      borderRadius: const BorderRadius.all(Radius.circular(20.0)),
                       child: CachedNetworkImage(
                         imageUrl:
                             authUser?.avatar ??
@@ -59,17 +59,18 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                     children: <Widget>[
                       Skeleton.keep(
                         key: skeletonizerKey,
-                        child: const Text(
+                        child: Text(
                           "Welcome Back,",
-                          style: TextStyle(fontSize: 14.0, color: Color(0xFFF5F6FA)),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelMedium?.copyWith(color: Colors.white),
                         ),
                       ),
                       Text(
                         authUser?.displayName ?? authUser?.username ?? "Guest",
-                        style: const TextStyle(
-                          fontSize: AppSizes.mTextSize,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFFF5F6FA),
+                          color: Colors.white,
                         ),
                       ),
                     ],
@@ -86,16 +87,16 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
                   DebugLogger(message: "Notification tapped", level: LogLevel.debug).log();
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(4.0),
-                  decoration: BoxDecoration(
+                  padding: const EdgeInsets.all(AppSizes.p8 / 2),
+                  decoration: const BoxDecoration(
                     color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(32.0),
+                    borderRadius: BorderRadius.all(Radius.circular(32.0)),
                   ),
                   child: Container(
-                    padding: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFCFBFB),
-                      borderRadius: BorderRadius.circular(20.0),
+                    padding: const EdgeInsets.all(AppSizes.p8),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFCFBFB),
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
                     ),
                     child: Stack(
                       alignment: Alignment.center,
