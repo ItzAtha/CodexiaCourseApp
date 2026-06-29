@@ -168,6 +168,7 @@ class _CoursePageState extends ConsumerState<CoursePage> {
           courseData.courseId,
           courseData.title,
           courseData.description,
+          courseData.iconUrl,
           courseData.rating,
           courseData.popular,
           courseData.validLevels,
