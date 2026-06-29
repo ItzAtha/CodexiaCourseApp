@@ -1,6 +1,7 @@
+import 'package:cached_network_svg_image/cached_network_svg_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../../core/app_constants.dart' show AppColors, AppSizes;
@@ -10,6 +11,7 @@ class CourseCard {
   final String _id;
   final String _title;
   final String _description;
+  final String _iconUrl;
   final double _rating;
   final double _popular;
   final List<CourseLevel> _levels;
@@ -22,6 +24,7 @@ class CourseCard {
     String id,
     String title,
     String description,
+    String iconUrl,
     double rating,
     double popular,
     List<CourseLevel> levels,
@@ -30,6 +33,7 @@ class CourseCard {
   ) : _id = id,
       _title = title,
       _description = description,
+      _iconUrl = iconUrl,
       _rating = rating,
       _popular = popular,
       _levels = levels,
@@ -115,10 +119,22 @@ class CourseCard {
                 ),
               ],
             ),
-            leading: CircleAvatar(
-              radius: 20.0,
-              backgroundColor: Colors.transparent,
-              backgroundImage: Svg('assets/icons/${_title.split(' ')[0].toLowerCase()}.svg'),
+            leading: ClipOval(
+              child: CachedNetworkSVGImage(
+                _iconUrl,
+                width: 50.0,
+                height: 50.0,
+                fit: BoxFit.cover,
+                placeholder: Skeletonizer(
+                  enabled: true,
+                  child: Container(
+                    width: 50.0,
+                    height: 50.0,
+                    decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
+                  ),
+                ),
+                errorWidget: const Icon(Icons.error, size: 32.0, color: Colors.red),
+              ),
             ),
             trailing: ValueListenableBuilder<bool>(
               valueListenable: _isCardOpened,
