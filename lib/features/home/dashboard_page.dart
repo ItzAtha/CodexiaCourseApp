@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:toastification/toastification.dart';
 
-import '../../../core/app_constants.dart' hide AppSizes;
+import '../../../core/app_constants.dart';
 import '../../core/utils/logger.dart';
 import '../../shared/providers/auth_user_notifier.dart';
 
@@ -125,10 +126,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             ? SpeedDial(
                 icon: Icons.add,
                 activeIcon: Icons.close,
-                spacing: 3,
+                spacing: 3.0,
                 foregroundColor: Colors.white,
                 backgroundColor: AppColors.secondary,
-                childPadding: const EdgeInsets.all(5),
+                childPadding: const EdgeInsets.all(AppSizes.p8 / 2),
                 spaceBetweenChildren: 4.0,
                 overlayColor: Colors.black,
                 overlayOpacity: 0.5,
@@ -139,28 +140,36 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 animationDuration: const Duration(milliseconds: 300),
                 children: [
                   SpeedDialChild(
-                    child: const Icon(Icons.code),
+                    child: const FaIcon(FontAwesomeIcons.code, size: 20.0),
                     backgroundColor: Colors.redAccent,
                     foregroundColor: Colors.white,
                     label: 'Code Sandbox',
+                    labelStyle: Theme.of(context).textTheme.labelMedium,
+                    labelBackgroundColor: Theme.of(context).cardTheme.color,
+                    labelShadow: [],
                     onTap: () {
                       DebugLogger(message: 'Code Sandbox', level: LogLevel.debug).log();
                     },
                   ),
                   SpeedDialChild(
-                    child: const Icon(Icons.question_answer),
+                    child: const FaIcon(FontAwesomeIcons.trophy, size: 20.0),
                     backgroundColor: Colors.orangeAccent,
                     foregroundColor: Colors.white,
                     label: 'Challenges',
+                    labelStyle: Theme.of(context).textTheme.labelMedium,
+                    labelBackgroundColor: Theme.of(context).cardTheme.color,
+                    labelShadow: [],
                     onTap: () => DebugLogger(message: 'Challenges', level: LogLevel.debug).log(),
                   ),
                   SpeedDialChild(
-                    child: const Icon(Icons.psychology),
+                    child: const FaIcon(FontAwesomeIcons.robot, size: 20.0),
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
                     label: 'AI Chat Bot',
+                    labelStyle: Theme.of(context).textTheme.labelMedium,
+                    labelBackgroundColor: Theme.of(context).cardTheme.color,
+                    labelShadow: [],
                     onTap: () {
-                      DebugLogger(message: 'AI Chat Bot', level: LogLevel.debug).log();
                       context.pushNamed(AppRoutes.chatBotRoute.name);
                     },
                   ),
