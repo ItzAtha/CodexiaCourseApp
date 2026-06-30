@@ -15,6 +15,7 @@ class ResetPasswordPage extends StatefulWidget {
 }
 
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
+  final GlobalKey<FormFieldState<String>> emailFieldKey = GlobalKey<FormFieldState<String>>();
   final TextEditingController emailController = TextEditingController();
   final AuthService authService = AuthService();
 
@@ -50,35 +51,28 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 const SizedBox(height: 40.0),
                 Text(
                   "Reset Password",
-                  style: TextStyle(
-                    fontSize: AppSizes.xlTextSize,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).textTheme.labelLarge?.color,
-                  ),
                   textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.displaySmall,
                 ),
+                const SizedBox(height: 12.0),
                 Text(
                   "Enter your email address to receive a password reset link.",
-                  style: TextStyle(
-                    fontSize: AppSizes.mTextSize,
-                    color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.7),
-                  ),
                   textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40.0),
-                Text(
-                  "Email Address",
-                  style: TextStyle(
-                    fontSize: AppSizes.mTextSize,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).textTheme.labelSmall?.color,
-                  ),
-                ),
-                TextFormField(
-                  controller: emailController,
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
                   ),
+                ),
+                const SizedBox(height: 50.0),
+                Text(
+                  "Email Address",
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                TextFormField(
+                  key: emailFieldKey,
+                  controller: emailController,
+                  style: Theme.of(context).textTheme.labelLarge,
                   decoration: const InputDecoration(hintText: "example@gmail.com"),
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
@@ -98,8 +92,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 const SizedBox(height: 25.0),
                 ElevatedButton(
                   onPressed: () async {
-                    String email = emailController.text.trim();
+                    if (!emailFieldKey.currentState!.validate()) {
+                      return;
+                    }
 
+                    String email = emailController.text.trim();
                     await authService.resetPassword(email).then((success) {
                       if (success) {
                         Toastification().show(
@@ -130,9 +127,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       }
                     });
                   },
-                  child: const Text(
+                  child: Text(
                     "Send Reset Link",
-                    style: TextStyle(fontSize: AppSizes.smTextSize, color: Colors.white),
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.white),
                   ),
                 ),
               ],
