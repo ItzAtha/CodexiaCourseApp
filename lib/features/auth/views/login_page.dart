@@ -83,27 +83,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               children: <Widget>[
                 Column(
                   children: <Widget>[
-                    Text(
-                      "Sign In",
-                      style: TextStyle(
-                        fontSize: AppSizes.xxlTextSize,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).textTheme.labelLarge?.color,
-                      ),
-                    ),
+                    Text("Sign In", style: Theme.of(context).textTheme.displaySmall),
+                    const SizedBox(height: 12.0),
                     Text(
                       "Welcome back Codexian! Please sign in your account to continue your last course.",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: AppSizes.mTextSize,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: Theme.of(
                           context,
-                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.7),
+                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 40.0),
+                const SizedBox(height: 50.0),
                 Form(
                   key: formKey,
                   child: Column(
@@ -111,23 +104,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     children: <Widget>[
                       Text(
                         "Email Address",
-                        style: TextStyle(
-                          fontSize: AppSizes.mTextSize,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).textTheme.labelSmall?.color,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       TextFormField(
                         controller: emailController,
-                        style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
-                        ),
+                        style: Theme.of(context).textTheme.labelLarge,
                         decoration: const InputDecoration(hintText: "example@gmail.com"),
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        autovalidateMode: AutovalidateMode.onUnfocus,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your email';
@@ -145,11 +132,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         children: <Widget>[
                           Text(
                             "Password",
-                            style: TextStyle(
-                              fontSize: AppSizes.mTextSize,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).textTheme.labelSmall?.color,
-                            ),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           const Spacer(),
                           GestureDetector(
@@ -163,9 +148,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               formKey.currentState?.reset();
                               FocusManager.instance.primaryFocus?.unfocus();
                             },
-                            child: const Text(
+                            child: Text(
                               "Forgot Password?",
-                              style: TextStyle(fontSize: AppSizes.sTextSize, color: Colors.blue),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.labelSmall?.copyWith(color: Colors.blue),
                             ),
                           ),
                         ],
@@ -175,11 +162,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         obscureText: !passwordVisible,
                         autocorrect: false,
                         enableSuggestions: false,
-                        style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
-                        ),
+                        style: Theme.of(context).textTheme.labelLarge,
                         decoration: InputDecoration(
                           suffixIcon: InkWell(
                             onTap: () {
@@ -191,7 +174,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             child: Icon(
                               passwordVisible ? Icons.visibility : Icons.visibility_off,
                               size: 24.0,
-                              color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.7),
+                              color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.8),
                             ),
                           ),
                         ),
@@ -220,13 +203,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ),
                     ),
                     const SizedBox(width: 8.0),
-                    Text(
-                      "Remember Me",
-                      style: TextStyle(
-                        fontSize: AppSizes.mTextSize,
-                        color: Theme.of(context).textTheme.labelSmall?.color,
-                      ),
-                    ),
+                    Text("Remember Me", style: Theme.of(context).textTheme.labelMedium),
                   ],
                 ),
                 const SizedBox(height: 10.0),
@@ -311,9 +288,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       );
                     }
                   },
-                  child: const Text(
+                  child: Text(
                     'Login',
-                    style: TextStyle(fontSize: AppSizes.mTextSize, color: Colors.white),
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 15.0),
@@ -323,11 +300,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     Text(
                       "or",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: AppSizes.smTextSize,
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: Theme.of(
                           context,
-                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.7),
+                        ).textTheme.labelMedium?.color?.withValues(alpha: 0.8),
                       ),
                     ),
                     const Expanded(child: Divider(height: 1.0, thickness: 1.0, indent: 20.0)),
@@ -386,10 +362,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       const SizedBox(width: 10.0),
                       Text(
                         "Continue with Google",
-                        style: TextStyle(
-                          fontSize: AppSizes.smTextSize,
-                          color: Colors.grey.shade800,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelMedium?.copyWith(color: Colors.grey.shade800),
                       ),
                     ],
                   ),
@@ -445,10 +420,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       const SizedBox(width: 10.0),
                       Text(
                         "Continue with Github",
-                        style: TextStyle(
-                          fontSize: AppSizes.smTextSize,
-                          color: Colors.grey.shade800,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelMedium?.copyWith(color: Colors.grey.shade800),
                       ),
                     ],
                   ),
@@ -459,11 +433,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   children: <Widget>[
                     Text(
                       "Don't have an account?",
-                      style: TextStyle(
-                        fontSize: AppSizes.smTextSize,
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: Theme.of(
                           context,
-                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
+                        ).textTheme.labelMedium?.color?.withValues(alpha: 0.8),
                       ),
                     ),
                     const SizedBox(width: 10.0),
@@ -477,9 +450,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         formKey.currentState?.reset();
                         FocusManager.instance.primaryFocus?.unfocus();
                       },
-                      child: const Text(
+                      child: Text(
                         "Sign Up",
-                        style: TextStyle(fontSize: AppSizes.smTextSize, color: Colors.blue),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelMedium?.copyWith(color: Colors.blue),
                       ),
                     ),
                   ],
