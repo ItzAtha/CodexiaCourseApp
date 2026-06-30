@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:codexia_course_learning/features/home/widgets/course_module_card.dart';
 import 'package:codexia_course_learning/routes/app_router.dart';
 import 'package:codexia_course_learning/shared/enums/course_level.dart';
@@ -320,13 +321,27 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Python Development"),
+          title: Text("Python Development", style: Theme.of(context).textTheme.titleLarge),
           centerTitle: true,
           backgroundColor: Colors.transparent,
-          leading: IconButton(
-            onPressed: () => context.pop(),
-            icon: const Icon(Icons.arrow_back),
-            style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
+          leading: ValueListenableBuilder(
+            valueListenable: AdaptiveTheme.of(context).modeChangeNotifier,
+            builder: (_, mode, child) {
+              bool isDarkMode = false;
+              if (mode == AdaptiveThemeMode.system) {
+                isDarkMode = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+              } else {
+                isDarkMode = mode == AdaptiveThemeMode.dark;
+              }
+
+              return IconButton(
+                onPressed: () => context.pop(),
+                icon: Icon(Icons.arrow_back, color: isDarkMode ? Colors.white : Colors.black),
+                style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.transparent),
+                ),
+              );
+            },
           ),
           flexibleSpace: Container(
             decoration: BoxDecoration(
@@ -350,7 +365,9 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
                 Card(
                   elevation: 2.0,
                   clipBehavior: Clip.antiAlias,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                  ),
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -368,9 +385,11 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                const Text(
+                                Text(
                                   "Overall Progress",
-                                  style: TextStyle(color: Colors.white),
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleSmall?.copyWith(color: Colors.white),
                                 ),
                                 TweenAnimationBuilder<double>(
                                   duration: const Duration(seconds: 1),
@@ -389,8 +408,7 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
                                 ),
                                 Text(
                                   "$completedModules/$totalModules modules completed",
-                                  style: const TextStyle(
-                                    fontSize: AppSizes.smTextSize,
+                                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
@@ -434,18 +452,15 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
                                   builder: (context, value, child) {
                                     return Text(
                                       "${value.toInt()}",
-                                      style: const TextStyle(
-                                        fontSize: AppSizes.xlTextSize,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleLarge?.copyWith(color: Colors.white),
                                     );
                                   },
                                 ),
-                                const Text(
+                                Text(
                                   "XP Earned",
-                                  style: TextStyle(
-                                    fontSize: AppSizes.smTextSize,
+                                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
@@ -465,7 +480,12 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
                   child: Row(
                     children: <Widget>[
                       FilterChip(
-                        label: const Text("Beginner", style: TextStyle(fontSize: 14.0)),
+                        label: Text(
+                          "Beginner",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelMedium?.copyWith(color: AppColors.textLight),
+                        ),
                         onSelected: (selected) {
                           setState(() => currentCourseLevel = CourseLevel.beginner);
                           pageController?.animateToPage(
@@ -482,7 +502,12 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
                       ),
                       const SizedBox(width: 12.0),
                       FilterChip(
-                        label: const Text("Intermediate", style: TextStyle(fontSize: 14.0)),
+                        label: Text(
+                          "Intermediate",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelMedium?.copyWith(color: AppColors.textLight),
+                        ),
                         onSelected: (selected) {
                           setState(() => currentCourseLevel = CourseLevel.intermediate);
                           pageController?.animateToPage(
@@ -499,7 +524,12 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
                       ),
                       const SizedBox(width: 12.0),
                       FilterChip(
-                        label: const Text("Expert", style: TextStyle(fontSize: 14.0)),
+                        label: Text(
+                          "Expert",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelMedium?.copyWith(color: AppColors.textLight),
+                        ),
                         onSelected: (selected) {
                           setState(() => currentCourseLevel = CourseLevel.expert);
                           pageController?.animateToPage(
@@ -516,7 +546,12 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
                       ),
                       const SizedBox(width: 12.0),
                       FilterChip(
-                        label: const Text("Master", style: TextStyle(fontSize: 14.0)),
+                        label: Text(
+                          "Master",
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelMedium?.copyWith(color: AppColors.textLight),
+                        ),
                         onSelected: (selected) {
                           setState(() => currentCourseLevel = CourseLevel.master);
                           pageController?.animateToPage(
@@ -566,11 +601,9 @@ class _PythonCourseState extends ConsumerState<PythonCourse> with RouteAware {
                             const SizedBox(height: 16.0),
                             Text(
                               "Loading Modules...",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: AppSizes.smTextSize,
-                                color: Theme.of(context).textTheme.labelSmall?.color,
-                              ),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
