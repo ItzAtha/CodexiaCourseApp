@@ -87,44 +87,30 @@ class _AuthLandingPageState extends State<AuthLandingPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Codexia Learning Course"),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        flexibleSpace: SafeArea(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.primary.withValues(alpha: 0.6), AppColors.primary],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+      body: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: isDarkMode ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        child: SafeArea(
+          child: Stack(
+            children: [
+              PageView.builder(
+                itemCount: carouselPage.length,
+                onPageChanged: (index) {
+                  setState(() {
+                    currentPage = index;
+                  });
+                },
+                itemBuilder: (context, index) {
+                  return carouselPage[index];
+                },
               ),
-            ),
+              Positioned(
+                bottom: 25.0,
+                left: 0,
+                right: 0,
+                child: PageViewIndicator(currentIndex: currentPage, pageCount: carouselPage.length),
+              ),
+            ],
           ),
-        ),
-        systemOverlayStyle: isDarkMode ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
-      ),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            PageView.builder(
-              itemCount: carouselPage.length,
-              onPageChanged: (index) {
-                setState(() {
-                  currentPage = index;
-                });
-              },
-              itemBuilder: (context, index) {
-                return carouselPage[index];
-              },
-            ),
-            Positioned(
-              bottom: 25.0,
-              left: 0,
-              right: 0,
-              child: PageViewIndicator(currentIndex: currentPage, pageCount: carouselPage.length),
-            ),
-          ],
         ),
       ),
     );
@@ -147,9 +133,9 @@ class PageViewIndicator extends StatelessWidget {
           scale: currentIndex == index ? 1.5 : 1.0,
           duration: const Duration(milliseconds: 300),
           child: Container(
-            width: 8,
-            height: 8,
-            margin: const EdgeInsets.symmetric(horizontal: 4),
+            width: 8.0,
+            height: 8.0,
+            margin: const EdgeInsets.symmetric(horizontal: AppSizes.p8 / 2),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: currentIndex == index ? Colors.white : Colors.white54,
