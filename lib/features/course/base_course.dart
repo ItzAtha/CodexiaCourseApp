@@ -44,6 +44,8 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
   int lastPage = 0;
   double completedProgress = 0.0;
 
+  bool isAlreadyRefetch = false;
+
   UserCourseProgress? courseProgress;
   UserLevelProgress? levelProgress;
   late PageController pageController;
@@ -207,236 +209,245 @@ class BaseCourseState extends ConsumerState<BaseCourse> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title ?? "", style: Theme.of(context).textTheme.titleLarge),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        leading: ValueListenableBuilder(
-          valueListenable: AdaptiveTheme.of(context).modeChangeNotifier,
-          builder: (_, mode, child) {
-            bool isDarkMode = false;
-            if (mode == AdaptiveThemeMode.system) {
-              isDarkMode = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
-            } else {
-              isDarkMode = mode == AdaptiveThemeMode.dark;
-            }
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) async {
+        if (isAlreadyRefetch) return;
+        await updateProgress();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(title ?? "", style: Theme.of(context).textTheme.titleLarge),
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          leading: ValueListenableBuilder(
+            valueListenable: AdaptiveTheme.of(context).modeChangeNotifier,
+            builder: (_, mode, child) {
+              bool isDarkMode = false;
+              if (mode == AdaptiveThemeMode.system) {
+                isDarkMode = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+              } else {
+                isDarkMode = mode == AdaptiveThemeMode.dark;
+              }
 
-            return IconButton(
-              onPressed: () async {
-                await updateProgress();
+              return IconButton(
+                onPressed: () async {
+                  isAlreadyRefetch = true;
+                  await updateProgress();
 
-                if (context.mounted) {
-                  context.pop();
-                }
-              },
-              icon: Icon(Icons.arrow_back, color: isDarkMode ? Colors.white : Colors.black),
-              style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
-            );
-          },
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColors.primary.withValues(alpha: 0.6), AppColors.primary],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+                  if (context.mounted) {
+                    context.pop();
+                  }
+                },
+                icon: Icon(Icons.arrow_back, color: isDarkMode ? Colors.white : Colors.black),
+                style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.transparent),
+                ),
+              );
+            },
+          ),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppColors.primary.withValues(alpha: 0.6), AppColors.primary],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
           ),
         ),
-      ),
-      body: Column(
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: AppSizes.p16, horizontal: AppSizes.p24),
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  spreadRadius: 1,
-                  blurRadius: 4,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text("Lesson Progress", style: Theme.of(context).textTheme.labelSmall),
-                    Row(
-                      children: <Widget>[
-                        Text(
-                          "Page ${currentPage + 1} of ${widget._lessons.length}",
-                          style: Theme.of(
-                            context,
-                          ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(width: 2.5),
-                        Text(
-                          "•",
-                          style: Theme.of(
-                            context,
-                          ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(width: 2.5),
-                        Text(
-                          NumberFormat.percentPattern().format(completedProgress),
-                          style: Theme.of(
-                            context,
-                          ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8.0),
-                TweenAnimationBuilder<double>(
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeInOut,
-                  tween: Tween<double>(begin: 0.0, end: completedProgress),
-                  builder: (context, value, child) {
-                    return LinearProgressIndicator(
-                      value: value,
-                      backgroundColor: AppColors.primary.withValues(alpha: 0.3),
-                      color: AppColors.primary,
-                      minHeight: 10.0,
-                      borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Color.lerp(
-                              AppColors.primary.withValues(alpha: 0.6),
-                              AppColors.secondary,
-                              value,
-                            ) ??
-                            AppColors.primary.withValues(alpha: 0.6),
+        body: Column(
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: AppSizes.p16, horizontal: AppSizes.p24),
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    spreadRadius: 1,
+                    blurRadius: 4,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text("Lesson Progress", style: Theme.of(context).textTheme.labelSmall),
+                      Row(
+                        children: <Widget>[
+                          Text(
+                            "Page ${currentPage + 1} of ${widget._lessons.length}",
+                            style: Theme.of(
+                              context,
+                            ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(width: 2.5),
+                          Text(
+                            "•",
+                            style: Theme.of(
+                              context,
+                            ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(width: 2.5),
+                          Text(
+                            NumberFormat.percentPattern().format(completedProgress),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 12.0),
-                PageViewIndicator(currentIndex: currentPage, pageCount: widget._lessons.length),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSizes.p8),
-              child: CourseContent(
-                lessons: widget._lessons,
-                controller: pageController,
-                onQuizChange: (isChange) => onQuizChange(isChange),
+                    ],
+                  ),
+                  const SizedBox(height: 8.0),
+                  TweenAnimationBuilder<double>(
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                    tween: Tween<double>(begin: 0.0, end: completedProgress),
+                    builder: (context, value, child) {
+                      return LinearProgressIndicator(
+                        value: value,
+                        backgroundColor: AppColors.primary.withValues(alpha: 0.3),
+                        color: AppColors.primary,
+                        minHeight: 10.0,
+                        borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Color.lerp(
+                                AppColors.primary.withValues(alpha: 0.6),
+                                AppColors.secondary,
+                                value,
+                              ) ??
+                              AppColors.primary.withValues(alpha: 0.6),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12.0),
+                  PageViewIndicator(currentIndex: currentPage, pageCount: widget._lessons.length),
+                ],
               ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(AppSizes.p16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: const BorderRadius.only(
-                topRight: Radius.circular(24.0),
-                topLeft: Radius.circular(24.0),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  spreadRadius: 1.5,
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSizes.p8),
+                child: CourseContent(
+                  lessons: widget._lessons,
+                  controller: pageController,
+                  onQuizChange: (isChange) => onQuizChange(isChange),
                 ),
-              ],
+              ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                currentPage >= 1
-                    ? OutlinedButton.icon(
-                        onPressed: () {
-                          setState(() => currentPage--);
-                          pageController.animateToPage(
-                            currentPage,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(120.0, 30.0),
-                          side: const BorderSide(color: Colors.grey),
-                          overlayColor: Colors.grey.shade400,
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                        ),
-                        icon: Icon(
-                          Icons.arrow_back_ios,
-                          size: 16.0,
-                          color: Theme.of(context).iconTheme.color,
-                        ),
-                        label: Text("Previous", style: Theme.of(context).textTheme.labelLarge),
-                      )
-                    : const SizedBox.shrink(),
-                ElevatedButton.icon(
-                  onPressed: !isModuleCompleted && !indexLesson.contains(currentPage)
-                      ? null
-                      : () async {
-                          if (currentPage == widget._lessons.length - 1) {
-                            if (!isModuleCompleted) {
-                              lastPage += 1;
-                              await updateProgress();
-                            }
-
-                            if (context.mounted) {
-                              context.pop();
-                              return;
-                            }
-                          }
-
-                          setState(() {
-                            currentPage++;
-
-                            if (lastPage < currentPage) {
-                              if (isModuleCompleted) {
-                                completedProgress = 1.0;
-                              } else {
-                                completedProgress = currentPage / (widget._lessons.length - 1);
-                              }
-
-                              lastPage = currentPage;
-                            }
-
+            Container(
+              padding: const EdgeInsets.all(AppSizes.p16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(24.0),
+                  topLeft: Radius.circular(24.0),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    spreadRadius: 1.5,
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  currentPage >= 1
+                      ? OutlinedButton.icon(
+                          onPressed: () {
+                            setState(() => currentPage--);
                             pageController.animateToPage(
                               currentPage,
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
                             );
-                          });
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
-                    minimumSize: const Size(120.0, 30.0),
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                  ),
-                  iconAlignment: IconAlignment.end,
-                  icon: const Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.white),
-                  label: currentPage != widget._lessons.length - 1
-                      ? Text(
-                          "Continue",
-                          style: Theme.of(
-                            context,
-                          ).textTheme.labelLarge?.copyWith(color: Colors.white),
+                          },
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(120.0, 30.0),
+                            side: const BorderSide(color: Colors.grey),
+                            overlayColor: Colors.grey.shade400,
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                          ),
+                          icon: Icon(
+                            Icons.arrow_back_ios,
+                            size: 16.0,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
+                          label: Text("Previous", style: Theme.of(context).textTheme.labelLarge),
                         )
-                      : Text(
-                          "Finish",
-                          style: Theme.of(
-                            context,
-                          ).textTheme.labelLarge?.copyWith(color: Colors.white),
-                        ),
-                ),
-              ],
+                      : const SizedBox.shrink(),
+                  ElevatedButton.icon(
+                    onPressed: !isModuleCompleted && !indexLesson.contains(currentPage)
+                        ? null
+                        : () async {
+                            if (currentPage == widget._lessons.length - 1) {
+                              if (!isModuleCompleted) {
+                                lastPage += 1;
+                                await updateProgress();
+                              }
+
+                              if (context.mounted) {
+                                context.pop();
+                                return;
+                              }
+                            }
+
+                            setState(() {
+                              currentPage++;
+
+                              if (lastPage < currentPage) {
+                                if (isModuleCompleted) {
+                                  completedProgress = 1.0;
+                                } else {
+                                  completedProgress = currentPage / (widget._lessons.length - 1);
+                                }
+
+                                lastPage = currentPage;
+                              }
+
+                              pageController.animateToPage(
+                                currentPage,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            });
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+                      minimumSize: const Size(120.0, 30.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                    ),
+                    iconAlignment: IconAlignment.end,
+                    icon: const Icon(Icons.arrow_forward_ios, size: 16.0, color: Colors.white),
+                    label: currentPage != widget._lessons.length - 1
+                        ? Text(
+                            "Continue",
+                            style: Theme.of(
+                              context,
+                            ).textTheme.labelLarge?.copyWith(color: Colors.white),
+                          )
+                        : Text(
+                            "Finish",
+                            style: Theme.of(
+                              context,
+                            ).textTheme.labelLarge?.copyWith(color: Colors.white),
+                          ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
