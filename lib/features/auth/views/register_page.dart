@@ -56,27 +56,20 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               children: <Widget>[
                 Column(
                   children: <Widget>[
-                    Text(
-                      "Sign Up",
-                      style: TextStyle(
-                        fontSize: AppSizes.xxlTextSize,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).textTheme.labelLarge?.color,
-                      ),
-                    ),
+                    Text("Sign Up", style: Theme.of(context).textTheme.displaySmall),
+                    const SizedBox(height: 12.0),
                     Text(
                       "Welcome Codexian! Please sign up your account to start your course journey.",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: AppSizes.mTextSize,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: Theme.of(
                           context,
-                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.7),
+                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 30.0),
+                const SizedBox(height: 50.0),
                 Form(
                   key: formKey,
                   child: Column(
@@ -84,19 +77,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     children: <Widget>[
                       Text(
                         "Username",
-                        style: TextStyle(
-                          fontSize: AppSizes.mTextSize,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).textTheme.labelSmall?.color,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       TextFormField(
                         controller: usernameController,
-                        style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
-                        ),
+                        style: Theme.of(context).textTheme.labelLarge,
                         textInputAction: TextInputAction.next,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (value) {
@@ -109,19 +96,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       const SizedBox(height: 15.0),
                       Text(
                         "Email Address",
-                        style: TextStyle(
-                          fontSize: AppSizes.mTextSize,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).textTheme.labelSmall?.color,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       TextFormField(
                         controller: emailController,
-                        style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
-                        ),
+                        style: Theme.of(context).textTheme.labelLarge,
                         decoration: const InputDecoration(hintText: "example@gmail.com"),
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
@@ -141,22 +122,16 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       const SizedBox(height: 15.0),
                       Text(
                         "Password",
-                        style: TextStyle(
-                          fontSize: AppSizes.mTextSize,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).textTheme.labelSmall?.color,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       TextFormField(
                         controller: passwordController,
                         obscureText: !passwordVisible,
                         autocorrect: false,
                         enableSuggestions: false,
-                        style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).textTheme.labelSmall?.color?.withValues(alpha: 0.9),
-                        ),
+                        style: Theme.of(context).textTheme.labelLarge,
                         decoration: InputDecoration(
                           suffixIcon: InkWell(
                             onTap: () {
@@ -168,7 +143,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             child: Icon(
                               passwordVisible ? Icons.visibility : Icons.visibility_off,
                               size: 24.0,
-                              color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.7),
+                              color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.8),
                             ),
                           ),
                         ),
@@ -186,15 +161,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 ),
                 RichText(
                   text: TextSpan(
-                    style: TextStyle(
-                      fontSize: AppSizes.sTextSize,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.7),
                     ),
                     children: <TextSpan>[
                       const TextSpan(text: "By signing up, you agree to our "),
                       TextSpan(
                         text: "Terms of Service",
-                        style: const TextStyle(color: Colors.blue),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.blue),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             context.pushNamed('tos');
@@ -203,7 +177,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       const TextSpan(text: " and "),
                       TextSpan(
                         text: "Privacy Policy",
-                        style: const TextStyle(color: Colors.blue),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.blue),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             context.pushNamed('privacy-policy');
@@ -268,9 +242,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       );
                     }
                   },
-                  child: const Text(
+                  child: Text(
                     'Register',
-                    style: TextStyle(fontSize: AppSizes.smTextSize, color: Colors.white),
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 15.0),
@@ -280,11 +254,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     Text(
                       "or",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: AppSizes.smTextSize,
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: Theme.of(
                           context,
-                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.7),
+                        ).textTheme.labelMedium?.color?.withValues(alpha: 0.8),
                       ),
                     ),
                     const Expanded(child: Divider(height: 1.0, thickness: 1.0, indent: 20.0)),
@@ -343,10 +316,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       const SizedBox(width: 10.0),
                       Text(
                         "Continue with Google",
-                        style: TextStyle(
-                          fontSize: AppSizes.smTextSize,
-                          color: Colors.grey.shade800,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelMedium?.copyWith(color: Colors.grey.shade800),
                       ),
                     ],
                   ),
@@ -402,10 +374,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       const SizedBox(width: 10.0),
                       Text(
                         "Continue with Github",
-                        style: TextStyle(
-                          fontSize: AppSizes.smTextSize,
-                          color: Colors.grey.shade800,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelMedium?.copyWith(color: Colors.grey.shade800),
                       ),
                     ],
                   ),
@@ -416,19 +387,20 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   children: <Widget>[
                     Text(
                       "Already have an account?",
-                      style: TextStyle(
-                        fontSize: AppSizes.smTextSize,
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: Theme.of(
                           context,
-                        ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
+                        ).textTheme.labelMedium?.color?.withValues(alpha: 0.8),
                       ),
                     ),
                     const SizedBox(width: 10.0),
                     GestureDetector(
                       onTap: () => context.pop(),
-                      child: const Text(
+                      child: Text(
                         "Sign In",
-                        style: TextStyle(fontSize: AppSizes.smTextSize, color: Colors.blue),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelMedium?.copyWith(color: Colors.blue),
                       ),
                     ),
                   ],
