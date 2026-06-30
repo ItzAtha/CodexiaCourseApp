@@ -77,8 +77,6 @@ class _CourseModuleCardState extends State<CourseModuleCard> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return GestureDetector(
       onTap: () {
         if (widget._isLocked ?? false) {
@@ -266,7 +264,7 @@ class _CourseModuleCardState extends State<CourseModuleCard> {
                         ),
                       ),
                       Container(
-                        width: 50,
+                        width: 44,
                         height: 120,
                         decoration: const BoxDecoration(
                           borderRadius: BorderRadius.only(
@@ -274,7 +272,7 @@ class _CourseModuleCardState extends State<CourseModuleCard> {
                             bottomRight: Radius.circular(15.0),
                           ),
                         ),
-                        child: const Icon(Icons.arrow_forward_ios, size: 20.0),
+                        child: const Icon(Icons.arrow_forward_ios, size: 24.0),
                       ),
                     ],
                   ),
