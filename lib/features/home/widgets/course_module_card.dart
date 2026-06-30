@@ -104,7 +104,9 @@ class _CourseModuleCardState extends State<CourseModuleCard> {
           Card(
                 elevation: 1.5,
                 clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                ),
                 child: IntrinsicHeight(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -148,11 +150,7 @@ class _CourseModuleCardState extends State<CourseModuleCard> {
                                         Expanded(
                                           child: Text(
                                             widget._module.title,
-                                            style: TextStyle(
-                                              fontSize: AppSizes.mlTextSize,
-                                              fontWeight: FontWeight.bold,
-                                              color: theme.textTheme.labelSmall?.color,
-                                            ),
+                                            style: Theme.of(context).textTheme.titleSmall,
                                           ),
                                         ),
                                         if (!isModuleLocked)
@@ -169,21 +167,18 @@ class _CourseModuleCardState extends State<CourseModuleCard> {
                                             ),
                                             child: Text(
                                               "+${widget._module.expAmount} XP",
-                                              style: const TextStyle(
-                                                fontSize: AppSizes.smTextSize,
-                                                color: AppColors.secondary,
-                                              ),
+                                              style: Theme.of(context).textTheme.labelMedium
+                                                  ?.copyWith(color: AppColors.secondary),
                                             ),
                                           ),
                                       ],
                                     ),
                                     Text(
                                       widget._module.description,
-                                      style: TextStyle(
-                                        fontSize: AppSizes.smTextSize,
-                                        color: theme.textTheme.labelSmall?.color?.withValues(
-                                          alpha: 0.7,
-                                        ),
+                                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).textTheme.labelMedium?.color?.withValues(alpha: 0.8),
                                       ),
                                     ),
                                     if (!isModuleLocked) const SizedBox(height: 8.0),
@@ -215,11 +210,10 @@ class _CourseModuleCardState extends State<CourseModuleCard> {
                                         const SizedBox(width: 4.0),
                                         Text(
                                           "${widget._module.lessons.length} Lessons",
-                                          style: TextStyle(
-                                            fontSize: AppSizes.sTextSize,
-                                            color: theme.textTheme.labelSmall?.color?.withValues(
-                                              alpha: 0.7,
-                                            ),
+                                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
                                           ),
                                         ),
                                         const SizedBox(width: 8.0),
@@ -227,23 +221,22 @@ class _CourseModuleCardState extends State<CourseModuleCard> {
                                         const SizedBox(width: 4.0),
                                         Text(
                                           formatDuration(widget._module.duration),
-                                          style: TextStyle(
-                                            fontSize: AppSizes.sTextSize,
-                                            color: theme.textTheme.labelSmall?.color?.withValues(
-                                              alpha: 0.7,
-                                            ),
+                                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).textTheme.labelSmall?.color?.withValues(alpha: 0.8),
                                           ),
                                         ),
                                         const SizedBox(width: 8.0),
                                         if (!isModuleLocked)
                                           isModuleCompleted
-                                              ? const Text(
+                                              ? Text(
                                                   "Completed",
-                                                  style: TextStyle(
-                                                    fontSize: AppSizes.sTextSize,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: AppColors.secondary,
-                                                  ),
+                                                  style: Theme.of(context).textTheme.labelSmall
+                                                      ?.copyWith(
+                                                        fontWeight: FontWeight.w600,
+                                                        color: AppColors.secondary,
+                                                      ),
                                                 )
                                               : TweenAnimationBuilder<double>(
                                                   duration: const Duration(seconds: 1),
@@ -255,11 +248,11 @@ class _CourseModuleCardState extends State<CourseModuleCard> {
                                                   builder: (context, value, child) {
                                                     return Text(
                                                       "${NumberFormat.percentPattern().format(value)} Done",
-                                                      style: const TextStyle(
-                                                        fontSize: AppSizes.sTextSize,
-                                                        fontWeight: FontWeight.w600,
-                                                        color: AppColors.primary,
-                                                      ),
+                                                      style: Theme.of(context).textTheme.labelSmall
+                                                          ?.copyWith(
+                                                            fontWeight: FontWeight.w600,
+                                                            color: AppColors.primary,
+                                                          ),
                                                     );
                                                   },
                                                 ),
@@ -281,11 +274,7 @@ class _CourseModuleCardState extends State<CourseModuleCard> {
                             bottomRight: Radius.circular(15.0),
                           ),
                         ),
-                        child: Icon(
-                          Icons.arrow_forward_ios,
-                          size: 20.0,
-                          color: theme.iconTheme.color,
-                        ),
+                        child: const Icon(Icons.arrow_forward_ios, size: 20.0),
                       ),
                     ],
                   ),
