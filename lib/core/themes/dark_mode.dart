@@ -71,22 +71,22 @@ class DarkMode {
           ),
         ),
       ),
-      inputDecorationTheme: const InputDecorationTheme(
+      inputDecorationTheme: InputDecorationTheme(
         isDense: true,
-        border: OutlineInputBorder(),
-        hintStyle: TextStyle(color: Color(0xCCF5F6FA)),
+        border: const OutlineInputBorder(),
+        hintStyle: TextStyle(color: AppColors.textDark.withValues(alpha: 0.8)),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Color(0x8000CEC9), width: 1.0),
+          borderSide: BorderSide(color: AppColors.secondary.withValues(alpha: 0.6), width: 1.0),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Color(0xFF00CEC9), width: 1.5),
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: AppColors.secondary, width: 1.5),
         ),
       ),
       checkboxTheme: CheckboxThemeData(
-        side: const BorderSide(color: Color(0xFF00CEC9), width: 1.5),
+        side: const BorderSide(color: AppColors.secondary, width: 1.5),
         fillColor: WidgetStateProperty.resolveWith<Color?>((states) {
           if (states.contains(WidgetState.selected)) {
-            return const Color(0xFF00CEC9);
+            return AppColors.secondary;
           }
           return null;
         }),
@@ -120,22 +120,20 @@ class DarkMode {
         elevation: 4.0,
         selectedColor: AppColors.secondary,
         backgroundColor: AppColors.secondary.withValues(alpha: 0.5),
-        checkmarkColor: AppColors.textDark,
+        checkmarkColor: Colors.white,
         side: const BorderSide(color: Color(0xFF006462), width: 1.5),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         elevation: 12.0,
         showDragHandle: true,
-        modalBackgroundColor: Color(0xFF28282B),
+        modalBackgroundColor: AppColors.bgDark,
       ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
           TargetPlatform.android: FadeForwardsPageTransitionsBuilder(
-            backgroundColor: Color(0xFF212121),
+            backgroundColor: AppColors.bgDark,
           ),
-          TargetPlatform.iOS: FadeForwardsPageTransitionsBuilder(
-            backgroundColor: Color(0xFF212121),
-          ),
+          TargetPlatform.iOS: FadeForwardsPageTransitionsBuilder(backgroundColor: AppColors.bgDark),
         },
       ),
     );
