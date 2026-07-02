@@ -1,3 +1,4 @@
+import 'package:codexia_course_learning/features/chat/models/user_chat_channel.dart';
 import 'package:codexia_course_learning/shared/models/user_course_progress.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -22,6 +23,7 @@ abstract class AuthUser with _$AuthUser {
     required DateTime lastSignIn,
 
     @Default([]) List<UserCourseProgress>? coursesProgress,
+    @Default([]) List<UserChatChannel>? chatChannels,
   }) = _AuthUser;
 
   factory AuthUser.fromJson(Map<String, dynamic> json) => _$AuthUserFromJson(json);
