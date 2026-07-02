@@ -20,10 +20,7 @@ abstract class UserCourseProgress with _$UserCourseProgress {
     required String lastAccessedLesson,
     required DateTime lastAccessedAt,
 
-    @UserLevelProgressConverter()
-    @JsonKey(name: 'levels')
-    @Default([])
-    List<UserLevelProgress> levels,
+    @UserLevelProgressConverter() @Default([]) List<UserLevelProgress> levels,
   }) = _UserCourseProgress;
 
   factory UserCourseProgress.fromJson(Map<String, dynamic> json) =>
