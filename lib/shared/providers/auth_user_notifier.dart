@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/utils/logger.dart';
+import '../../features/chat/models/user_chat_channel.dart';
 import '../../manager/firebase_manager.dart';
 import '../models/user_course_progress.dart';
 
@@ -61,13 +62,12 @@ class AuthUserNotifier extends _$AuthUserNotifier {
             coursesProgressRaw.add(progressData);
           }
         }
-        userData['coursesProgress'] = coursesProgressRaw;
+        userData['coursesProgress'] = [...coursesProgressRaw];
+        coursesProgressRaw.clear();
 
         try {
           authUser = AuthUser.fromJson(userData);
-          Map<String, dynamic> authUserDetail = authUser.toJson();
-
-          DebugLogger(message: authUserDetail, level: LogLevel.trace).log();
+          DebugLogger(message: authUser.toJson(), level: LogLevel.trace).log();
         } catch (error, stackTrace) {
           DebugLogger(
             message: 'Error parsing user data: $error',
@@ -119,6 +119,47 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     }
 
     state = AsyncData(state.value!.copyWith(coursesProgress: compiledProgressList));
+  }
+
+  Future<void> loadChatChannels(ChatType type) async {
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null || state.value == null) return;
+
+    final String userId = currentUser.uid;
+    final chatChannelsData = await usersCollection
+        .doc(userId)
+        .collection('ChatChannels')
+        .where('type', isEqualTo: type.name.toUpperCase())
+        .get();
+
+    List<UserChatChannel> chatChannelList = [];
+
+    if (chatChannelsData.docs.isNotEmpty) {
+      for (final chatChannel in chatChannelsData.docs) {
+        Map<String, dynamic> channelData = chatChannel.data();
+        final Map<String, dynamic> messagesGroupMap = {};
+
+        final chatMessagesData = await usersCollection
+            .doc(userId)
+            .collection('ChatChannels')
+            .doc(chatChannel.id)
+            .collection('ChatMessages')
+            .get();
+
+        for (final chatMessage in chatMessagesData.docs) {
+          messagesGroupMap[chatMessage.id] = chatMessage.data();
+        }
+
+        channelData['messages'] = messagesGroupMap;
+        chatChannelList.add(UserChatChannel.fromJson(channelData));
+      }
+    }
+
+    state = AsyncData(state.value!.copyWith(chatChannels: chatChannelList));
+  }
+
+  Future<void> unloadChatChannels() async {
+    state = AsyncData(state.value!.copyWith(chatChannels: []));
   }
 
   Future<void> updateDisplayName(String? displayName) async {
