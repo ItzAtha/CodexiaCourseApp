@@ -702,8 +702,8 @@ class AvatarSelector extends ConsumerStatefulWidget {
 class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
   final FirebaseServices services = FirebaseServices();
 
-  Future<void> selectAvatarImage(ImageSource source, {String? avatarPath}) async {
-    AuthUser? authUser = ref.read(authUserProvider).value;
+  Future<void> selectAvatarImage(ImageSource source, String userId) async {
+    String fileName = '${userId}_avatar.jpg';
 
     final imagePicker = ImagePicker();
     try {
@@ -723,7 +723,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
 
         final uploadProgress = await services.uploadFile(
           croppedImage.path,
-          fileName: "${authUser?.username.toLowerCase()}_avatar.jpg",
+          fileName: fileName,
           savePath: 'Avatars',
           metadata: SettableMetadata(contentType: 'image/jpeg'),
         );
@@ -784,13 +784,15 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
     }
   }
 
-  Future<bool> deleteCurrentAvatar(String? avatarPath) async {
-    if (avatarPath == null) {
+  Future<bool> deleteCurrentAvatar(String userId) async {
+    String fileName = '${userId}_avatar.jpg';
+    bool? isDeleted = await services.deleteFile("Avatars", fileName);
+
+    if (isDeleted == null) {
       DebugLogger(message: "No avatar to delete", level: LogLevel.info).log();
       return false;
     }
 
-    bool isDeleted = await services.deleteFile(avatarPath);
     if (isDeleted) {
       ref.read(authUserProvider.notifier).updateAvatar(null);
 
@@ -853,7 +855,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
 
   @override
   Widget build(BuildContext context) {
-    final userAvatar = ref.watch(authUserProvider.select((value) => value.value?.avatar));
+    final userId = ref.watch(authUserProvider.select((value) => value.requireValue.userId));
 
     return SafeArea(
       child: Padding(
@@ -862,7 +864,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             InkWell(
-              onTap: () => selectAvatarImage(ImageSource.camera, avatarPath: userAvatar),
+              onTap: () => selectAvatarImage(ImageSource.camera, userId),
               customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
               child: SizedBox(
                 height: 100.0,
@@ -878,7 +880,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
               ),
             ),
             InkWell(
-              onTap: () => selectAvatarImage(ImageSource.gallery, avatarPath: userAvatar),
+              onTap: () => selectAvatarImage(ImageSource.gallery, userId),
               customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
               child: SizedBox(
                 height: 100.0,
@@ -895,7 +897,7 @@ class _AvatarSelectorState extends ConsumerState<AvatarSelector> {
             ),
             InkWell(
               onTap: () async {
-                bool isSuccess = await deleteCurrentAvatar(userAvatar);
+                bool isSuccess = await deleteCurrentAvatar(userId);
                 if (context.mounted && isSuccess) {
                   context.pop();
                 }
@@ -934,14 +936,9 @@ class _ResetCourseConfirmationState extends ConsumerState<ResetCourseConfirmatio
     if (currentUser == null) return false;
 
     final String userId = currentUser.uid;
-    String provider = currentUser.providerData.isNotEmpty
-        ? currentUser.providerData[0].providerId
-        : 'anonymous';
-    final String docId = '${userId}_$provider';
-
     final querySnapshot = await FirebaseFirestore.instance
         .collection('Users')
-        .doc(docId)
+        .doc(userId)
         .collection('CourseProgress')
         .count()
         .get();
