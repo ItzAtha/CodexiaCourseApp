@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:codexia_course_learning/shared/models/auth_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,6 +22,7 @@ class AuthUserNotifier extends _$AuthUserNotifier {
 
   Future<AuthUser> _loadUserData() async {
     AuthUser authUser = AuthUser(
+      userId: Random.secure().nextInt(1 << 32).toString(),
       username: "Guest",
       email: "guest@example.com",
       createdAt: DateTime.now(),
@@ -29,14 +32,9 @@ class AuthUserNotifier extends _$AuthUserNotifier {
 
     if (currentUser != null) {
       final String userId = currentUser.uid;
-      String provider = currentUser.providerData.isNotEmpty
-          ? currentUser.providerData[0].providerId
-          : 'anonymous';
-
-      final String docId = '${userId}_$provider';
       final (usersData, courseProgressData) = await (
-        usersCollection.doc(docId).get(),
-        usersCollection.doc(docId).collection('CourseProgress').get(),
+        usersCollection.doc(userId).get(),
+        usersCollection.doc(userId).collection('CourseProgress').get(),
       ).wait;
 
       if (usersData.exists) {
@@ -49,7 +47,7 @@ class AuthUserNotifier extends _$AuthUserNotifier {
             final Map<String, dynamic> levelsGroupMap = {};
 
             final levelProgressData = await usersCollection
-                .doc(docId)
+                .doc(userId)
                 .collection('CourseProgress')
                 .doc(courseProgress.id)
                 .collection('Levels')
@@ -95,12 +93,7 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     if (currentUser == null || state.value == null) return;
 
     final String userId = currentUser.uid;
-    String provider = currentUser.providerData.isNotEmpty
-        ? currentUser.providerData[0].providerId
-        : 'anonymous';
-    final String docId = '${userId}_$provider';
-
-    final courseProgressData = await usersCollection.doc(docId).collection('CourseProgress').get();
+    final courseProgressData = await usersCollection.doc(userId).collection('CourseProgress').get();
 
     List<UserCourseProgress> compiledProgressList = [];
 
@@ -110,7 +103,7 @@ class AuthUserNotifier extends _$AuthUserNotifier {
         final Map<String, dynamic> levelsGroupMap = {};
 
         final levelProgressData = await usersCollection
-            .doc(docId)
+            .doc(userId)
             .collection('CourseProgress')
             .doc(courseProgress.id)
             .collection('Levels')
@@ -134,14 +127,9 @@ class AuthUserNotifier extends _$AuthUserNotifier {
 
     if (state.value != null && currentUser != null) {
       final String userId = currentUser.uid;
-      String provider = currentUser.providerData.isNotEmpty
-          ? currentUser.providerData[0].providerId
-          : 'anonymous';
-
-      final String docId = '${userId}_$provider';
       state = AsyncData(state.value!.copyWith(displayName: displayName));
 
-      await manager.updateData('Users', docId, newData: {'displayName': state.value!.displayName});
+      await manager.updateData('Users', userId, newData: {'displayName': state.value!.displayName});
     }
   }
 
@@ -151,14 +139,13 @@ class AuthUserNotifier extends _$AuthUserNotifier {
 
     if (state.value != null && currentUser != null) {
       final String userId = currentUser.uid;
-      String provider = currentUser.providerData.isNotEmpty
-          ? currentUser.providerData[0].providerId
-          : 'anonymous';
+      state = AsyncData(state.value!.copyWith(avatar: avatar ?? currentUser.photoURL));
 
-      final String docId = '${userId}_$provider';
-      state = AsyncData(state.value!.copyWith(avatar: avatar));
-
-      await manager.updateData('Users', docId, newData: {'avatar': avatar});
+      await manager.updateData(
+        'Users',
+        userId,
+        newData: {'avatar': avatar ?? currentUser.photoURL},
+      );
     }
   }
 
@@ -167,11 +154,6 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     if (state.value == null || currentUser == null) return;
 
     final String userId = currentUser.uid;
-    String provider = currentUser.providerData.isNotEmpty
-        ? currentUser.providerData[0].providerId
-        : 'anonymous';
-    final String docId = '${userId}_$provider';
-
     final List<UserCourseProgress> currentProgressList = List<UserCourseProgress>.from(
       state.value!.coursesProgress ?? [],
     );
@@ -187,7 +169,7 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     state = AsyncData(state.value!.copyWith(coursesProgress: currentProgressList));
 
     final courseDocRef = usersCollection
-        .doc(docId)
+        .doc(userId)
         .collection('CourseProgress')
         .doc(updatedProgress.courseId);
 
@@ -220,13 +202,9 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     if (state.value == null || currentUser == null) return false;
 
     final String userId = currentUser.uid;
-    String provider = currentUser.providerData.isNotEmpty
-        ? currentUser.providerData[0].providerId
-        : 'anonymous';
-    final String docId = '${userId}_$provider';
 
     try {
-      final courseProgressCollection = usersCollection.doc(docId).collection('CourseProgress');
+      final courseProgressCollection = usersCollection.doc(userId).collection('CourseProgress');
       final courseProgressDocs = await courseProgressCollection.get();
 
       for (final courseProgressDoc in courseProgressDocs.docs) {
