@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/utils/logger.dart';
+import '../../features/chat/models/chat_message.dart';
 import '../../features/chat/models/user_chat_channel.dart';
 import '../../manager/firebase_manager.dart';
 import '../models/user_course_progress.dart';
@@ -137,25 +138,62 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     if (chatChannelsData.docs.isNotEmpty) {
       for (final chatChannel in chatChannelsData.docs) {
         Map<String, dynamic> channelData = chatChannel.data();
-        final Map<String, dynamic> messagesGroupMap = {};
-
-        final chatMessagesData = await usersCollection
-            .doc(userId)
-            .collection('ChatChannels')
-            .doc(chatChannel.id)
-            .collection('ChatMessages')
-            .get();
-
-        for (final chatMessage in chatMessagesData.docs) {
-          messagesGroupMap[chatMessage.id] = chatMessage.data();
-        }
-
-        channelData['messages'] = messagesGroupMap;
         chatChannelList.add(UserChatChannel.fromJson(channelData));
       }
     }
 
     state = AsyncData(state.value!.copyWith(chatChannels: chatChannelList));
+  }
+
+  Future<DocumentSnapshot?> loadChatMessages(
+    String channelId, {
+    DocumentSnapshot? lastDocumentLoad,
+    int maxLoad = 5,
+  }) async {
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null || state.value == null) return null;
+
+    final List<ChatMessage> messageList = [];
+    List<UserChatChannel> chatChannelList = state.value!.chatChannels ?? [];
+
+    if (chatChannelList.isNotEmpty) {
+      UserChatChannel? chatChannel = chatChannelList
+          .where((channel) => channel.channelId == channelId)
+          .firstOrNull;
+      if (chatChannel != null) {
+        final String userId = currentUser.uid;
+        Query chatMessagesQuery = usersCollection
+            .doc(userId)
+            .collection('ChatChannels')
+            .doc(channelId)
+            .collection('ChatMessages')
+            .orderBy('timestamp', descending: true)
+            .limit(maxLoad);
+
+        if (lastDocumentLoad != null) {
+          chatMessagesQuery = chatMessagesQuery.startAfterDocument(lastDocumentLoad);
+        }
+
+        final chatMessagesData = await chatMessagesQuery.get();
+        if (chatMessagesData.docs.isNotEmpty) {
+          for (var chatMessage in chatMessagesData.docs) {
+            Map<String, dynamic> data = chatMessage.data() as Map<String, dynamic>;
+            messageList.add(ChatMessage.fromJson(data));
+          }
+
+          final updatedChannels = chatChannelList.map((channel) {
+            if (channel.channelId == channelId) {
+              return channel.copyWith(messages: [...channel.messages, ...messageList]);
+            }
+            return channel;
+          }).toList();
+
+          state = AsyncData(state.value!.copyWith(chatChannels: updatedChannels));
+          return chatMessagesData.docs.last;
+        }
+      }
+    }
+    return null;
   }
 
   Future<void> unloadChatChannels() async {
