@@ -123,6 +123,7 @@ class DarkMode {
         checkmarkColor: Colors.white,
         side: const BorderSide(color: Color(0xFF006462), width: 1.5),
       ),
+      drawerTheme: const DrawerThemeData(elevation: 8.0, backgroundColor: AppColors.bgDark),
       bottomSheetTheme: const BottomSheetThemeData(
         elevation: 12.0,
         showDragHandle: true,

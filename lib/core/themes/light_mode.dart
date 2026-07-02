@@ -123,6 +123,7 @@ class LightMode {
         checkmarkColor: Colors.white,
         side: const BorderSide(color: Color(0xFF006462), width: 1.5),
       ),
+      drawerTheme: const DrawerThemeData(elevation: 4.0, backgroundColor: AppColors.bgLight),
       bottomSheetTheme: const BottomSheetThemeData(
         elevation: 8.0,
         showDragHandle: true,
