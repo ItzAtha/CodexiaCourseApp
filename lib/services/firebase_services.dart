@@ -30,59 +30,43 @@ class FirebaseServices {
     return uploadTask;
   }
 
-  Future<String?> downloadFile(String path) async {
-    String? extractedPath = _extractFilePathFromDownloadUrl(path);
+  Future<bool?> deleteFile(String filePath, String fileName) async {
+    String fullPath = '$filePath/$fileName';
+    bool isFileExists = await _isFileExists(fullPath);
 
-    if (extractedPath == null) {
-      return null;
-    }
+    if (!isFileExists) return null;
 
-    final storageRef = FirebaseStorage.instance.ref();
-    final url = await storageRef.child(extractedPath).getDownloadURL();
-    return url;
-  }
-
-  Future<bool> deleteFile(String path) async {
-    String? extractedPath = _extractFilePathFromDownloadUrl(path);
-
-    if (extractedPath != null) {
-      try {
-        final storageRef = FirebaseStorage.instance.ref();
-        await storageRef.child(extractedPath).delete();
-        return true;
-      } on FirebaseException catch (e) {
-        print('Firebase Storage deletion error: ${e.code} - ${e.message}');
-        if (e.code == 'object-not-found') {
-          print('The file you tried to delete does not exist.');
-        } else if (e.code == 'unauthorized') {
-          print(
-            'You do not have permission to delete this file. Check your Firebase Storage Security Rules.',
-          );
-        } else {
-          print('An unknown Firebase error occurred during deletion.');
-        }
-      } catch (e) {
-        print('An unknown error occurred during deletion: $e');
+    try {
+      final storageRef = FirebaseStorage.instance.ref();
+      await storageRef.child(fullPath).delete();
+      return true;
+    } on FirebaseException catch (e) {
+      print('Firebase Storage deletion error: ${e.code} - ${e.message}');
+      if (e.code == 'object-not-found') {
+        print('The file you tried to delete does not exist.');
+      } else if (e.code == 'unauthorized') {
+        print(
+          'You do not have permission to delete this file. Check your Firebase Storage Security Rules.',
+        );
+      } else {
+        print('An unknown Firebase error occurred during deletion.');
       }
+    } catch (e) {
+      print('An unknown error occurred during deletion: $e');
     }
     return false;
   }
 
-  String? _extractFilePathFromDownloadUrl(String downloadUrl) {
+  Future<bool> _isFileExists(String path) async {
     try {
-      final uri = Uri.parse(downloadUrl);
-      final pathSegments = uri.pathSegments;
-      final oIndex = pathSegments.indexOf('o');
-
-      if (oIndex == -1 || oIndex == pathSegments.length - 1) {
-        return null;
+      final ref = FirebaseStorage.instance.ref().child(path);
+      await ref.getMetadata();
+      return true;
+    } on FirebaseException catch (e) {
+      if (e.code == 'object-not-found') {
+        return false;
       }
-
-      final encodedFilePath = pathSegments.sublist(oIndex + 1).join('/');
-      return Uri.decodeFull(encodedFilePath);
-    } catch (e) {
-      print('Error parsing URL: $e');
-      return null;
+      rethrow;
     }
   }
 }
