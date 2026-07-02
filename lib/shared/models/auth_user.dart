@@ -10,10 +10,12 @@ abstract class AuthUser with _$AuthUser {
   const AuthUser._();
 
   const factory AuthUser({
+    @JsonKey(name: 'id') required String userId,
+
     required String username,
     required String email,
 
-    @Default('') String? displayName,
+    String? displayName,
     @Default('https://cdn-icons-png.flaticon.com/128/3135/3135715.png') String? avatar,
 
     required DateTime createdAt,
