@@ -92,6 +92,24 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           }
                           return null;
                         },
+                        contextMenuBuilder:
+                            (BuildContext context, EditableTextState editableTextState) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  iconButtonTheme: IconButtonThemeData(
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor: Colors.black,
+                                      shape: const RoundedRectangleBorder(),
+                                      elevation: 0,
+                                    ),
+                                  ),
+                                ),
+                                child: AdaptiveTextSelectionToolbar.editableText(
+                                  editableTextState: editableTextState,
+                                ),
+                              );
+                            },
                       ),
                       const SizedBox(height: 15.0),
                       Text(
@@ -118,6 +136,24 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
                           return null;
                         },
+                        contextMenuBuilder:
+                            (BuildContext context, EditableTextState editableTextState) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  iconButtonTheme: IconButtonThemeData(
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor: Colors.black,
+                                      shape: const RoundedRectangleBorder(),
+                                      elevation: 0,
+                                    ),
+                                  ),
+                                ),
+                                child: AdaptiveTextSelectionToolbar.editableText(
+                                  editableTextState: editableTextState,
+                                ),
+                              );
+                            },
                       ),
                       const SizedBox(height: 15.0),
                       Text(
@@ -154,6 +190,24 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           }
                           return null;
                         },
+                        contextMenuBuilder:
+                            (BuildContext context, EditableTextState editableTextState) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  iconButtonTheme: IconButtonThemeData(
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor: Colors.black,
+                                      shape: const RoundedRectangleBorder(),
+                                      elevation: 0,
+                                    ),
+                                  ),
+                                ),
+                                child: AdaptiveTextSelectionToolbar.editableText(
+                                  editableTextState: editableTextState,
+                                ),
+                              );
+                            },
                       ),
                       const SizedBox(height: 15.0),
                     ],

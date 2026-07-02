@@ -88,6 +88,23 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
                     return null;
                   },
+                  contextMenuBuilder: (BuildContext context, EditableTextState editableTextState) {
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        iconButtonTheme: IconButtonThemeData(
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.black,
+                            shape: const RoundedRectangleBorder(),
+                            elevation: 0,
+                          ),
+                        ),
+                      ),
+                      child: AdaptiveTextSelectionToolbar.editableText(
+                        editableTextState: editableTextState,
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 25.0),
                 ElevatedButton(
