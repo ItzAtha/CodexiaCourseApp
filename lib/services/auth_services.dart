@@ -264,20 +264,18 @@ class AuthService {
     UserInfo userInfo = userCredential.user!.providerData.first;
 
     final String userId = userCredential.user!.uid;
-    String provider = userInfo.providerId;
-
-    final String docId = '${userId}_$provider';
-    Map<String, dynamic>? existingUserData = await manager.getData("Users", docId);
+    Map<String, dynamic>? existingUserData = await manager.getData("Users", userId);
 
     if (existingUserData == null) {
       await manager.addData(
         "Users",
-        docId: docId,
+        docId: userId,
         data: {
+          "id": userId,
           "email": userInfo.email!,
           "username": userInfo.displayName ?? displayName,
           "displayName": null,
-          "avatar": null,
+          "avatar": userInfo.photoURL,
           "createdAt": DateTime.now().toIso8601String(),
           "lastSignIn": DateTime.now().toIso8601String(),
         },
@@ -290,7 +288,7 @@ class AuthService {
     } else {
       await manager.updateData(
         "Users",
-        docId,
+        userId,
         newData: {"lastSignIn": DateTime.now().toIso8601String()},
       );
     }
