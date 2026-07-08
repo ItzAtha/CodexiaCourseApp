@@ -17,6 +17,7 @@ abstract class UserChatChannel with _$UserChatChannel {
   const factory UserChatChannel({
     @JsonKey(name: 'id') required String channelId,
 
+    required String title,
     required ChatType type,
     required DateTime lastConversation,
 
