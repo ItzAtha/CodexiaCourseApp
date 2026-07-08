@@ -29,6 +29,7 @@ class AIChatBotPage extends ConsumerStatefulWidget {
 
 class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
   UserChatChannel? chatChannel;
+  DocumentSnapshot? lastDocumentSnapshot;
 
   final List<ChatMessageBubble> chatBubbles = [];
   final List<UserChatChannel> chatChannelList = [];
@@ -171,9 +172,11 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
   Future<void> loadChatData({required String channelId, int maxLoad = 6}) async {
     final lastDocumentLoad = await ref
         .read(authUserProvider.notifier)
-        .loadChatMessages(channelId, maxLoad: maxLoad);
+        .loadChatMessages(channelId, lastDocumentLoad: lastDocumentSnapshot, maxLoad: maxLoad);
 
     if (lastDocumentLoad != null) {
+      lastDocumentSnapshot = lastDocumentLoad;
+
       await loadChannelData(reload: true);
       chatChannel = chatChannelList.where((channel) => channel.channelId == channelId).firstOrNull;
 
@@ -200,25 +203,25 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
 
         chat = model.startChat(history: chatHistories);
         return;
+      } else {
+        Toastification().show(
+          title: const Text(
+            "Error Loading Chat",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          description: const Text(
+            "An error occurred when loading chat data. Please try again.",
+            style: TextStyle(color: Colors.white),
+          ),
+          type: ToastificationType.error,
+          alignment: Alignment.topCenter,
+          backgroundColor: Colors.red.shade400,
+          icon: const Icon(Icons.error, color: Colors.white),
+          autoCloseDuration: ToastAnimations.closeDuration,
+          animationDuration: ToastAnimations.animationDuration,
+        );
       }
     }
-
-    Toastification().show(
-      title: const Text(
-        "Error Loading Chat",
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      description: const Text(
-        "An error occurred when loading chat data. Please try again.",
-        style: TextStyle(color: Colors.white),
-      ),
-      type: ToastificationType.error,
-      alignment: Alignment.topCenter,
-      backgroundColor: Colors.red.shade400,
-      icon: const Icon(Icons.error, color: Colors.white),
-      autoCloseDuration: ToastAnimations.closeDuration,
-      animationDuration: ToastAnimations.animationDuration,
-    );
   }
 
   Future<bool> saveMessageHistory() async {
@@ -304,12 +307,10 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
           scrollController.position.pixels == scrollController.position.maxScrollExtent;
       showScrollableButton.value = !isReachBottom;
 
-      //  TODO: Change system to load chat data if user scroll to up
       if (isReachTop) {
-        // await controller.loadChatData(limit: limitDataLoad).then((value) {
-        //   debugPrint("Load chat data");
-        //   setState(() {});
-        // });
+        if (chatChannel != null) {
+          loadChatData(channelId: chatChannel?.channelId ?? '');
+        }
       }
     });
   }
@@ -438,7 +439,7 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
                               await loadChatData(channelId: chatChannel.channelId);
 
                               if (context.mounted) {
-                                context.pop();
+                                Scaffold.of(context).closeEndDrawer();
                               }
                             },
                           );
