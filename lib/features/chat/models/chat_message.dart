@@ -18,7 +18,7 @@ abstract class ChatMessage with _$ChatMessage {
     required String content,
     required Role role,
     required DateTime timestamp,
-  }) = _BotMessage;
+  }) = BotMessage;
 
   @FreezedUnionValue("USER")
   const factory ChatMessage.user({
@@ -27,7 +27,7 @@ abstract class ChatMessage with _$ChatMessage {
     required String content,
     required String senderId,
     required DateTime timestamp,
-  }) = _UserMessage;
+  }) = UserMessage;
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) => _$ChatMessageFromJson(json);
 }
