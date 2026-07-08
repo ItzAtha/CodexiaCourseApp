@@ -154,13 +154,14 @@ class AuthUserNotifier extends _$AuthUserNotifier {
     if (currentUser == null || state.value == null) return null;
 
     final List<UserChatChannel> chatChannelList = state.value!.chatChannels ?? [];
-    final List<ChatMessage> messageList = [];
 
     if (chatChannelList.isNotEmpty) {
       UserChatChannel? chatChannel = chatChannelList
           .where((channel) => channel.channelId == channelId)
           .firstOrNull;
       if (chatChannel != null) {
+        final List<ChatMessage> messageList = List.from(chatChannel.messages);
+
         final String userId = currentUser.uid;
         Query chatMessagesQuery = usersCollection
             .doc(userId)
