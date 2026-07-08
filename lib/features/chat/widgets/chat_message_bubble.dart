@@ -2,6 +2,8 @@ import 'package:codexia_course_learning/core/app_constants.dart' show AppColors,
 import 'package:codexia_course_learning/features/chat/models/chat_message.dart';
 import 'package:flutter/material.dart';
 
+import '../factory/chat_factory.dart';
+
 class ChatMessageBubble extends StatelessWidget {
   final String message;
   final Role role;
@@ -22,7 +24,7 @@ class ChatMessageBubble extends StatelessWidget {
         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
         child: role == Role.user
             ? Text(message, style: Theme.of(context).textTheme.labelLarge)
-            : Text(message, style: Theme.of(context).textTheme.labelLarge),
+            : Text.rich(TextSpan(children: ChatFactory(message: message).format())),
       ),
     );
   }
