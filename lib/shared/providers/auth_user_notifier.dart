@@ -148,13 +148,13 @@ class AuthUserNotifier extends _$AuthUserNotifier {
   Future<DocumentSnapshot?> loadChatMessages(
     String channelId, {
     DocumentSnapshot? lastDocumentLoad,
-    int maxLoad = 5,
+    int maxLoad = 6,
   }) async {
     final User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null || state.value == null) return null;
 
+    final List<UserChatChannel> chatChannelList = state.value!.chatChannels ?? [];
     final List<ChatMessage> messageList = [];
-    List<UserChatChannel> chatChannelList = state.value!.chatChannels ?? [];
 
     if (chatChannelList.isNotEmpty) {
       UserChatChannel? chatChannel = chatChannelList
@@ -181,9 +181,10 @@ class AuthUserNotifier extends _$AuthUserNotifier {
             messageList.add(ChatMessage.fromJson(data));
           }
 
+          messageList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
           final updatedChannels = chatChannelList.map((channel) {
             if (channel.channelId == channelId) {
-              return channel.copyWith(messages: [...channel.messages, ...messageList]);
+              return channel.copyWith(messages: [...messageList]);
             }
             return channel;
           }).toList();
