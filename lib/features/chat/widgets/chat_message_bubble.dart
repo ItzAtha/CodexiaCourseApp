@@ -21,10 +21,16 @@ class ChatMessageBubble extends StatelessWidget {
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: AppSizes.p8, horizontal: AppSizes.p12),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * (role == Role.user ? 0.8 : 0.85),
+        ),
         child: role == Role.user
-            ? Text(message, style: Theme.of(context).textTheme.labelLarge)
-            : Text.rich(TextSpan(children: ChatFactory(message: message).format())),
+            ? SelectableText(message, style: Theme.of(context).textTheme.labelLarge)
+            : Text.rich(
+                TextSpan(
+                  children: ChatFactory(context: context, message: message).format(),
+                ),
+              ),
       ),
     );
   }
