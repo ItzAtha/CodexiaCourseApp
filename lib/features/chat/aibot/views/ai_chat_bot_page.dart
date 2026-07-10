@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:toastification/toastification.dart';
@@ -276,10 +277,6 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
     }
   }
 
-  Future<void> unloadChannelData() async {
-    await ref.read(authUserProvider.notifier).unloadChatChannels();
-  }
-
   @override
   void initState() {
     super.initState();
@@ -317,7 +314,6 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
 
   @override
   void dispose() {
-    saveMessageHistory();
     scrollController.dispose();
     textEditingController.dispose();
     super.dispose();
@@ -336,328 +332,370 @@ class _AIChatBotPageState extends ConsumerState<AIChatBotPage> {
       isDarkMode = themeMode == AdaptiveThemeMode.dark;
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          chatChannel?.title ?? "Codexia AI",
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false,
-        automaticallyImplyActions: false,
-        flexibleSpace: SafeArea(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.primary.withValues(alpha: 0.6), AppColors.primary],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) => saveMessageHistory(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            chatChannel?.title ?? "Codexia AI",
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          automaticallyImplyLeading: false,
+          automaticallyImplyActions: false,
+          flexibleSpace: SafeArea(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppColors.primary.withValues(alpha: 0.6), AppColors.primary],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
               ),
             ),
           ),
-        ),
-        systemOverlayStyle: isDarkMode ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
-        leading: ValueListenableBuilder(
-          valueListenable: AdaptiveTheme.of(context).modeChangeNotifier,
-          builder: (_, mode, child) {
-            bool isDarkMode = false;
-            if (mode == AdaptiveThemeMode.system) {
-              isDarkMode = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
-            } else {
-              isDarkMode = mode == AdaptiveThemeMode.dark;
-            }
+          systemOverlayStyle: isDarkMode ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+          leading: ValueListenableBuilder(
+            valueListenable: AdaptiveTheme.of(context).modeChangeNotifier,
+            builder: (_, mode, child) {
+              bool isDarkMode = false;
+              if (mode == AdaptiveThemeMode.system) {
+                isDarkMode = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+              } else {
+                isDarkMode = mode == AdaptiveThemeMode.dark;
+              }
 
-            return IconButton(
-              onPressed: () async {
-                if (context.mounted) {
-                  context.pop();
-                }
-              },
-              icon: Icon(Icons.arrow_back, color: isDarkMode ? Colors.white : Colors.black),
-              style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.transparent)),
-            );
-          },
-        ),
-        actions: <Widget>[
-          Builder(
-            builder: (context) {
-              return ValueListenableBuilder(
-                valueListenable: AdaptiveTheme.of(context).modeChangeNotifier,
-                builder: (_, mode, child) {
-                  bool isDarkMode = false;
-                  if (mode == AdaptiveThemeMode.system) {
-                    isDarkMode = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
-                  } else {
-                    isDarkMode = mode == AdaptiveThemeMode.dark;
+              return IconButton(
+                onPressed: () async {
+                  if (context.mounted) {
+                    context.pop();
                   }
-
-                  return DrawerButton(
-                    onPressed: () async {
-                      Scaffold.of(context).openEndDrawer();
-                    },
-                    color: isDarkMode ? Colors.white : Colors.black,
-                    style: const ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(Colors.transparent),
-                    ),
-                  );
                 },
+                icon: Icon(Icons.arrow_back, color: isDarkMode ? Colors.white : Colors.black),
+                style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.transparent),
+                ),
               );
             },
           ),
-        ],
-      ),
-      endDrawer: SafeArea(
-        child: Drawer(
-          elevation: Theme.of(context).drawerTheme.elevation,
-          backgroundColor: Theme.of(context).drawerTheme.backgroundColor,
-          width: 240.0,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              DrawerHeader(
-                decoration: const BoxDecoration(color: AppColors.primary),
-                child: Text('Chat Histories', style: Theme.of(context).textTheme.titleLarge),
-              ),
+          actions: <Widget>[
+            Builder(
+              builder: (context) {
+                return ValueListenableBuilder(
+                  valueListenable: AdaptiveTheme.of(context).modeChangeNotifier,
+                  builder: (_, mode, child) {
+                    bool isDarkMode = false;
+                    if (mode == AdaptiveThemeMode.system) {
+                      isDarkMode = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+                    } else {
+                      isDarkMode = mode == AdaptiveThemeMode.dark;
+                    }
 
-              Expanded(
-                child: chatChannelList.isNotEmpty
-                    ? ListView.builder(
-                        padding: EdgeInsets.zero,
-                        itemCount: chatChannelList.length,
-                        itemBuilder: (context, index) {
-                          UserChatChannel chatChannel = chatChannelList[index];
+                    return DrawerButton(
+                      onPressed: () {
+                        Scaffold.of(context).openEndDrawer();
+                      },
+                      color: isDarkMode ? Colors.white : Colors.black,
+                      style: const ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll(Colors.transparent),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+        endDrawer: SafeArea(
+          child: Drawer(
+            elevation: Theme.of(context).drawerTheme.elevation,
+            backgroundColor: Theme.of(context).drawerTheme.backgroundColor,
+            width: 240.0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Builder(
+                  builder: (context) {
+                    return DrawerHeader(
+                      decoration: const BoxDecoration(color: AppColors.primary),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text('Chat Histories', style: Theme.of(context).textTheme.titleLarge),
+                          const SizedBox(height: 8.0),
+                          OutlinedButton.icon(
+                            onPressed: () async {
+                              await saveMessageHistory();
 
-                          return ListTile(
-                            title: Text(
-                              chatChannel.title,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                            dense: true,
-                            onTap: () async {
-                              await loadChatData(channelId: chatChannel.channelId);
+                              setState(() {
+                                chatChannel = null;
+                                lastDocumentSnapshot = null;
+                                chatBubbles.clear();
+                              });
 
                               if (context.mounted) {
                                 Scaffold.of(context).closeEndDrawer();
                               }
                             },
-                          );
-                        },
-                      )
-                    : Center(
-                        child: Text(
-                          "No chat history found.",
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+                            label: Text(
+                              "New Chat",
+                              style: Theme.of(
+                                context,
+                              ).textTheme.labelLarge?.copyWith(color: Colors.white),
+                            ),
+                            icon: const FaIcon(FontAwesomeIcons.penToSquare, color: Colors.white),
                           ),
-                        ),
-                      ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      body: SafeArea(
-        child: Stack(
-          children: <Widget>[
-            if (chatBubbles.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(AppSizes.p16),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(
-                        Icons.auto_awesome,
-                        size: 40.0,
-                        color: Theme.of(context).iconTheme.color,
-                      ),
-                      const SizedBox(width: 16.0),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text(
-                              "Hello, ${authUser?.displayName ?? authUser?.username ?? "Guest"}!",
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            Text(
-                              "What can I do to help?",
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).textTheme.titleSmall?.color?.withValues(alpha: 0.8),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-            Positioned.fill(
-              child: SingleChildScrollView(
-                controller: scrollController,
-                primary: false,
-                reverse: true,
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSizes.p16),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      const SizedBox(height: 8.0),
-                      ChatPlaceholder(children: <ChatMessageBubble>[...chatBubbles]),
-                      const SizedBox(height: 16.0),
-                      Text.rich(
-                        TextSpan(
-                          text: "Powered by ",
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Theme.of(
-                              context,
-                            ).textTheme.labelSmall?.color?.withValues(alpha: 0.6),
-                          ),
-                          children: [
-                            TextSpan(
-                              text: "Google Gemini",
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(
-                                  context,
-                                ).textTheme.labelSmall?.color?.withValues(alpha: 0.6),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 80.0),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                ValueListenableBuilder<bool>(
-                  valueListenable: showScrollableButton,
-                  builder: (context, value, child) {
-                    return Visibility(
-                      visible: value,
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                          padding: const EdgeInsets.all(AppSizes.p16),
-                          child: Material(
-                            elevation: 1.5,
-                            surfaceTintColor: Theme.of(context).cardColor,
-                            borderRadius: const BorderRadius.all(Radius.circular(32.0)),
-                            child: InkWell(
-                              borderRadius: const BorderRadius.all(Radius.circular(32.0)),
-                              onTap: () {
-                                scrollController.animateTo(
-                                  scrollController.position.minScrollExtent,
-                                  duration: const Duration(seconds: 1),
-                                  curve: Curves.easeOut,
-                                );
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(AppSizes.p8),
-                                child: Icon(
-                                  Icons.keyboard_arrow_down,
-                                  size: 28.0,
-                                  color: Theme.of(context).iconTheme.color,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                        ],
                       ),
                     );
                   },
                 ),
 
-                Card(
-                  clipBehavior: Clip.antiAlias,
-                  margin: const EdgeInsets.all(0.0),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16.0),
-                      topRight: Radius.circular(16.0),
-                    ),
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(AppSizes.p16),
-                    constraints: const BoxConstraints(minWidth: double.infinity, minHeight: 80.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        TextField(
-                          controller: textEditingController,
-                          minLines: 1,
-                          maxLines: 5,
-                          style: Theme.of(context).textTheme.labelLarge,
-                          keyboardType: TextInputType.multiline,
-                          textInputAction: TextInputAction.send,
-                          decoration: InputDecoration(
-                            suffixIcon: IconButton(
-                              onPressed: () async {
-                                String value = textEditingController.text.trim();
-                                if (value.isEmpty) return;
+                Expanded(
+                  child: chatChannelList.isNotEmpty
+                      ? ListView.builder(
+                          padding: EdgeInsets.zero,
+                          itemCount: chatChannelList.length,
+                          itemBuilder: (context, index) {
+                            UserChatChannel chatChannel = chatChannelList[index];
 
-                                if (context.mounted) {
-                                  textEditingController.clear();
-                                  FocusScope.of(context).unfocus();
+                            return ListTile(
+                              title: Text(
+                                chatChannel.title,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.titleSmall,
+                              ),
+                              dense: true,
+                              onTap: () async {
+                                if (this.chatChannel == null ||
+                                    this.chatChannel?.channelId != chatChannel.channelId) {
+                                  await loadChatData(channelId: chatChannel.channelId);
+
+                                  if (context.mounted) {
+                                    Scaffold.of(context).closeEndDrawer();
+                                  }
                                 }
-
-                                sendMessage(message: value);
                               },
-                              icon: const Icon(Icons.send),
-                              iconSize: 20.0,
-                              color: Theme.of(context).iconTheme.color,
-                            ),
-                            suffixIconConstraints: const BoxConstraints(
-                              minWidth: 40.0,
-                              minHeight: 40.0,
-                            ),
-                            hintText: 'Write prompt here',
-                            border: const OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                            );
+                          },
+                        )
+                      : Center(
+                          child: Text(
+                            "No chat history found.",
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
                             ),
                           ),
-                          contextMenuBuilder:
-                              (BuildContext context, EditableTextState editableTextState) {
-                                return Theme(
-                                  data: Theme.of(context).copyWith(
-                                    iconButtonTheme: IconButtonThemeData(
-                                      style: IconButton.styleFrom(
-                                        backgroundColor: Colors.transparent,
-                                        foregroundColor: Colors.black,
-                                        shape: const RoundedRectangleBorder(),
-                                        elevation: 0,
-                                      ),
-                                    ),
-                                  ),
-                                  child: AdaptiveTextSelectionToolbar.editableText(
-                                    editableTextState: editableTextState,
-                                  ),
-                                );
-                              },
+                        ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        body: SafeArea(
+          child: Stack(
+            children: <Widget>[
+              if (chatBubbles.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(AppSizes.p16),
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(
+                          Icons.auto_awesome,
+                          size: 40.0,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        const SizedBox(width: 16.0),
+                        Flexible(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                "Hello, ${authUser?.displayName ?? authUser?.username ?? "Guest"}!",
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              Text(
+                                "What can I do to help?",
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.titleSmall?.color?.withValues(alpha: 0.8),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-              ],
-            ),
-          ],
+
+              Positioned.fill(
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  primary: false,
+                  reverse: true,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSizes.p16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        const SizedBox(height: 8.0),
+                        ChatPlaceholder(children: <ChatMessageBubble>[...chatBubbles]),
+                        const SizedBox(height: 16.0),
+                        Text.rich(
+                          TextSpan(
+                            text: "Powered by ",
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).textTheme.labelSmall?.color?.withValues(alpha: 0.6),
+                            ),
+                            children: <InlineSpan>[
+                              TextSpan(
+                                text: "Google Gemini",
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.labelSmall?.color?.withValues(alpha: 0.6),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 80.0),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  ValueListenableBuilder<bool>(
+                    valueListenable: showScrollableButton,
+                    builder: (context, value, child) {
+                      return Visibility(
+                        visible: value,
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(AppSizes.p16),
+                            child: Material(
+                              elevation: 1.5,
+                              surfaceTintColor: Theme.of(context).cardColor,
+                              borderRadius: const BorderRadius.all(Radius.circular(32.0)),
+                              child: InkWell(
+                                borderRadius: const BorderRadius.all(Radius.circular(32.0)),
+                                onTap: () {
+                                  scrollController.animateTo(
+                                    scrollController.position.minScrollExtent,
+                                    duration: const Duration(seconds: 1),
+                                    curve: Curves.easeOut,
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(AppSizes.p8),
+                                  child: Icon(
+                                    Icons.keyboard_arrow_down,
+                                    size: 28.0,
+                                    color: Theme.of(context).iconTheme.color,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+                  Card(
+                    clipBehavior: Clip.antiAlias,
+                    margin: const EdgeInsets.all(0.0),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16.0),
+                        topRight: Radius.circular(16.0),
+                      ),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(AppSizes.p16),
+                      constraints: const BoxConstraints(minWidth: double.infinity, minHeight: 80.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          TextField(
+                            controller: textEditingController,
+                            minLines: 1,
+                            maxLines: 5,
+                            style: Theme.of(context).textTheme.labelLarge,
+                            keyboardType: TextInputType.multiline,
+                            textInputAction: TextInputAction.send,
+                            decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                                onPressed: () async {
+                                  String value = textEditingController.text.trim();
+                                  if (value.isEmpty) return;
+
+                                  if (context.mounted) {
+                                    textEditingController.clear();
+                                    FocusScope.of(context).unfocus();
+                                  }
+
+                                  sendMessage(message: value);
+                                },
+                                icon: const Icon(Icons.send),
+                                iconSize: 20.0,
+                                color: Theme.of(context).iconTheme.color,
+                              ),
+                              suffixIconConstraints: const BoxConstraints(
+                                minWidth: 40.0,
+                                minHeight: 40.0,
+                              ),
+                              hintText: 'Write prompt here',
+                              border: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                              ),
+                            ),
+                            contextMenuBuilder:
+                                (BuildContext context, EditableTextState editableTextState) {
+                                  return Theme(
+                                    data: Theme.of(context).copyWith(
+                                      iconButtonTheme: IconButtonThemeData(
+                                        style: IconButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          foregroundColor: Colors.black,
+                                          shape: const RoundedRectangleBorder(),
+                                          elevation: 0,
+                                        ),
+                                      ),
+                                    ),
+                                    child: AdaptiveTextSelectionToolbar.editableText(
+                                      editableTextState: editableTextState,
+                                    ),
+                                  );
+                                },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
